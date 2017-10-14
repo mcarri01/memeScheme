@@ -13,6 +13,8 @@ funEnv.addBind("+", add)
 funEnv.addBind("-", sub)
 funEnv.addBind("*", mult)
 funEnv.addBind("/", div)
+funEnv.addBind(">", greater)
+funEnv.addBind("<", less)
 funEnv.addBind("meme", defineVar)
 	
 

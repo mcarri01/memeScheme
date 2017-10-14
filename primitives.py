@@ -34,6 +34,26 @@ def div(args, varEnv, funEnv):
         return ("error", "Error: Memes unbounded")
     return ("not_error", arg_list[0] / arg_list[1])
 
+def greater(args, varEnv, funEnv):
+    arg_list = check_args(args, varEnv)
+    if arg_list == "error":
+        return ("error", "Error: Normie meme type")
+    if len(arg_list) != 2:
+        return ("error", "Error: Incorrect number of memes")
+    if arg_list[1] == 0:
+        return ("error", "Error: Memes unbounded")
+    return ("not_error", "spicy" if arg_list[0] > arg_list[1] else "normie")
+
+def less(args, varEnv, funEnv):
+    arg_list = check_args(args, varEnv)
+    if arg_list == "error":
+        return ("error", "Error: Normie meme type")
+    if len(arg_list) != 2:
+        return ("error", "Error: Incorrect number of memes")
+    if arg_list[1] == 0:
+        return ("error", "Error: Memes unbounded")
+    return ("not_error",  "spicy" if arg_list[0] < arg_list[1] else "normie")
+
 
 def defineVar(args, varEnv, funEnv):
     if len(args) != 2:
