@@ -64,6 +64,13 @@ def equal(args, varEnv, funEnv):
         return ("error", "Error: Memes unbounded")
     return ("not_error", "even-stevens" if arg_list[0] == arg_list[1] else "different-memes")
 
+def printVar(args, varEnv, funEnv):
+    arg_list = check_args(args, varEnv)
+    if arg_list == "error":
+        return ("error", "Error: Normie meme type")
+    if len(arg_list) != 1:
+        return ("error", "Error: Incorrect number of memes")
+    return ("not_error", arg_list[0])
 
 def defineVar(args, varEnv, funEnv):
     if len(args) != 2:

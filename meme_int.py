@@ -16,6 +16,7 @@ funEnv.addBind("/", div)
 funEnv.addBind(">", greater)
 funEnv.addBind("<", less)
 funEnv.addBind("=", equal)
+funEnv.addBind("print", printVar)
 funEnv.addBind("meme", defineVar)
 	
 
