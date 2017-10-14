@@ -32,7 +32,7 @@ def evaluate(filename, lines, lineCount):
 				fun = funEnv.getVal(expression[0])
 				expression.pop(0)
 			except:
-				RaiseException(lines[line], filename, lineCount + 1, "Where's the meme?")
+				RaiseException(lines[line], filename, lineCount + 1, "Error: Where's the meme?")
 			for token in expression:
 				args.append(token)
 
@@ -51,7 +51,7 @@ def main(filename):
 	for line in lines:
 		if line != '':
 			if line != "I like memes":
-				RaiseException(line, filename, lineCount + 1, "User does not like memes")
+				RaiseException(line, filename, lineCount + 1, "Error: User does not like memes")
 			else:
 				lineCount += 1
 				break
