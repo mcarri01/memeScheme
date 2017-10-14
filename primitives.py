@@ -3,7 +3,7 @@ from env import *
 def add(args, varEnv, funEnv):
     arg_list = check_args(args, varEnv)
     if arg_list == "error":
-        return ("error", "Error: Normie meme")    
+        return ("error", "Error: Normie meme type")  #wrong type
     if len(arg_list) != 2:
         return ("error", "Error: Incorrect number of memes")
     return ("not_error", arg_list[0] + arg_list[1])
@@ -11,7 +11,7 @@ def add(args, varEnv, funEnv):
 def sub(args, varEnv, funEnv):
     arg_list = check_args(args, varEnv)
     if arg_list == "error":
-        return ("error", "Error: Normie meme")    
+        return ("error", "Error: Normie meme type")
     if len(arg_list) != 2:
         return ("error", "Error: Incorrect number of memes")
     return ("not_error", arg_list[0] - arg_list[1])
@@ -19,7 +19,7 @@ def sub(args, varEnv, funEnv):
 def mult(args, varEnv, funEnv):
     arg_list = check_args(args, varEnv)
     if arg_list == "error":
-        return ("error", "Error: Normie meme")    
+        return ("error", "Error: Normie meme type")
     if len(arg_list) != 2:
         return ("error", "Error: Incorrect number of memes")
     return ("not_error", arg_list[0] * arg_list[1])
@@ -27,21 +27,39 @@ def mult(args, varEnv, funEnv):
 def div(args, varEnv, funEnv):
     arg_list = check_args(args, varEnv)
     if arg_list == "error":
-        return ("error", "Error: Normie meme")    
+        return ("error", "Error: Normie meme type")
     if len(arg_list) != 2:
         return ("error", "Error: Incorrect number of memes")
     if arg_list[1] == 0:
         return ("error", "Error: Memes unbounded")
     return ("not_error", arg_list[0] / arg_list[1])
 
-    # if val[1] == 0:
-    #     return "error"
-    # return val[0] / val[1]
 
 def defineVar(args, varEnv, funEnv):
-    varEnv.addBind(args[0], int(args[1]))
-    return ("not_error", args[0])
-    #return args[0]
+    if len(args) != 2:
+        return ("error", "Error: Incorrect number of memes")
+
+    set_as = check_args(args[1], varEnv)
+    if set_as == "error":
+        return ("error", "Error: Meme does not exist") #(val x y) but y doesn't exist
+    try:
+        temp = int(args[0])
+    except:
+        varEnv.addBind(args[0], int(args[1]))
+        return ("not_error", args[0])
+
+    return ("error", "Error: Normie meme type")       
+
+        
+
+
+    #if varEnv.addBind(args[0], int(args[1]))
+    #arg_list = check_args(args, varEnv)
+
+
+
+#(val x 2)
+
 
 
 def check_args(args, varEnv):
