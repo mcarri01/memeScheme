@@ -1,16 +1,17 @@
-def add(a, b):
-    return a + b
+def add(var, val, varEnv, funEnv):
+    return val[0] + val[1]
 
-def sub(a, b):
-    return a - b
+def sub(var, val, varEnv, funEnv):
+    return val[0] - val[1]
 
-def mult(a, b):
-	return a * b
+def mult(var, val, varEnv, funEnv):
+	return val[0] * val[1]
 
-def div(a, b):
-	if b == 0:
+def div(var, val, varEnv, funEnv):
+	if val[1] == 0:
 		return "error"
-	return a / b
+	return val[0] / val[1]
 
-def bind(var, b, c):
-	var[b] = c
+def defineVar(var, val, varEnv, funEnv):
+	varEnv.addBind(var, val[0])
+	return var
