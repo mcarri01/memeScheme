@@ -13,13 +13,6 @@ funEnv.addBind("-", sub)
 funEnv.addBind("*", mult)
 funEnv.addBind("/", div)
 funEnv.addBind("meme", defineVar)
-
-
-def getNextLine(lines, lineCount):
-	while lines[lineCount] == '':
-		lineCount += 1
-
-	return lines[lineCount], lineCount + 1
 	
 
 def evaluate(filename, lines, lineCount):
@@ -28,24 +21,17 @@ def evaluate(filename, lines, lineCount):
 		expression = lines[line].split()[::-1]
 		if len(expression) != 0:
 			fun = 0
-			val = []
-			var = 0
+			args = []
 			for token in expression:
 				try:
 					fun = funEnv.getVal(token)
 				except:
-					try:
-						val.append(varEnv.getVal(token))
-					except:
-						try:
-							val.append(int(token))
-						except:
-							# latex op sem for variable initializing  
-							var = token            
-			e = fun(var, val, varEnv, funEnv)
-			if e == "error":
-				RaiseException(lines[line], filename, lineCount + 1, "Memes unbounded")
-			print "-->", e
+					args.append(token)
+			error, val = fun(args, varEnv, funEnv)
+
+			if error == "error":
+				RaiseException(lines[line], filename, lineCount + 1, val)
+			print "-->", val
 
 def main(filename):
 	f = open(filename, 'r')
@@ -62,8 +48,6 @@ def main(filename):
 		lineCount += 1
 
 	lines = filter(lambda x: x != "I like memes", lines)
-	#lineInfo = (lines, lineCount)
-	#line, lineCount = getNextLine(lines, lineCount)
 	evaluate(filename, lines, lineCount)
 	
 
