@@ -1,4 +1,6 @@
 from env import *
+import inspect
+import itertools
 
 def add(args, varEnv, funEnv):
     arg_list = check_args(args, varEnv)
@@ -62,7 +64,7 @@ def equal(args, varEnv, funEnv):
         return ("error", "Error: Incorrect number of memes")
     if arg_list[1] == 0:
         return ("error", "Error: Memes unbounded")
-    return ("not_error", "even-stevens" if arg_list[0] == arg_list[1] else "different-memes")
+    return ("not_error", "spicy" if arg_list[0] == arg_list[1] else "normie")
 
 def printVar(args, varEnv, funEnv):
     arg_list = check_args(args, varEnv)
@@ -85,6 +87,27 @@ def defineVar(args, varEnv, funEnv):
         return ("not_error", args[0])
 
     return ("error", "Error: Normie meme type")       
+
+def conditional(args, varEnv, funEnv):
+    op = args[0]
+    args.remove(op)
+    condOp = funEnv.getVal(op)
+    condArgs = list(itertools.takewhile(lambda x: not funEnv.inEnv(x), args))
+
+    restList = list(itertools.dropwhile(lambda x: not funEnv.inEnv(x), args))
+    trueOp = restList.pop(0)
+    trueOp = funEnv.getVal(trueOp)
+    trueArgs = list(itertools.takewhile(lambda x: not funEnv.inEnv(x), restList))
+
+    restList =  list(itertools.dropwhile(lambda x: not funEnv.inEnv(x), restList))
+    falseOp = restList.pop(0)
+    falseOp = funEnv.getVal(falseOp)
+    falseArgs = list(itertools.takewhile(lambda x: not funEnv.inEnv(x), restList))
+
+    if condOp(condArgs, varEnv, funEnv) == ('not_error', 'spicy'):
+        return trueOp(trueArgs, varEnv, funEnv)
+    else:
+        return falseOp(falseArgs, varEnv, funEnv)
 
 def check_args(args, varEnv):
     arg_values = []

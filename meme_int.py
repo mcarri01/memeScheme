@@ -18,6 +18,7 @@ funEnv.addBind("<", less)
 funEnv.addBind("=", equal)
 funEnv.addBind("print", printVar)
 funEnv.addBind("meme", defineVar)
+funEnv.addBind("if", conditional)
 	
 
 def evaluate(filename, lines, lineCount):
@@ -27,11 +28,14 @@ def evaluate(filename, lines, lineCount):
 		if len(expression) != 0:
 			fun = 0
 			args = []
+			try:
+				fun = funEnv.getVal(expression[0])
+				expression.pop(0)
+			except:
+				RaiseException(lines[line], filename, lineCount + 1, "Where's the meme?")
 			for token in expression:
-				try:
-					fun = funEnv.getVal(token)
-				except:
-					args.append(token)
+				args.append(token)
+
 			error, val = fun(args, varEnv, funEnv)
 			varEnv.addBind("MEME", val)
 

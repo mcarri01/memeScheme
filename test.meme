@@ -1,6 +1,4 @@
 I like memes
 
-3 5 +
-MEME x meme
-x 2 +
-MEME x *
+3 y meme 4 y meme 4 5 > if
+y print
