@@ -5,7 +5,6 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
-	cout << argv[1];
 	string file = argv[1];
 
 	string command = "python meme_int.py ";

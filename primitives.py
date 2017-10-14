@@ -38,33 +38,19 @@ def div(args, varEnv, funEnv):
 def defineVar(args, varEnv, funEnv):
     if len(args) != 2:
         return ("error", "Error: Incorrect number of memes")
-
-    set_as = check_args(args[1], varEnv)
+    set_as = check_arg(args[1], varEnv)
     if set_as == "error":
         return ("error", "Error: Meme does not exist") #(val x y) but y doesn't exist
     try:
         temp = int(args[0])
     except:
-        varEnv.addBind(args[0], int(args[1]))
+        varEnv.addBind(args[0], set_as)
         return ("not_error", args[0])
 
     return ("error", "Error: Normie meme type")       
 
-        
-
-
-    #if varEnv.addBind(args[0], int(args[1]))
-    #arg_list = check_args(args, varEnv)
-
-
-
-#(val x 2)
-
-
-
 def check_args(args, varEnv):
     arg_values = []
-
     for arg in args:
         try:
             val = int(arg)
@@ -75,8 +61,17 @@ def check_args(args, varEnv):
                 arg_values.append(val)
             except:
                 return "error"
-
     return arg_values
 
-
-
+def check_arg(arg, varEnv):
+    argv = 0
+    try:
+        val = int(arg)
+        argv = val
+    except:
+        try:
+            val = varEnv.getVal(arg)
+            argv = val
+        except:
+            return "error"
+    return argv

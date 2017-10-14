@@ -6,6 +6,7 @@ from env import *
 
 # later rename normie memes
 varEnv = Environment(dict())
+varEnv.addBind("MEME", 0)
 # fun memes
 funEnv = Environment(dict())
 funEnv.addBind("+", add)
@@ -28,6 +29,7 @@ def evaluate(filename, lines, lineCount):
 				except:
 					args.append(token)
 			error, val = fun(args, varEnv, funEnv)
+			varEnv.addBind("MEME", val)
 
 			if error == "error":
 				RaiseException(lines[line], filename, lineCount + 1, val)
