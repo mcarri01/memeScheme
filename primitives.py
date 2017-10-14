@@ -1,5 +1,4 @@
 from env import *
-import inspect
 import itertools
 
 def add(args, varEnv, funEnv):
