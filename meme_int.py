@@ -7,6 +7,8 @@ from env import *
 # later rename normie memes
 varEnv = Environment(dict())
 varEnv.addBind("MEME", 0)
+varEnv.addBind("spicy", True)
+varEnv.addBind("normie", False)
 # fun memes
 funEnv = Environment(dict())
 funEnv.addBind("+", add)

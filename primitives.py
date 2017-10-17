@@ -90,7 +90,7 @@ def defineVar(args, varEnv, funEnv):
 def conditional(args, varEnv, funEnv):
     op = args[0]
     args.remove(op)
-    condOp = funEnv.getVal(op)
+
     condArgs = list(itertools.takewhile(lambda x: not funEnv.inEnv(x), args))
 
     restList = list(itertools.dropwhile(lambda x: not funEnv.inEnv(x), args))
@@ -103,10 +103,21 @@ def conditional(args, varEnv, funEnv):
     falseOp = funEnv.getVal(falseOp)
     falseArgs = list(itertools.takewhile(lambda x: not funEnv.inEnv(x), restList))
 
+    if varEnv.inEnv(op):
+        if varEnv.getVal(op) == True:
+            return trueOp(trueArgs, varEnv, funEnv)
+        elif varEnv.getVal(op) == False:
+            return falseOp(falseArgs, varEnv, funEnv)
+        else:
+            return ("error", "Error: Normie meme type") 
+
+    condOp = funEnv.getVal(op)
     if condOp(condArgs, varEnv, funEnv) == ('not_error', 'spicy'):
         return trueOp(trueArgs, varEnv, funEnv)
-    else:
+    elif condOp(condArgs, varEnv, funEnv) == ('not_error', 'normie'):
         return falseOp(falseArgs, varEnv, funEnv)
+    else:
+        return ("error", "Error: Normie meme type")         
 
 def check_args(args, varEnv):
     arg_values = []
@@ -134,3 +145,6 @@ def check_arg(arg, varEnv):
         except:
             return "error"
     return argv
+
+
+    
