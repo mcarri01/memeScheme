@@ -9,6 +9,7 @@ varEnv = Environment(dict())
 varEnv.addBind("MEME", 0)
 varEnv.addBind("spicy", True)
 varEnv.addBind("normie", False)
+varEnv.addBind("mild", 0)
 # fun memes
 funEnv = Environment(dict())
 funEnv.addBind("+", add)
@@ -28,10 +29,10 @@ def evaluate(filename, lines, lineCount):
 		lineCount += 1
 		expression = lines[line].split()[::-1]
 		if len(expression) != 0:
-			fun = 0
+			fun = 0 #purpose of this line?
 			args = []
 			try:
-				fun = funEnv.getVal(expression[0])
+				fun = funEnv.getVal(expression[0], "function")
 				expression.pop(0)
 			except:
 				RaiseException(lines[line], filename, lineCount + 1, "Error: Where's the meme?")
@@ -39,7 +40,7 @@ def evaluate(filename, lines, lineCount):
 				args.append(token)
 
 			error, val = fun(args, varEnv, funEnv)
-			varEnv.addBind("MEME", val)
+			varEnv.addBindMEME("MEME", val)
 
 			if error == "error":
 				RaiseException(lines[line], filename, lineCount + 1, val)
