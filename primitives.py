@@ -165,9 +165,9 @@ def check_args(args, varEnv):
             arg_values.append(arg[0])
             continue
         if arg[0] == "mild" and arg[1] == "bool":
-            mildVal = lambda: "spicy" if randint(0,1) == 0 else "normie"
-            arg_values.append(mildVal())
-            continue
+           mildVal = lambda: "spicy" if randint(0,1) == 0 else "normie"
+           arg_values.append(mildVal())
+           continue
         if (arg[0] == "spicy" or arg[0] == "normie" or arg[0] == "mild") and arg[1] != "bool":
             return "error"
         try:
@@ -179,19 +179,22 @@ def check_args(args, varEnv):
         except:
             if varEnv.inEnvandType(arg[0], arg[1]):
                 val = varEnv.getVal(arg[0], arg[1])
+                if val == "mild":
+                    mildVal = lambda: "spicy" if randint(0,1) == 0 else "normie"
+                    val = mildVal()
                 arg_values.append(val)
             else:
                 return "error"
     return arg_values
 
+#this function is only called by defineVar.  if in the future, another function
+#needs to call this function we might have to change how the case of mild is
+#handled.
 def check_arg(arg, varEnv):
     argv = 0
     try:
-        if arg == "spicy" or arg == "normie":
+        if arg == "spicy" or arg == "normie" or arg == "mild":
             argv = arg
-        elif arg == "mild":
-            mildVal = lambda: "spicy" if randint(0,1) == 0 else "normie"
-            argv = mildVal()
         else:
             val = int(arg)
             argv = val
