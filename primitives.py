@@ -101,6 +101,19 @@ def equal(args, varEnv, funEnv):
         return ("error", "Error: Memes unbounded")
     return ("not_error", "spicy" if arg_list[0] == arg_list[1] else "normie")
 
+
+def notEqual(args, varEnv, funEnv):
+    arg_list = get_args_with_orig_type(args, varEnv)
+
+    if arg_list == "error":
+        return ("error", "Error: Normie meme type")
+    if len(arg_list) != 2:
+        return ("error", "Error: Incorrect number of memes")
+    if arg_list[1] == 0:
+        return ("error", "Error: Memes unbounded")
+    return ("not_error", "spicy" if arg_list[0] != arg_list[1] else "normie")
+
+
 def printVar(args, varEnv, funEnv):
     arg_list = get_args_with_orig_type(args, varEnv)
     if arg_list == "error":
