@@ -130,19 +130,36 @@ def conditional(args, varEnv, funEnv):
     condArgs = list(itertools.takewhile(lambda x: not funEnv.inEnv(x), args))
 
     restList = list(itertools.dropwhile(lambda x: not funEnv.inEnv(x), args))
+    if len(filter(lambda x: funEnv.inEnv(x), restList)) != 2:
+        return ("error", "Error: Bad meme format")
+
     trueOp = restList.pop(0)
     trueOp = funEnv.getVal(trueOp, "function")
     trueArgs = list(itertools.takewhile(lambda x: not funEnv.inEnv(x), restList))
+    try:    #handles the bad format case of 1 print + x normie = if
+        trueOp(trueArgs, varEnv, funEnv)
+    except:
+        return ("error", "Error: Bad meme format")
 
     restList =  list(itertools.dropwhile(lambda x: not funEnv.inEnv(x), restList))
+
     falseOp = restList.pop(0)
     falseOp = funEnv.getVal(falseOp, "function")
     falseArgs = list(itertools.takewhile(lambda x: not funEnv.inEnv(x), restList))
+    try:    #handles the bad format case of + 1 print x spicy = if
+        falseOp(falseArgs, varEnv, funEnv)
+    except:
+        return ("error", "Error: Bad meme format")
 
     if varEnv.inEnv(op):
-        if varEnv.getVal(op, "bool") == True:
+        if (op == "mild" or varEnv.getVal(op, "bool") == "mild") and randint(0,1) == 0:
+            op = "spicy"
+        elif op == "mild" or varEnv.getVal(op, "bool") == "mild":
+            op = "normie"
+
+        if op == "spicy" or varEnv.getVal(op, "bool") == "spicy":
             return trueOp(trueArgs, varEnv, funEnv)
-        elif varEnv.getVal(op, "bool") == False:
+        elif op == "normie" or varEnv.getVal(op, "bool") == "normie":
             return falseOp(falseArgs, varEnv, funEnv)
         else:
             return ("error", "Error: Normie meme type") 
