@@ -113,6 +113,65 @@ def notEqual(args, varEnv, funEnv):
         return ("error", "Error: Memes unbounded")
     return ("not_error", "spicy" if arg_list[0] != arg_list[1] else "normie")
 
+def boolAnd(args, varEnv, funEnv):
+    arg_list = get_args_with_types(args, "bool", varEnv)
+
+    if arg_list == "error":
+        return ("error", "Error: Normie meme type")
+    if len(arg_list) != 2:
+        return ("error", "Error: Incorrect number of memes")
+    if arg_list[1] == 0:
+        return ("error", "Error: Memes unbounded")
+
+    for arg in arg_list:
+        if arg == "mild":
+            if randint(0,1) == 0:
+                arg = "spicy"
+            else:
+                arg = "normie"
+    return ("not_error", "spicy" if arg_list[0] == arg_list[1] else "normie")
+
+
+def boolOr(args, varEnv, funEnv):
+    arg_list = get_args_with_types(args, "bool", varEnv)
+
+    if arg_list == "error":
+        return ("error", "Error: Normie meme type")
+    if len(arg_list) != 2:
+        return ("error", "Error: Incorrect number of memes")
+    if arg_list[1] == 0:
+        return ("error", "Error: Memes unbounded")
+
+    for arg in arg_list:
+        if arg == "mild":
+            if randint(0,1) == 0:
+                arg = "spicy"
+            else:
+                arg = "normie"
+    return ("not_error", "spicy" if arg_list[0] == "spicy" or arg_list[1] == "spicy" else "normie")
+
+
+def boolNot(args, varEnv, funEnv):
+    if len(args) != 1:
+        return ("error", "Error: Incorrect number of memes")
+    if args[0] == "spicy" or args[0] == "normie" or args[0] == "mild":
+        arg = args[0]
+    else:
+        if varEnv.inEnvandType(args[0], "bool"):
+            arg = varEnv.getVal(args[0], "bool")
+        elif varEnv.inEnv(args[0]):
+            return ("error", "Error: Normie meme type")
+        else:
+            return ("error", "Error: Meme does not exist")
+
+    if arg == "mild":
+        if randint(0,1) == 1:
+            arg = "spicy"
+        else:
+            arg = "normie"
+
+    return ("not_error", "spicy" if arg == "normie" else "normie")
+
 
 def printVar(args, varEnv, funEnv):
     arg_list = get_args_with_orig_type(args, varEnv)
@@ -230,7 +289,7 @@ def check_arg(arg, varEnv):
             argv = val
     except:
         try:
-            val = varEnv.getVal(arg, getType(arg))
+            val = varEnv.getVal(arg, getTypeOfVal(arg))
             argv = val
         except:
             return "error"
@@ -238,7 +297,7 @@ def check_arg(arg, varEnv):
 
 
 
-def getType(arg):
+def getTypeOfVal(arg):
     if arg == "spicy" or arg == "normie" or arg == "mild":
         return "bool"
     elif isinstance(arg, int):
