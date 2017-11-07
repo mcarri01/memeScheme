@@ -1,6 +1,7 @@
 from env import *
 from random import *
 import itertools
+import operator
 
 def get_args_with_orig_type(args, env):
     args_with_orig_types = []
@@ -34,122 +35,87 @@ def get_args_with_types(args, desired_type, env):
     return check_args(args_with_types, env)
 
 
-def add(args, varEnv, funEnv):
-
+def arithmetic(op, args, varEnv, funEnv):
     arg_list = get_args_with_types(args, "int", varEnv)
 
     if arg_list == "error":
         return ("error", "Error: Normie meme type")  #wrong type #make sure this error still works
     if len(arg_list) != 2:
         return ("error", "Error: Incorrect number of memes")
-    return ("not_error", arg_list[0] + arg_list[1])
+    return ("not_error", op(arg_list[0], arg_list[1]))
 
+def add(args, varEnv, funEnv):
+    return arithmetic(operator.add, args, varEnv, funEnv)
 def sub(args, varEnv, funEnv):
-    arg_list = get_args_with_types(args, "int", varEnv)
-    if arg_list == "error":
-        return ("error", "Error: Normie meme type")
-    if len(arg_list) != 2:
-        return ("error", "Error: Incorrect number of memes")
-    return ("not_error", arg_list[0] - arg_list[1])
-
-def mult(args, varEnv, funEnv):
-    arg_list = get_args_with_types(args, "int", varEnv)
-    if arg_list == "error":
-        return ("error", "Error: Normie meme type")
-    if len(arg_list) != 2:
-        return ("error", "Error: Incorrect number of memes")
-    return ("not_error", arg_list[0] * arg_list[1])
-
+    return arithmetic(operator.sub, args, varEnv, funEnv)
+def mul(args, varEnv, funEnv):
+    return arithmetic(operator.mul, args, varEnv, funEnv)
 def div(args, varEnv, funEnv):
-    arg_list = get_args_with_types(args, "int", varEnv)
-    if arg_list == "error":
-        return ("error", "Error: Normie meme type")
-    if len(arg_list) != 2:
-        return ("error", "Error: Incorrect number of memes")
     if arg_list[1] == 0:
         return ("error", "Error: Memes unbounded")
-    return ("not_error", arg_list[0] / arg_list[1])
+    return arithmetic(operator.div, args, varEnv, funEnv)
+
+
+def int_comparison(op, args, varEnv, funEnv):
+    arg_list = get_args_with_types(args, "int", varEnv)
+
+    if arg_list == "error":
+        return ("error", "Error: Normie meme type")  #wrong type #make sure this error still works
+    if len(arg_list) != 2:
+        return ("error", "Error: Incorrect number of memes")
+    return ("not_error", "spicy" if op(arg_list[0], arg_list[1]) else "normie")
 
 def greater(args, varEnv, funEnv):
-    arg_list = get_args_with_types(args, "int", varEnv)
-    if arg_list == "error":
-        return ("error", "Error: Normie meme type")
-    if len(arg_list) != 2:
-        return ("error", "Error: Incorrect number of memes")
-    if arg_list[1] == 0:
-        return ("error", "Error: Memes unbounded")
-    return ("not_error", "spicy" if arg_list[0] > arg_list[1] else "normie")
-
+    return int_comparison(operator.gt, args, varEnv, funEnv)
 def less(args, varEnv, funEnv):
-    arg_list = get_args_with_types(args, "int", varEnv)
+    return int_comparison(operator.lt, args, varEnv, funEnv)
+def geq(args, varEnv, funEnv):
+    return int_comparison(operator.ge, args, varEnv, funEnv)
+def leq(args, varEnv, funEnv):
+    return int_comparison(operator.le, args, varEnv, funEnv)
+
+def eq_and_neq(op, args, varEnv, funEnv):
+    arg_list = get_args_with_orig_type(args, varEnv)
+
     if arg_list == "error":
-        return ("error", "Error: Normie meme type")
+        return ("error", "Error: Normie meme type")  #wrong type #make sure this error still works
     if len(arg_list) != 2:
         return ("error", "Error: Incorrect number of memes")
-    if arg_list[1] == 0:
-        return ("error", "Error: Memes unbounded")
-    return ("not_error",  "spicy" if arg_list[0] < arg_list[1] else "normie")
+    return ("not_error", "spicy" if op(arg_list[0], arg_list[1]) else "normie")
 
 def equal(args, varEnv, funEnv):
-    arg_list = get_args_with_orig_type(args, varEnv)
-
-    if arg_list == "error":
-        return ("error", "Error: Normie meme type")
-    if len(arg_list) != 2:
-        return ("error", "Error: Incorrect number of memes")
-    if arg_list[1] == 0:
-        return ("error", "Error: Memes unbounded")
-    return ("not_error", "spicy" if arg_list[0] == arg_list[1] else "normie")
-
-
+    return eq_and_neq(operator.eq, args, varEnv, funEnv)
 def notEqual(args, varEnv, funEnv):
-    arg_list = get_args_with_orig_type(args, varEnv)
+    return eq_and_neq(operator.ne, args, varEnv, funEnv)
+
+
+def boolean_operations(op, args, varEnv, funEnv):
+    arg_list = get_args_with_types(args, "bool", varEnv)
 
     if arg_list == "error":
         return ("error", "Error: Normie meme type")
     if len(arg_list) != 2:
         return ("error", "Error: Incorrect number of memes")
-    if arg_list[1] == 0:
-        return ("error", "Error: Memes unbounded")
-    return ("not_error", "spicy" if arg_list[0] != arg_list[1] else "normie")
+
+    for i in range(len(arg_list)):
+        if arg_list[i] == "mild":
+            if randint(0,1) == 0:
+                arg_list[i] = True
+            else:
+                arg_list[i] = False
+        elif arg_list[i] == "spicy":
+            arg_list[i] = True
+        else: #arg_list[i] == "normie"
+            arg_list[i] = False
+
+    return ("not_error", "spicy" if op(arg_list[0], arg_list[1]) else "normie")
 
 def boolAnd(args, varEnv, funEnv):
-    arg_list = get_args_with_types(args, "bool", varEnv)
-
-    if arg_list == "error":
-        return ("error", "Error: Normie meme type")
-    if len(arg_list) != 2:
-        return ("error", "Error: Incorrect number of memes")
-    if arg_list[1] == 0:
-        return ("error", "Error: Memes unbounded")
-
-    for arg in arg_list:
-        if arg == "mild":
-            if randint(0,1) == 0:
-                arg = "spicy"
-            else:
-                arg = "normie"
-    return ("not_error", "spicy" if arg_list[0] == arg_list[1] else "normie")
-
-
+    return boolean_operations(operator.and_, args, varEnv, funEnv)
 def boolOr(args, varEnv, funEnv):
-    arg_list = get_args_with_types(args, "bool", varEnv)
-
-    if arg_list == "error":
-        return ("error", "Error: Normie meme type")
-    if len(arg_list) != 2:
-        return ("error", "Error: Incorrect number of memes")
-    if arg_list[1] == 0:
-        return ("error", "Error: Memes unbounded")
-
-    for arg in arg_list:
-        if arg == "mild":
-            if randint(0,1) == 0:
-                arg = "spicy"
-            else:
-                arg = "normie"
-    return ("not_error", "spicy" if arg_list[0] == "spicy" or arg_list[1] == "spicy" else "normie")
-
+    return boolean_operations(operator.or_, args, varEnv, funEnv)
+def boolXor(args, varEnv, funEnv):
+    return boolean_operations(operator.xor, args, varEnv, funEnv)
 
 def boolNot(args, varEnv, funEnv):
     if len(args) != 1:
@@ -171,6 +137,22 @@ def boolNot(args, varEnv, funEnv):
             arg = "normie"
 
     return ("not_error", "spicy" if arg == "normie" else "normie")
+
+def larger_and_smaller(args, varEnv, funEnv):
+    if len(args) != 1:
+        return ("error", "Error: Incorrect number of memes")
+    try:
+        if isinstance(int(args[0]), int):
+            arg = args[0]
+    except:
+        if varEnv.inEnvandType(args[0], "int"):
+            arg = varEnv.getVal(args[0], "int")
+        elif varEnv.inEnv(args[0]):
+            return ("error", "Error: Normie meme type")
+        else:
+            return ("error", "Error: Meme does not exist")
+
+    return ("not_error", "spicy" if randint(0,1) == 0 else "normie")
 
 
 def printVar(args, varEnv, funEnv):
