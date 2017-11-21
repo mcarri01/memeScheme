@@ -11,16 +11,23 @@ def arithmetic(op, args, varEnv):
     if len(args) != 2:
         return ("error", "Error: Incorrect number of memes")
 
-    args = specific_type_dot(args, "int", varEnv)
-    if args[0] == "error":
-        return args
-    arg_list = get_args_with_types(args, "int", varEnv)
+    constraints = [lambda: "int", lambda: "int"]
 
-    if arg_list[0] == "error":
-        return arg_list
-    if arg_list[1] == 0 and op == operator.div:
+    cleanArgs = [] # strips dot from argument name
+    for i in range(len(args)):
+        toAppend = specific_type(args[i], constraints[i], varEnv)
+        if toAppend[0] == "error":
+            return toAppend
+        cleanArgs.append(toAppend)
+
+
+    val_list = [] # values with correct type
+    for i in range(len(cleanArgs)):
+        val_list.append(getValofType(cleanArgs[i], constraints[i], varEnv))
+
+    if val_list[1] == 0 and op == operator.div:
         return ("error", "Error: Memes unbounded")
-    return ("not_error", op(arg_list[0], arg_list[1]))
+    return ("not_error", op(val_list[0], val_list[1]))
 
 
 def add(args, varEnv, funEnv):
@@ -37,14 +44,29 @@ def int_comparison(op, args, varEnv):
     if len(args) != 2:
         return ("error", "Error: Incorrect number of memes")
 
-    args = specific_type_dot(args, "int", varEnv)
-    if args[0] == "error":
-        return args
-    arg_list = get_args_with_types(args, "int", varEnv)
+    constB = [lambda: ["int", "string"]]
+    constA = constB
+    constraints = [constA, constB]
 
-    if arg_list[0] == "error":
-        return arg_list
-    return ("not_error", "spicy" if op(arg_list[0], arg_list[1]) else "normie")
+    # print constraints[0][0]()   #int, string
+    # print constraints[1][0]()   #int, string
+    # constraints[0][0] = lambda: ["int"]
+    # print constraints[0][0]()   #int
+    # print constraints[1][0]()   #int
+
+    cleanArgs = [] # strips dot from argument name
+    for i in range(len(args)):
+        (toAppend, constraints[i][0]) = general_type(args[i], constraints[i], varEnv)
+        if toAppend[0] == "error":
+            return toAppend
+        cleanArgs.append(toAppend)
+
+    constraints[0][0] = constraintCheck(cleanArgs[0], constraints[0], varEnv)
+    val_list = [] # values with correct type
+    for i in range(len(cleanArgs)):
+        val_list.append(getValofType(cleanArgs[i], constraints[i][0], varEnv))
+
+    return ("not_error", "spicy" if op(val_list[0], val_list[1]) else "normie")
 
 
 def greater(args, varEnv, funEnv):
@@ -62,6 +84,7 @@ def eq_and_neq(op, args, varEnv, funEnv):
         return ("error", "Error: Incorrect number of memes")
 
     arg_list = same_dot(args, varEnv)
+
     if arg_list[0] == "error":
         return arg_list
 
@@ -160,7 +183,7 @@ def defineVar(args, varEnv, funEnv):
     # otherwise this would break it:
     # 1 error meme
     # 2 error +
-    if isIntorBool(args[0]) or args[0] == "error":
+    if isIntBoolorString(args[0]) or args[0] == "error":
         return ("error", "Error: Meme is reserved")
     if "." in args[0]:
         return ("error", "Error: Dot cannot appear in meme name")

@@ -1,0 +1,93 @@
+
+I like memes
+
+!@ Comparison #$
+
+!@ Errors #$
+!@
+1 a meme
+spicy b meme
+1 2 3 <
+1.int 1 <
+spicy.int 1 <
+"hello".int 1 <
+a.in 1 <
+b.bool 1 <
+b.int 1 <
+c.int 1 <
+1 c <
+1 b >
+
+spicy 1 <
+"hello" 1 <
+#$
+
+!@ Test with two literals #$
+1 1 <=
+"hello" "hello" <=
+
+!@ Tests with one variable of a singular type #$
+1 x meme
+x.int 1 <=
+1 x.int <=
+x 1 <=
+1 x <=
+x.int x.int <=
+x x <=
+
+"hello" a meme
+a.string "goodbye" <=
+"goodbye" a.string <=
+a "goodbye" <=
+"goodbye" a <=
+a.string a.string <=
+a a <=
+
+
+!@ Tests with one variable of multiple types
+   int was declared first #$
+"hello" x meme
+x.int 1 <=
+1 x.int <=
+x 1 <=
+1 x <=
+x.int x.int <=
+
+!@ Tests with two variables, one of a singular type, one of multiple types
+   int was declared first for both variables #$
+2 y meme
+x y <=
+y.int x <=
+x y.int <=
+x.int y <=
+y x.int <= 
+x.int y.int <=
+
+2 a meme
+x a <=
+a.int x <=
+x a.int <=
+x.int a <=
+a x.int <= 
+x.int a.int <=
+
+!@ Tests with two variables, both of multiple types #$
+"hello" y meme
+x y >
+y.int x >=
+x y.int >=
+x.int y >=
+y x.int >= 
+x.int y.int >=
+
+spicy q meme
+2 q meme
+"hello" q meme
+"hello" r meme
+1 r meme
+
+q.string r.string <=
+r.int q.int <=
+q r <=
+r q <=
+

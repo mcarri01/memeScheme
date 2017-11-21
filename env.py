@@ -1,12 +1,17 @@
 def getType(arg):  #make this private
 	if arg == "spicy" or arg == "normie" or arg == "mild" or arg == True or arg == False:
 		return "bool"
-	elif isinstance(arg, int):
-		return "int"
-	elif arg == "MEME":
-		return "int_or_bool"
-	else:
-		return "function"
+	try:
+		if isinstance(int(arg), int):
+			return "int"
+	except:
+			argStr = str(arg)
+			if argStr[0] == "\"" and argStr[-1] == "\"":
+				return "string"
+			if arg == "MEME":
+				return "meme_type"
+			else:
+				return "function"
 
 
 class Environment:
@@ -65,6 +70,15 @@ class Environment:
 	def getOrigType(self, var):
 		if self.inEnv(var):
 			return self.env[var][0][1]
+
+	def getVarTypes(self, var):
+		if self.inEnv(var):
+			typeList = []
+			for i in range(len(self.env[var])):
+				typeList.append(self.env[var][i][1])
+			return typeList
+
+
 
 
 

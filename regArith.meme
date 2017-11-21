@@ -1,0 +1,68 @@
+
+I like memes
+
+!@ Arithmetic #$
+
+
+!@ Errors #$
+!@
+1 a meme
+spicy b meme
+1 +
+1 2 3 +
+1.int 1 +
+spicy.int 1 +
+"hello".int 1 +
+a.in 1 +
+b.bool 1 +
+b.int 1 +
+c.int 1 +
+spicy 1 +
+"hello" 1 +
+0 3 /
+#$
+
+!@ Test with two literals #$
+1 1 +
+
+!@ Tests with one variable of a singular type #$
+1 x meme
+x.int 1 +
+1 x.int +
+x 1 +
+1 x +
+x.int x.int +
+x x +
+
+!@ Tests with one variable of multiple types
+   int was declared first #$
+spicy x meme
+x.int 1 +
+1 x.int +
+x 1 +
+1 x +
+x.int x.int +
+x x +
+
+!@ Tests with two variables, one of a singular type, one of multiple types
+   int was declared first for both variables #$
+1 y meme
+x y +
+y.int x +
+x y.int +
+x.int y +
+y x.int + 
+x.int y.int +
+
+!@ Tests with two variables, both of multiple types #$
+spicy y meme
+x y +
+y.int x +
+x y.int +
+x.int y +
+y x.int + 
+x.int y.int +
+
+
+
+
