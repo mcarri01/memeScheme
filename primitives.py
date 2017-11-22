@@ -79,21 +79,55 @@ def leq(args, varEnv, funEnv):
     return int_comparison(operator.le, args, varEnv)
 
 
-def eq_and_neq(op, args, varEnv, funEnv):
+
+
+
+def eq_and_neq(op, args, varEnv):
     if len(args) != 2:
         return ("error", "Error: Incorrect number of memes")
 
-    arg_list = same_dot(args, varEnv)
+    constB = [lambda: ["int", "bool", "string"]]
+    constA = constB
+    constraints = [constA, constB]
 
-    if arg_list[0] == "error":
-        return arg_list
+    cleanArgs = [] # strips dot from argument name
+    for i in range(len(args)):
+        (toAppend, constraints[i][0]) = general_type(args[i], constraints[i], varEnv)
+        if toAppend[0] == "error":
+            return toAppend
+        cleanArgs.append(toAppend)
 
-    return ("not_error", "spicy" if op(arg_list[0], arg_list[1]) else "normie")
+    constraints[0][0] = constraintCheck(cleanArgs[0], constraints[0], varEnv)
+    val_list = [] # values with correct type
+    for i in range(len(cleanArgs)):
+        val_list.append(getValofType(cleanArgs[i], constraints[i][0], varEnv))
+
+    return ("not_error", "spicy" if op(val_list[0], val_list[1]) else "normie")
+
+
+
+
+
+
+
+# def eq_and_neq(op, args, varEnv, funEnv):
+#     if len(args) != 2:
+#         return ("error", "Error: Incorrect number of memes")
+
+#     arg_list = same_dot(args, varEnv)
+
+#     if arg_list[0] == "error":
+#         return arg_list
+
+#     return ("not_error", "spicy" if op(arg_list[0], arg_list[1]) else "normie")
+
+
+
 
 def equal(args, varEnv, funEnv):
-    return eq_and_neq(operator.eq, args, varEnv, funEnv)
+    return eq_and_neq(operator.eq, args, varEnv)
 def notEqual(args, varEnv, funEnv):
-    return eq_and_neq(operator.ne, args, varEnv, funEnv)
+    return eq_and_neq(operator.ne, args, varEnv)
 
 
 def boolean_operations(op, args, varEnv):
