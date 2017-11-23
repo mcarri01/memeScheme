@@ -1,0 +1,74 @@
+
+I like memes
+
+!@ Booleans (arrity: 2) #$
+
+empty
+
+!@ Errors #$
+
+spicy a meme
+33 b meme
+spicy and check-error
+spicy normie spicy and check-error
+spicy.bool spicy and check-error
+33.bool spicy and check-error
+"hello".bool spicy and check-error
+a.bol spicy and check-error
+b.bool spicy and check-error
+a.int spicy and check-error
+c.bool spicy and check-error
+33 spicy and check-error
+"hello" spicy and check-error
+c spicy and check-error
+
+
+!@ Test with two literals #$
+spicy spicy spicy and check-expect
+normie normie spicy and check-expect
+spicy normie spicy or check-expect
+
+
+!@ Tests with one variable of a singular type #$
+spicy x meme
+spicy x.bool spicy and check-expect
+spicy spicy x.bool and check-expect
+spicy x spicy and check-expect
+spicy spicy x and check-expect
+spicy x.bool x.bool and check-expect
+spicy x x and check-expect
+
+!@ Tests with one variable of multiple types
+   int was declared first #$
+33 x meme
+spicy x.bool spicy and check-expect
+spicy spicy x.bool and check-expect
+spicy x spicy and check-expect
+spicy spicy x and check-expect
+spicy x.bool x.bool and check-expect
+spicy x x and check-expect
+
+!@ Tests with two variables, one of a singular type, one of multiple types
+   int was declared first for both variables #$
+normie y meme
+normie x y and check-expect
+normie y.bool x and check-expect
+normie x y.bool and check-expect
+spicy x.bool y or check-expect
+spicy y x.bool or check-expect 
+spicy x.bool y.bool or check-expect
+
+!@ Tests with two variables, both of multiple types #$
+33 y meme
+normie x y and check-expect
+spicy x y or check-expect
+spicy x y xor check-expect
+normie y.bool x and check-expect
+normie x y.bool and check-expect
+spicy x.bool y xor check-expect
+spicy y x.bool xor check-expect 
+spicy x.bool y.bool xor check-expect
+
+
+
+

@@ -73,14 +73,19 @@ def specific_type(arg, constraint, varEnv):
     else:
         if isIntBoolorString(arg):
             arg = check_expected_literal_type(arg, constraint())
-
+        else:
+            if not varEnv.inEnvandType(arg_split[0], constraint()):
+                if varEnv.inEnv(arg_split[0]):
+                    return ("error", "Error: Normie meme type")
+                else:
+                    return ("error", "Error: Meme does not exist")
     return arg
 
 
 # called if the constraint is polymorphic (eg. a 'a)
 def general_type(arg, constraints, varEnv):
     arg_split = arg.split(".")
-    if arg_split[0] != arg:
+    if arg_split[0] != arg: #if var contains a dot
         if isIntBoolorString(arg_split[0]):
             return (("error", "Error: Meme does not support dot operation"), constraints)
         if isUndesirableType(arg_split[1], constraints[0]()):
@@ -94,7 +99,7 @@ def general_type(arg, constraints, varEnv):
                 return (("error", "Error: Meme does not exist"), constraints)
         arg = arg_split[0]
         constraints = lambda: [arg_split[1]]
-    else:
+    else: #if var is a literal
         if isIntBoolorString(arg):
             for i in range(len(constraints[0]())):
                 errorTest = check_expected_literal_type(arg, constraints[0]()[i])
@@ -104,7 +109,7 @@ def general_type(arg, constraints, varEnv):
                     break
                 elif i == len(constraints[0]())-1:
                     return (errorTest, constraints)
-        else:
+        else: #if var is a variable with no dot
             if not varEnv.inEnv(arg):
                 return (("error", "Error: Meme does not exist"), constraints)
             typesOfArg = varEnv.getVarTypes(arg)
@@ -133,9 +138,21 @@ def casted(arg):
     if isInt(arg):
         return int(arg)
     if isBool(arg):
-        return bool(arg)
+        return getBoolVal(arg)
     if isString(arg):
         return str(arg)
+
+def getBoolVal(arg):
+    if arg == "mild":
+        if randint(0,1) == 0:
+            return True
+        else:
+            return False
+    elif arg == "spicy":
+        return True
+    return False
+
+
 
 # by the time this function is called, all potential errors should have been
 # handled so arg will either be a literal or variable of type constraint
@@ -146,7 +163,6 @@ def getValofType(arg, constraint, varEnv):
     if isinstance(constraint(), list):
         return casted(varEnv.getVal(arg, constraint()[0]))
     return casted(varEnv.getVal(arg, constraint()))
-
 
 
 
@@ -201,7 +217,7 @@ def getTypeOfVal(arg):
 
 
 
-# ALL THE FUNCTIONS BELOW ARE GARBAGE CODE.  IT WILL BE DELETED ONCE I REWRITE
+# ALL THE FUNCTIONS BELOW ARE GARBAGE CODE.  THEY WILL BE DELETED ONCE I REWRITE
 # ALL THE PRIMITIVE FUNCTIONS WITH THE NEW CONSTRAINT CODE
 
 
@@ -236,12 +252,12 @@ def get_args_with_orig_type(args, env):
     for arg in args:
         if isInt(arg):
             args_with_orig_types.append((arg, "int"))
-        elif isBool(arg):
+        elif isBool(arg) or arg == "mild":
             args_with_orig_types.append((arg, "bool"))
         elif isString(arg):
             args_with_orig_types.append((arg, "string"))
         else:
-            return ("error", "Bug in type checker")       
+            return ("error", "Error: Bug in type checker")       
 
     return check_args(args_with_orig_types, env)    
 

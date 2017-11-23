@@ -80,8 +80,6 @@ def leq(args, varEnv, funEnv):
 
 
 
-
-
 def eq_and_neq(op, args, varEnv):
     if len(args) != 2:
         return ("error", "Error: Incorrect number of memes")
@@ -108,22 +106,6 @@ def eq_and_neq(op, args, varEnv):
 
 
 
-
-
-# def eq_and_neq(op, args, varEnv, funEnv):
-#     if len(args) != 2:
-#         return ("error", "Error: Incorrect number of memes")
-
-#     arg_list = same_dot(args, varEnv)
-
-#     if arg_list[0] == "error":
-#         return arg_list
-
-#     return ("not_error", "spicy" if op(arg_list[0], arg_list[1]) else "normie")
-
-
-
-
 def equal(args, varEnv, funEnv):
     return eq_and_neq(operator.eq, args, varEnv)
 def notEqual(args, varEnv, funEnv):
@@ -134,26 +116,21 @@ def boolean_operations(op, args, varEnv):
     if len(args) != 2:
         return ("error", "Error: Incorrect number of memes")
 
-    args = specific_type_dot(args, "bool", varEnv)
-    if args[0] == "error":
-        return args
-    arg_list = get_args_with_types(args, "bool", varEnv)
+    constraints = [lambda: "bool", lambda: "bool"]
 
-    if arg_list[0] == "error":
-        return arg_list
+    cleanArgs = [] # strips dot from argument name
+    for i in range(len(args)):
+        toAppend = specific_type(args[i], constraints[i], varEnv)
+        if toAppend[0] == "error":
+            return toAppend
+        cleanArgs.append(toAppend)
 
-    for i in range(len(arg_list)):
-        if arg_list[i] == "mild":
-            if randint(0,1) == 0:
-                arg_list[i] = True
-            else:
-                arg_list[i] = False
-        elif arg_list[i] == "spicy":
-            arg_list[i] = True
-        else: #arg_list[i] == "normie"
-            arg_list[i] = False
+    val_list = [] # values with correct type
+    for i in range(len(cleanArgs)):
+        val_list.append(getValofType(cleanArgs[i], constraints[i], varEnv))
 
-    return ("not_error", "spicy" if op(arg_list[0], arg_list[1]) else "normie")
+    return ("not_error", "spicy" if op(val_list[0], val_list[1]) else "normie")
+
 
 def boolAnd(args, varEnv, funEnv):
     return boolean_operations(operator.and_, args, varEnv)
@@ -161,38 +138,46 @@ def boolOr(args, varEnv, funEnv):
     return boolean_operations(operator.or_, args, varEnv)
 def boolXor(args, varEnv, funEnv):
     return boolean_operations(operator.xor, args, varEnv)
-
 def boolNot(args, varEnv, funEnv):
+    return not_operation(operator.not_, args, varEnv)
+
+
+def not_operation(op, args, varEnv):
     if len(args) != 1:
         return ("error", "Error: Incorrect number of memes")
 
-    args = specific_type_dot(args, "bool", varEnv)
-    if args[0] == "error":
-        return args
-    arg_list = get_args_with_types(args, "bool", varEnv)
-    if arg_list[0] == "error":
-        return arg_list
-    arg = arg_list[0]
+    constraints = [lambda: "bool"]
 
-    if arg == "mild":
-        if randint(0,1) == 1:
-            arg = "spicy"
-        else:
-            arg = "normie"
+    cleanArgs = [] # strips dot from argument name
+    for i in range(len(args)):
+        toAppend = specific_type(args[i], constraints[i], varEnv)
+        if toAppend[0] == "error":
+            return toAppend
+        cleanArgs.append(toAppend)
 
-    return ("not_error", "spicy" if arg == "normie" else "normie")
+    val_list = [] # values with correct type
+    for i in range(len(cleanArgs)):
+        val_list.append(getValofType(cleanArgs[i], constraints[i], varEnv))
+
+    return ("not_error", "spicy" if op(val_list[0]) else "normie")
+
 
 def larger_and_smaller(args, varEnv, funEnv):
     if len(args) != 1:
         return ("error", "Error: Incorrect number of memes")
-    args = specific_type_dot(args, "int", varEnv)
 
-    if args[0] == "error":
-        return args
-    arg = get_args_with_types(args, "int", varEnv)
+    constraints = [lambda: "int"]
 
-    if arg[0] == "error":
-        return arg
+    cleanArgs = [] # strips dot from argument name
+    for i in range(len(args)):
+        toAppend = specific_type(args[i], constraints[i], varEnv)
+        if toAppend[0] == "error":
+            return toAppend
+        cleanArgs.append(toAppend)
+
+    val_list = [] # values with correct type
+    for i in range(len(cleanArgs)):
+        val_list.append(getValofType(cleanArgs[i], constraints[i], varEnv))
 
     return ("not_error", "spicy" if randint(0,1) == 0 else "normie")
 
@@ -217,7 +202,7 @@ def defineVar(args, varEnv, funEnv):
     # otherwise this would break it:
     # 1 error meme
     # 2 error +
-    if isIntBoolorString(args[0]) or args[0] == "error":
+    if isIntBoolorString(args[0]) or args[0] == "error" or args[0] == "MEME":
         return ("error", "Error: Meme is reserved")
     if "." in args[0]:
         return ("error", "Error: Dot cannot appear in meme name")
@@ -276,3 +261,11 @@ def conditional(args, varEnv, funEnv):
         return falseOp(falseArgs, varEnv, funEnv)
     else:
         return funResult
+
+
+
+def empty(args, varEnv, funEnv):
+    varEnv.empty()
+    return ("not_error", "no memes left")
+
+

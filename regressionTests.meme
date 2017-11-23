@@ -1,0 +1,440 @@
+
+I like memes
+
+!@ Arithmetic #$
+
+empty
+
+!@ Errors #$
+
+1 a meme
+spicy b meme
+1 + check-error
+1 2 3 + check-error
+1.int 1 + check-error
+spicy.int 1 + check-error
+"hello".int 1 + check-error
+a.in 1 + check-error
+b.bool 1 + check-error
+b.int 1 + check-error
+c.int 1 + check-error
+spicy 1 + check-error
+"hello" 1 + check-error
+c 1 + check-error
+0 3 / check-error
+
+!@ Test with two literals #$
+2 1 1 + check-expect
+
+!@ Tests with one variable of a singular type #$
+1 x meme
+2 x.int 1 + check-expect
+2 1 x.int + check-expect
+2 x 1 + check-expect
+2 1 x + check-expect
+2 x.int x.int + check-expect
+2 x x + check-expect
+
+!@ Tests with one variable of multiple types
+   int was declared first #$
+spicy x meme
+2 x.int 1 + check-expect
+2 1 x.int + check-expect
+2 x 1 + check-expect
+2 1 x + check-expect
+2 x.int x.int + check-expect
+2 x x + check-expect
+
+!@ Tests with two variables, one of a singular type, one of multiple types
+   int was declared first for both variables #$
+1 y meme
+2 x y + check-expect
+2 y.int x + check-expect
+2 x y.int + check-expect
+2 x.int y + check-expect
+2 y x.int + check-expect 
+2 x.int y.int + check-expect
+
+!@ Tests with two variables, both of multiple types #$
+spicy y meme
+2 x y + check-expect
+2 y.int x + check-expect
+2 x y.int + check-expect
+2 x.int y + check-expect
+2 y x.int + check-expect 
+2 x.int y.int + check-expect
+
+
+
+
+
+I like memes
+
+!@ Booleans (arrity: 2) #$
+
+empty
+
+!@ Errors #$
+
+spicy a meme
+33 b meme
+spicy and check-error
+spicy normie spicy and check-error
+spicy.bool spicy and check-error
+33.bool spicy and check-error
+"hello".bool spicy and check-error
+a.bol spicy and check-error
+b.bool spicy and check-error
+a.int spicy and check-error
+c.bool spicy and check-error
+33 spicy and check-error
+"hello" spicy and check-error
+c spicy and check-error
+
+
+!@ Test with two literals #$
+spicy spicy spicy and check-expect
+normie normie spicy and check-expect
+spicy normie spicy or check-expect
+
+
+!@ Tests with one variable of a singular type #$
+spicy x meme
+spicy x.bool spicy and check-expect
+spicy spicy x.bool and check-expect
+spicy x spicy and check-expect
+spicy spicy x and check-expect
+spicy x.bool x.bool and check-expect
+spicy x x and check-expect
+
+!@ Tests with one variable of multiple types
+   int was declared first #$
+33 x meme
+spicy x.bool spicy and check-expect
+spicy spicy x.bool and check-expect
+spicy x spicy and check-expect
+spicy spicy x and check-expect
+spicy x.bool x.bool and check-expect
+spicy x x and check-expect
+
+!@ Tests with two variables, one of a singular type, one of multiple types
+   int was declared first for both variables #$
+normie y meme
+normie x y and check-expect
+normie y.bool x and check-expect
+normie x y.bool and check-expect
+spicy x.bool y or check-expect
+spicy y x.bool or check-expect 
+spicy x.bool y.bool or check-expect
+
+!@ Tests with two variables, both of multiple types #$
+33 y meme
+normie x y and check-expect
+spicy x y or check-expect
+spicy x y xor check-expect
+normie y.bool x and check-expect
+normie x y.bool and check-expect
+spicy x.bool y xor check-expect
+spicy y x.bool xor check-expect 
+spicy x.bool y.bool xor check-expect
+
+
+
+
+
+I like memes
+
+!@ Comparison #$
+
+empty
+
+!@ Errors #$
+1 a meme
+spicy b meme
+1 2 3 < check-error
+1.int 1 < check-error
+spicy.int 1 < check-error
+"hello".int 1 < check-error
+a.in 1 < check-error
+b.bool 1 < check-error
+b.int 1 < check-error
+c.int 1 < check-error
+1 c < check-error
+1 b > check-error
+spicy 1 < check-error
+"hello" 1 < check-error
+c "hello" < check-error
+
+
+
+!@ Test with two literals #$
+spicy  1 1 <= check-expect
+spicy "hello" "hello" <= check-expect
+
+!@ Tests with one variable of a singular type #$
+1 x meme
+spicy x.int 1 <= check-expect
+spicy 1 x.int <= check-expect
+spicy x 1 <= check-expect
+spicy 1 x <= check-expect
+spicy x.int x.int <= check-expect
+spicy x x <= check-expect
+
+"hello" a meme
+spicy a.string "hello" <= check-expect
+spicy "hello" a.string <= check-expect
+spicy a "hello" <= check-expect
+spicy "hello" a <= check-expect
+spicy a.string a.string <= check-expect
+spicy a a <= check-expect
+
+
+!@ Tests with one variable of multiple types
+   int was declared first #$
+"hello" x meme
+spicy x.int 1 <= check-expect
+spicy 1 x.int <= check-expect
+spicy x 1 <= check-expect
+spicy 1 x <= check-expect
+spicy x.int x.int <= check-expect
+
+!@ Tests with two variables, one of a singular type, one of multiple types
+   int was declared first for both variables #$
+2 y meme
+normie x y <= check-expect
+spicy y.int x <= check-expect
+normie x y.int <= check-expect
+normie x.int y <= check-expect
+spicy y x.int <= check-expect 
+normie x.int y.int <= check-expect
+
+
+!@ Tests with two variables, both of multiple types #$
+"hello" y meme
+spicy x y > check-expect
+normie y.int x >= check-expect
+spicy x y.int >= check-expect
+spicy x.int y >= check-expect
+normie y x.int >= check-expect
+spicy x.int y.int >= check-expect
+normie y.int x.int >= check-expect
+
+spicy q meme
+2 q meme
+"hello" q meme
+"hello" r meme
+1 r meme
+
+spicy q.string r.string <= check-expect
+normie r.int q.int <= check-expect
+spicy q r <= check-expect
+normie r q <= check-expect
+
+
+I like memes
+
+
+
+!@ Equal/Not equal #$
+
+empty
+
+!@ Errors #$
+1 a meme
+spicy b meme
+1 2 3 = check-error
+1.int 1 = check-error
+spicy.int 1 = check-error
+"hello".int 1 = check-error
+a.in 1 = check-error
+b.bool 1 = check-error
+b.int 1 = check-error
+c.int 1 = check-error
+1 c = check-error
+1 b = check-error
+spicy 1 = check-error
+"hello" 1 = check-error
+"hello" spicy = check-error
+"hello" 1 = check-error
+"hello" a meme
+a b = check-error
+
+
+
+!@ Test with two literals #$
+spicy 1 1 = check-expect
+spicy spicy spicy = check-expect
+spicy "hello" "hello" = check-expect
+
+
+!@ Tests with one variable of a singular type #$
+1 x meme
+spicy x.int 1 = check-expect
+spicy 1 x.int = check-expect
+spicy x 1 = check-expect
+spicy 1 x = check-expect
+spicy x.int x.int = check-expect
+spicy x x = check-expect
+
+"hello" g meme
+normie g.string "goodbye" = check-expect
+normie "goodbye" g.string = check-expect
+normie g "goodbye" = check-expect
+normie "goodbye" g = check-expect
+spicy g.string g.string = check-expect
+spicy g g = check-expect
+
+
+!@ Tests with one variable of multiple types
+   int was declared first #$
+"hello" x meme
+spicy x.int 1 = check-expect
+spicy 1 x.int = check-expect
+spicy x 1 = check-expect
+spicy 1 x = check-expect
+spicy x.int x.int = check-expect
+spicy x.string "hello" = check-expect
+spicy "hello" x.string = check-expect
+spicy x "hello" = check-expect
+spicy "hello" x = check-expect
+
+
+!@ Tests with two variables, one of a singular type, one of multiple types
+   int was declared first for both variables #$
+2 y meme
+normie x y = check-expect
+normie y.int x = check-expect
+normie x y.int = check-expect
+normie x.int y = check-expect
+normie y x.int = check-expect 
+normie x.int y.int = check-expect
+
+
+!@ Tests with two variables, both of multiple types
+   int was declared first for x;
+   string was declared first for z#$ 
+"hello" z meme
+2 z meme
+spicy x z = check-expect
+normie z x = check-expect
+normie z.int x = check-expect
+normie x z.int = check-expect
+normie x.int z = check-expect
+normie z x.int = check-expect
+normie x.int z.int = check-expect
+spicy z.string x = check-expect
+spicy x z.string = check-expect
+spicy x.string z = check-expect
+spicy z x.string = check-expect
+spicy x.string z.string = check-expect
+
+spicy q meme
+2 q meme
+"hello" q meme
+
+"hello" r meme
+1 r meme
+
+spicy q.string r.string = check-expect
+normie r.int q.int = check-expect
+spicy q r = check-expect
+normie r q = check-expect
+spicy q q = check-expect
+spicy r r = check-expect
+
+
+I like memes
+
+
+!@ Bool #$
+empty
+
+!@ Errors #$
+
+spicy a meme
+spicy a not check-error
+not check-error
+spicy.bool not check-error
+33.bool not check-error
+"hello".bool not check-error
+a.bol not check-error
+b.bool not check-error
+a.int not check-error
+c not check-error
+33 not check-error
+
+
+!@ Tests with one literals #$
+normie spicy not check-expect
+spicy normie not check-expect
+mild not
+mild not
+mild not
+mild not
+
+
+!@ Test with one variable of a singular type #$
+spicy x meme
+normie x not check-expect
+normie x.bool not check-expect
+
+
+!@ Test with one variable of multiple types
+   bool was declared first #$
+1 x meme
+normie x not check-expect
+normie x.bool not check-expect
+
+
+!@ Test with one variable of multiple types
+   int was declared first #$
+1 y meme
+spicy y meme 
+normie y not check-expect
+normie y.bool not check-expect
+
+I like memes
+
+
+!@ Larger/Smaller #$
+empty
+
+!@ Errors #$
+
+1 a meme
+1 a larger? check-error
+larger? check-error
+spicy larger? check-error
+33.int larger? check-error
+"hello".int larger? check-error
+a.it larger? check-error
+b.int larger? check-error
+a.bool larger? check-error
+c larger? check-error
+"hello" larger? check-error
+
+
+!@ Tests with one literals #$
+1 larger?
+1 smaller?
+
+
+!@ Test with one variable of a singular type #$
+1 x meme
+x larger?
+x.int smaller?
+
+
+!@ Test with one variable of multiple types
+   bool was declared first #$
+spicy x meme
+x larger?
+x.int smaller?
+
+
+!@ Test with one variable of multiple types
+   int was declared first #$
+1 y meme
+spicy y meme
+y larger?
+y.int smaller?
