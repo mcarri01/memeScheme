@@ -33,16 +33,16 @@ def addPrimitives():
     funEnv.addBind("if", conditional)
     funEnv.addBind("larger?", larger_and_smaller)
     funEnv.addBind("smaller?", larger_and_smaller)
-    funEnv.addBind("check-error", None) #can I make this None?
-    funEnv.addBind("check-expect", None) #can I make this None?
+    funEnv.addBind("check-error", check) #can I make this None?
+    funEnv.addBind("check-expect", check) #can I make this None?
     funEnv.addBind("empty", empty)
 
     return (varEnv, funEnv)
 
 
-
 def evaluate(filename, lines, origLines):
     (varEnv, funEnv) = addPrimitives()
+    check = False
 
     lineCount = 0
     for line in range(len(lines)):
@@ -58,17 +58,23 @@ def evaluate(filename, lines, origLines):
             args = []
             try:
                 if expression[0] == "check-error":
+                    check = True
                     expression.pop(0)
-                    origLines.toggleErrorCheck()
-                if expression[0] == "check-expect":
+                    if len(expression) != 0:
+                        origLines.toggleErrorCheck()
+                elif expression[0] == "check-expect":
+                    check_expect == True
                     expression.pop(0)
                     desired_val = expression[-1]
                     expression = expression[:-1]
-                    check_expect = True
+                    check = True
                 fun = funEnv.getVal(expression[0], "function")
                 expression.pop(0)
             except:
+                if check and len(expression) == 0:
+                    origLines.RaiseException(filename, lineCount, "Error: Incorrect number of memes")
                 origLines.RaiseException(filename, lineCount, "Error: Where's the meme?")
+
             for token in expression:
                 args.append(token)
 
@@ -77,6 +83,8 @@ def evaluate(filename, lines, origLines):
 
             if error == "error":
                 origLines.RaiseException(filename, lineCount, val)
+                if val == "Error: Can't check a check, ya doofus":
+                    origLines.RaiseException(filename, lineCount, val)
                 val = "Meme failed, as expected"
             if origLines.handleError():
                 origLines.toggleErrorCheck()
@@ -91,16 +99,13 @@ def evaluate(filename, lines, origLines):
                     origLines.RaiseException(filename, lineCount, val)
             print "-->", val
 
+
 def main(filename):
     f = open(filename, 'r')
     lines = [line.rstrip('\n') for line in open(filename)]
     lines = map(lambda x: ' '.join(x.split()), lines)
     origLines = OriginalLines(lines)
-
-    (error, lineNum, message) = userMemerCheck(lines)
-    if error == "error":
-        origLines.RaiseException(filename, lineNum, message)
-
+    userMemerCheck(lines, filename, origLines)
     evaluate(filename, lines, origLines)
     
 

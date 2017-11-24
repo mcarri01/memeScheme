@@ -11,19 +11,19 @@ def arithmetic(op, args, varEnv):
     if len(args) != 2:
         return ("error", "Error: Incorrect number of memes")
 
-    constraints = [lambda: "int", lambda: "int"]
+    constraints = [[lambda: ["int"]], [lambda: ["int"]]]
 
     cleanArgs = [] # strips dot from argument name
     for i in range(len(args)):
-        toAppend = specific_type(args[i], constraints[i], varEnv)
+        (toAppend, constraints[i][0]) = general_type(args[i], constraints[i], varEnv)
         if toAppend[0] == "error":
             return toAppend
         cleanArgs.append(toAppend)
 
-
+    constraints[0][0] = constraintCheck(cleanArgs[0], constraints[0], varEnv)
     val_list = [] # values with correct type
     for i in range(len(cleanArgs)):
-        val_list.append(getValofType(cleanArgs[i], constraints[i], varEnv))
+        val_list.append(getValofType(cleanArgs[i], constraints[i][0], varEnv))
 
     if val_list[1] == 0 and op == operator.div:
         return ("error", "Error: Memes unbounded")
@@ -116,18 +116,19 @@ def boolean_operations(op, args, varEnv):
     if len(args) != 2:
         return ("error", "Error: Incorrect number of memes")
 
-    constraints = [lambda: "bool", lambda: "bool"]
+    constraints = [[lambda: ["bool"]], [lambda: ["bool"]]]
 
     cleanArgs = [] # strips dot from argument name
     for i in range(len(args)):
-        toAppend = specific_type(args[i], constraints[i], varEnv)
+        (toAppend, constraints[i][0]) = general_type(args[i], constraints[i], varEnv)
         if toAppend[0] == "error":
             return toAppend
         cleanArgs.append(toAppend)
 
+    constraints[0][0] = constraintCheck(cleanArgs[0], constraints[0], varEnv)
     val_list = [] # values with correct type
     for i in range(len(cleanArgs)):
-        val_list.append(getValofType(cleanArgs[i], constraints[i], varEnv))
+        val_list.append(getValofType(cleanArgs[i], constraints[i][0], varEnv))
 
     return ("not_error", "spicy" if op(val_list[0], val_list[1]) else "normie")
 
@@ -146,68 +147,110 @@ def not_operation(op, args, varEnv):
     if len(args) != 1:
         return ("error", "Error: Incorrect number of memes")
 
-    constraints = [lambda: "bool"]
+    constraints = [[lambda: ["bool"]]]
 
     cleanArgs = [] # strips dot from argument name
     for i in range(len(args)):
-        toAppend = specific_type(args[i], constraints[i], varEnv)
+        (toAppend, constraints[i][0]) = general_type(args[i], constraints[i], varEnv)
         if toAppend[0] == "error":
             return toAppend
         cleanArgs.append(toAppend)
 
+    constraints[0][0] = constraintCheck(cleanArgs[0], constraints[0], varEnv)
     val_list = [] # values with correct type
     for i in range(len(cleanArgs)):
-        val_list.append(getValofType(cleanArgs[i], constraints[i], varEnv))
+        val_list.append(getValofType(cleanArgs[i], constraints[i][0], varEnv))
 
     return ("not_error", "spicy" if op(val_list[0]) else "normie")
 
 
 def larger_and_smaller(args, varEnv, funEnv):
+    return LS_function(None, args, varEnv)
+
+def LS_function(op, args, varEnv):
     if len(args) != 1:
         return ("error", "Error: Incorrect number of memes")
 
-    constraints = [lambda: "int"]
+    constraints = [[lambda: ["int"]]]
 
     cleanArgs = [] # strips dot from argument name
     for i in range(len(args)):
-        toAppend = specific_type(args[i], constraints[i], varEnv)
+        (toAppend, constraints[i][0]) = general_type(args[i], constraints[i], varEnv)
         if toAppend[0] == "error":
             return toAppend
         cleanArgs.append(toAppend)
 
+    constraints[0][0] = constraintCheck(cleanArgs[0], constraints[0], varEnv)
     val_list = [] # values with correct type
     for i in range(len(cleanArgs)):
-        val_list.append(getValofType(cleanArgs[i], constraints[i], varEnv))
+        val_list.append(getValofType(cleanArgs[i], constraints[i][0], varEnv))
 
     return ("not_error", "spicy" if randint(0,1) == 0 else "normie")
 
 
+
 def printVar(args, varEnv, funEnv):
+    return printFunction(None, args, varEnv)
+
+
+def printFunction(op, args, varEnv):
     if len(args) != 1:
         return ("error", "Error: Incorrect number of memes")
-    arg_list = any_type_dot(args, varEnv)
-    if arg_list[0] == "error":
-        return arg_list
 
-    return ("not_error", arg_list[0])
+    constraints = [[lambda: ["int", "bool", "string"]]]
+
+    cleanArgs = [] # strips dot from argument name
+    for i in range(len(args)):
+        (toAppend, constraints[i][0]) = general_type(args[i], constraints[i], varEnv)
+        if toAppend[0] == "error":
+            return toAppend
+        cleanArgs.append(toAppend)
+
+    constraints[0][0] = constraintCheck(cleanArgs[0], constraints[0], varEnv)
+    val_list = [] # values with correct type
+    for i in range(len(cleanArgs)):
+        val_list.append(getValofType(cleanArgs[i], constraints[i][0], varEnv))
+
+    if isinstance(val_list[0], bool):
+        return ("not_error", "spicy" if val_list[0] else "normie")
+
+    return ("not_error", val_list[0])
 
 def defineVar(args, varEnv, funEnv):
-    if len(args) != 2:
-        return ("error", "Error: Incorrect number of memes")
-    error_check = check_arg(args[1], varEnv)
-    if error_check[0] == "error":
-        return error_check
-    set_as = error_check[0]
+    constraints = [[lambda: ["int", "bool", "string"]]]
 
-    # otherwise this would break it:
-    # 1 error meme
-    # 2 error +
+    val_list = define_help(None, [args[1]], constraints, varEnv)
+    if val_list[0] == "error":
+        return val_list
+
     if isIntBoolorString(args[0]) or args[0] == "error" or args[0] == "MEME":
         return ("error", "Error: Meme is reserved")
     if "." in args[0]:
         return ("error", "Error: Dot cannot appear in meme name")
-    varEnv.addBind(args[0], set_as)
-    return ("not_error", args[0])
+
+    varEnv.addBind(args[0], val_list[0], constraints[0])
+    return ("not_error", args[0])    
+
+
+def define_help(op, args, constraints, varEnv):
+    if len(args) != 1:
+        return ("error", "Error: Incorrect number of memes")
+    
+    cleanArgs = []
+    for i in range(len(args)):
+        (toAppend, constraints[0][0]) = general_type(args[i], constraints[i], varEnv)
+        if toAppend[0] == "error":
+            return toAppend
+        cleanArgs.append(toAppend)
+
+    #constraints[0][0] = constraintCheck(cleanArgs[0], constraints[0], varEnv)
+
+    # val_list = []
+    # for i in range(len(cleanArgs)):
+    #     val_list.append(getValofType(cleanArgs[i], constraints[i][0], varEnv))
+
+    #return val_list
+    return cleanArgs
 
     
 
@@ -263,9 +306,9 @@ def conditional(args, varEnv, funEnv):
         return funResult
 
 
+def check (args, varEnv, funEnv):
+    return ("error", "Error: Can't check a check, ya doofus")
 
 def empty(args, varEnv, funEnv):
     varEnv.empty()
     return ("not_error", "no memes left")
-
-

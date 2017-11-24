@@ -38,17 +38,20 @@ def handle_comments(line, lines, lineCount, filename, origLines):
 
 
 # determines whether or not the first line of code is "I like memes"
-def userMemerCheck(lines):
+# necessary because we want to allow the use to put comments before "I like
+# memes"
+def userMemerCheck(lines, filename, origLines):
     global comment_start, comment_end
     comment = False
     s = "I like memes"
     k = 0
+    message = "Error: User does not like memes"
 
     for i in range(len(lines)):
         if len(lines[i]) == 0:
                 continue
         if not comment and len(lines[i]) == 1:
-            return ("error", i+1, "User does not like memes")
+            origLines.RaiseException(filename, i+1, message)
         for j in range(len(lines[i])):
             if j != len(lines[i])-1 and lines[i][j]+lines[i][j+1] == comment_start and not comment:
                 comment = True
@@ -57,16 +60,16 @@ def userMemerCheck(lines):
                     continue
                 if lines[i][j] == s[k]:
                     if s[k] == "s": #last char in "I like memes"
-                        return ("not_error", None, None)
+                        return
                     else:
                         k += 1
                 elif lines[i][j] == " ":
                     continue
                 else:
-                    return ("error", i+1, "User does not like memes")
+                    origLines.RaiseException(filename, i+1, message)
             if j != len(lines[i])-1 and lines[i][j]+lines[i][j+1] == comment_end and comment:
                 comment = False
-    return ("error", len(lines), "User does not like memes")
+    origLines.RaiseException(filename, i+1, message)
 
 
 
