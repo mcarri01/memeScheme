@@ -2,8 +2,10 @@ from env import *
 from dot import *
 from random import *
 import itertools
-import operator
 
+# Constraints must be of the form [[["constraint A"]] [["constraint B"]]] and
+# not [["constraint A"] ["constraint B"]] because the constraints cannot be
+# "linked" to each other in the latter form.
 
 def definePrimitive(args, constraints, varEnv):
     if len(args) != len(constraints):
@@ -24,7 +26,7 @@ def definePrimitive(args, constraints, varEnv):
     return val_list
 
 def arithmetic(args, varEnv, funEnv, op):
-    constraints = [[lambda: ["int"]], [lambda: ["int"]]]
+    constraints = [[["int"]], [["int"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
@@ -34,21 +36,21 @@ def arithmetic(args, varEnv, funEnv, op):
         return ("error", "Error: Memes unbounded")
 
 def booleans(args, varEnv, funEnv, op):
-    constraints = [[lambda: ["bool"]], [lambda: ["bool"]]]
+    constraints = [[["bool"]], [["bool"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
     return ("not_error", "spicy" if op(val_list[0], val_list[1]) else "normie")
 
 def boolNot(args, varEnv, funEnv, op):
-    constraints = [[lambda: ["bool"]]]
+    constraints = [[["bool"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
     return ("not_error", "spicy" if op(val_list[0]) else "normie")
 
 def comparison(args, varEnv, funEnv, op):
-    constB = [lambda: ["int", "string"]]
+    constB = [["int", "string"]]
     constA = constB
     constraints = [constA, constB]
     val_list = definePrimitive(args, constraints, varEnv)
@@ -57,7 +59,7 @@ def comparison(args, varEnv, funEnv, op):
     return ("not_error", "spicy" if op(val_list[0], val_list[1]) else "normie")
 
 def equal_nequal(args, varEnv, funEnv, op):
-    constB = [lambda: ["int", "bool", "string"]]
+    constB = [["int", "bool", "string"]]
     constA = constB
     constraints = [constA, constB]
     val_list = definePrimitive(args, constraints, varEnv)
@@ -66,14 +68,14 @@ def equal_nequal(args, varEnv, funEnv, op):
     return ("not_error", "spicy" if op(val_list[0], val_list[1]) else "normie")
 
 def larger_and_smaller(args, varEnv, funEnv, op):
-    constraints = [[lambda: ["int"]]]
+    constraints = [[["int"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
     return ("not_error", "spicy" if randint(0,1) == 0 else "normie")
 
 def printVar(args, varEnv, funEnv, op):
-    constraints = [[lambda: ["int", "bool", "string"]]]
+    constraints = [[["int", "bool", "string"]]]#[[lambda: ["int", "bool", "string"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
@@ -86,7 +88,7 @@ def defineVar(args, varEnv, funEnv, op):
     if len(args) != 2:
         return ("error", "Error: Incorrect number of memes")
 
-    constraints = [[lambda: ["int", "bool", "string"]]]
+    constraints = [[["int", "bool", "string"]]]#[[lambda: ["int", "bool", "string"]]]
 
     val_list = []
     (toAppend, constraints[0][0]) = general_type(args[1], constraints[0], varEnv)

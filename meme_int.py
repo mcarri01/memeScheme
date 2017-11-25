@@ -20,9 +20,11 @@ def addPrimitives():
     funEnv.addBind("*", (arithmetic, operator.mul))
     funEnv.addBind("/", (arithmetic, operator.div))
     funEnv.addBind("%", (arithmetic, operator.mod))
+    funEnv.addBind("^", (arithmetic, operator.pow))
     funEnv.addBind("and", (booleans, operator.and_))
     funEnv.addBind("or", (booleans, operator.or_))
     funEnv.addBind("xor", (booleans, operator.xor))
+    funEnv.addBind("nand", (booleans, (lambda x, y: not (x and y))))
     funEnv.addBind("not", (boolNot, operator.not_))
     funEnv.addBind(">", (comparison, operator.gt))
     funEnv.addBind("<", (comparison, operator.lt))
@@ -58,8 +60,6 @@ def evaluate(filename, lines, origLines):
 
         expression = lines[line].split()[::-1]
         if len(expression) != 0:
-            fun = 0 #purpose of this line?
-            args = []
             try:
                 (check, check_expect, expression, desired_val, (fun, op), origLines) = \
                     checks(check, expression, origLines, funEnv)
@@ -70,6 +70,7 @@ def evaluate(filename, lines, origLines):
                 val = "Error: Where's the meme?"
                 origLines.RaiseException(filename, lineCount, val)
 
+            args = []
             for token in expression:
                 args.append(token)
 

@@ -26,6 +26,16 @@ c 1 + check-error
 
 !@ Test with two literals #$
 2 1 1 + check-expect
+2 1 3 - check-expect
+6 2 3 * check-expect
+3 2 6 / check-expect
+1 3 7 % check-expect
+8 3 2 ^ check-expect
+
+
+
+
+
 
 !@ Tests with one variable of a singular type #$
 1 x meme

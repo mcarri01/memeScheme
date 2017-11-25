@@ -1,20 +1,14 @@
 from env import *
 from random import *
-import itertools
 import operator
 
 
 def isInt(x):
     try:
-        if isinstance(int(x), int):
-            return True
+        isinstance(int(x), int)
+        return True
     except:
         return False
-    # s = "1234567890"
-    # for digit in x:
-    #     if digit not in s:
-    #         return False
-    # return True
 
 def isBool(x):
     return (x == "spicy" or x == "normie" or x == "mild")
@@ -67,9 +61,9 @@ def general_type(arg, constraints, varEnv):
     if arg_split[0] != arg: #if var contains a dot
         if isIntBoolorString(arg_split[0]):
             return (("error", "Error: Meme does not support dot operation"), constraints)
-        if isUndesirableType(arg_split[1], constraints[0]()):
+        if isUndesirableType(arg_split[1], constraints[0]):
             return (("error", "Error: Normie meme type"), constraints)
-        if arg_split[1] not in constraints[0]():
+        if arg_split[1] not in constraints[0]:
             return (("error", "Error: Meme type does not exist"), constraints)
         if not varEnv.inEnvandType(arg_split[0], arg_split[1]):
             if varEnv.inEnv(arg_split[0]):
@@ -77,39 +71,38 @@ def general_type(arg, constraints, varEnv):
             else:
                 return (("error", "Error: Meme does not exist"), constraints)
         arg = arg_split[0]
-        constraints = lambda: [arg_split[1]]
+        constraints = [arg_split[1]]
     else: #if var is a literal
         if isIntBoolorString(arg):
-            for i in range(len(constraints[0]())):
-                errorTest = check_expected_literal_type(arg, constraints[0]()[i])
+            for i in range(len(constraints[0])):
+                errorTest = check_expected_literal_type(arg, constraints[0][i])
                 if errorTest[0] != "error":
                     arg = errorTest
-                    constraints = lambda: [getLiteralType(arg)]
+                    constraints = [getLiteralType(arg)]
                     break
-                elif i == len(constraints[0]())-1:
+                elif i == len(constraints[0])-1:
                     return (errorTest, constraints)
         else: #if var is a variable with no dot
             if not varEnv.inEnv(arg):
                 return (("error", "Error: Meme does not exist"), constraints)
             typesOfArg = varEnv.getVarTypes(arg)
-            intersection = [x for x in typesOfArg if x in constraints[0]()]
+            intersection = [x for x in typesOfArg if x in constraints[0]]
             if intersection == []:
                 return (("error", "Error: Normie meme type"), constraints)
             else:
-                constraints = lambda: intersection
+                constraints = intersection
     return (arg, constraints)
-
 
 
 # if input is two variables with identical and multiple types, constraints will
 # not be a singleton list so we need to find the constraint we want
 def constraintCheck(arg, constraints, varEnv):
-    if len(constraints[0]()) == 1:
+    if len(constraints[0]) == 1:
         return constraints[0]
 
     typesOfArg = varEnv.getVarTypes(arg)
-    intersection = [x for x in typesOfArg if x in constraints[0]()]
-    constraints = lambda: [intersection[0]]
+    intersection = [x for x in typesOfArg if x in constraints[0]]
+    constraints = [intersection[0]]
     return constraints
 
 # must update as more types are added
@@ -138,9 +131,9 @@ def getValofType(arg, constraint, varEnv):
     if isIntBoolorString(arg):
         return casted(arg)
 
-    if isinstance(constraint(), list):
-        return casted(varEnv.getVal(arg, constraint()[0]))
-    return casted(varEnv.getVal(arg, constraint()))
+    if isinstance(constraint, list):
+        return casted(varEnv.getVal(arg, constraint[0]))
+    return casted(varEnv.getVal(arg, constraint))
 
 
 
@@ -228,17 +221,15 @@ def getValofType(arg, constraint, varEnv):
 
 
 
-
-
-
-
-
-
 # ALL THE FUNCTIONS BELOW ARE GARBAGE CODE.  THEY WILL BE DELETED ONCE I REWRITE
 # ALL THE PRIMITIVE FUNCTIONS WITH THE NEW CONSTRAINT CODE
 
-
-
+# def isInt(x):        
+#     s = "1234567890"
+#     for digit in x:
+#         if digit not in s:
+#             return False
+#     return True
 
 
 # def orig_types_ints(args, args_with_orig_types):
@@ -258,8 +249,6 @@ def getValofType(arg, constraint, varEnv):
 #             return args_with_orig_types
 #         except:
 #             return args_with_orig_types
-
-
 
 
 
@@ -314,21 +303,6 @@ def getValofType(arg, constraint, varEnv):
 #     for arg in args:
 #         args_with_types.append((arg, desired_type))
 #     return check_args(args_with_types, env)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

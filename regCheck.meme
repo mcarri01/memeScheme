@@ -9,7 +9,7 @@ I like memes
 !@check-error#$
 !@check-expect#$
 !@1 check-expect#$
-check-error check-error
+!@check-error check-error#$
 !@check-error check-expect#$
 !@check-expect check-error#$
 !@check-expect check-expect#$

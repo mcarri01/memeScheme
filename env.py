@@ -44,13 +44,13 @@ class Environment:
                 self.env[var] = [(val, self.__getType(val))] 
 
 
-
-    # this function is called if the variable is being assigned to the value(s) of another variable
+    # this function is called if the variable is being assigned to the value(s)
+    # of another variable
     def __addBindVar(self, var, val, constraints):
         cont = False
         if self.inEnv(var):
             for i in range(len(self.env[val])):
-                if self.env[val][i][1] not in constraints[0]():
+                if self.env[val][i][1] not in constraints[0]:
                     continue
                 for j in range(len(self.env[var])):
                     if self.env[var][j][1] == self.env[val][i][1]:
@@ -64,7 +64,7 @@ class Environment:
         else:
             newVar = []
             for i in range(len(self.env[val])):
-                if self.env[val][i][1] in constraints[0]():
+                if self.env[val][i][1] in constraints[0]:
                     newVar.append((self.env[val][i][0], self.env[val][i][1]))
             self.env[var] = newVar
 

@@ -27,6 +27,10 @@ c spicy and check-error
 spicy spicy spicy and check-expect
 normie normie spicy and check-expect
 spicy normie spicy or check-expect
+spicy normie normie nand check-expect
+spicy spicy normie nand check-expect
+spicy normie spicy nand check-expect
+normie spicy spicy nand check-expect
 
 
 !@ Tests with one variable of a singular type #$
