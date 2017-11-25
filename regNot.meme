@@ -8,7 +8,7 @@ empty
 !@ Errors #$
 
 spicy a meme
-spicy a not check-error
+spicy 1 not check-error
 not check-error
 spicy.bool not check-error
 33.bool not check-error

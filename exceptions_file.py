@@ -14,7 +14,10 @@ class OriginalLines:
     	return self.handle_error
 
     def getLine(self, lineNum):
-        return self.lines[lineNum]
+        try:
+            return self.lines[lineNum]
+        except:
+            return self.lines[lineNum-1]
 
     def RaiseException(self, filename, lineNum, error):
     	if self.handle_error:

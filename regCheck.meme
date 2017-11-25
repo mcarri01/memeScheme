@@ -9,7 +9,7 @@ I like memes
 !@check-error#$
 !@check-expect#$
 !@1 check-expect#$
-!@check-error check-error#$
+check-error check-error
 !@check-error check-expect#$
 !@check-expect check-error#$
 !@check-expect check-expect#$
@@ -18,3 +18,8 @@ I like memes
 !@error check-error check-expect#$
 !@check-error check-expect check-error#$
 !@check-expect check-error check-expect#$
+!@!@ check-error#$
+!@#$!@ check-error#$
+!@2 #$!@ 1 1 + check-expect#$
+
+

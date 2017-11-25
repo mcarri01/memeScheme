@@ -22,6 +22,7 @@ spicy 1 + check-error
 "hello" 1 + check-error
 c 1 + check-error
 0 3 / check-error
+0 3 % check-error
 
 !@ Test with two literals #$
 2 1 1 + check-expect

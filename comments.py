@@ -2,37 +2,50 @@
 from exceptions_file import *
 
 comment = False
-comment_start = "!@"
-comment_end = "#$"
+comment_start_line = None
+COMMENT_START = "!@"
+COMMENT_END = "#$"
 
 # sanitizes comments from a line of code
 def handle_comments(line, lines, lineCount, filename, origLines):
     loop = True
 
-    global comment, comment_start, comment_end
+    global comment, comment_start_line, COMMENT_START, COMMENT_END
     while loop:
         loop = False
         # deals with the end of block comments
-        if comment_end in lines[line] and comment:
+        if COMMENT_END in lines[line] and comment:
             comment = False
-            lines[line] = lines[line][str.find(lines[line], comment_end)+2:]
+            lines[line] = lines[line][str.find(lines[line], COMMENT_END)+2:]
             loop = True       
         #deals with the middle of block comments
-        if comment and comment_end not in lines[line] and lines[line] != "":
+        if comment and COMMENT_END not in lines[line] and lines[line] != "":
             lines[line] = ""
             loop = True
         # deals with the start of block comments
-        if comment_start in lines[line] and comment_end not in lines[line]:
+        if COMMENT_START in lines[line] and COMMENT_END not in lines[line]:
+            comment_start_line = lineCount
             comment = True
-            lines[line] = lines[line][:str.find(lines[line], comment_start)]
-            loop = True
+            lines[line] = lines[line][:str.find(lines[line], COMMENT_START)]
+            loop = False
         # deals with comments that are contained on one line
-        if str.find(lines[line], comment_start)+1 < str.find(lines[line], comment_end):
-            lines[line] = lines[line][:str.find(lines[line], comment_start)] + \
-                          lines[line][str.find(lines[line], comment_end)+2:]
-            loop = True
+        # and comments that end without starting
+        if str.find(lines[line], COMMENT_START) < str.find(lines[line], COMMENT_END):
+            if str.find(lines[line], COMMENT_START) == -1:
+                val = "Error: Lil ending memer doesn't have a partner"
+                origLines.RaiseException(filename, lineCount, val)
+            else:
+                lines[line] = lines[line][:str.find(lines[line], COMMENT_START)] + \
+                              lines[line][str.find(lines[line], COMMENT_END)+2:]
+                loop = True
+        # deals with the invalid case of comments in this format: #$___!@ when there is
+        # no comment currently being written
+        elif str.find(lines[line], COMMENT_START) > str.find(lines[line], COMMENT_END) \
+           and not comment:
+                val = "Error: Lil ending memer doesn't have a partner"
+                origLines.RaiseException(filename, lineCount, val)
     if lineCount == len(lines) and comment:
-        origLines.RaiseException(filename, lineCount+1, "Error: Endless memer")
+        origLines.RaiseException(filename, comment_start_line, "Error: Endless memer")
 
     return lines[line]
 
@@ -41,7 +54,7 @@ def handle_comments(line, lines, lineCount, filename, origLines):
 # necessary because we want to allow the use to put comments before "I like
 # memes"
 def userMemerCheck(lines, filename, origLines):
-    global comment_start, comment_end
+    global COMMENT_START, COMMENT_END
     comment = False
     s = "I like memes"
     k = 0
@@ -53,7 +66,7 @@ def userMemerCheck(lines, filename, origLines):
         if not comment and len(lines[i]) == 1:
             origLines.RaiseException(filename, i+1, message)
         for j in range(len(lines[i])):
-            if j != len(lines[i])-1 and lines[i][j]+lines[i][j+1] == comment_start and not comment:
+            if j != len(lines[i])-1 and lines[i][j]+lines[i][j+1] == COMMENT_START and not comment:
                 comment = True
             if not comment:
                 if lines[i][j] == "$" and lines[i][j] != 0 and lines[i][j-1] == "#":
@@ -67,7 +80,7 @@ def userMemerCheck(lines, filename, origLines):
                     continue
                 else:
                     origLines.RaiseException(filename, i+1, message)
-            if j != len(lines[i])-1 and lines[i][j]+lines[i][j+1] == comment_end and comment:
+            if j != len(lines[i])-1 and lines[i][j]+lines[i][j+1] == COMMENT_END and comment:
                 comment = False
     origLines.RaiseException(filename, i+1, message)
 
