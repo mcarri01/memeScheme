@@ -35,6 +35,16 @@ def arithmetic(args, varEnv, funEnv, op):
     except:
         return ("error", "Error: Memes unbounded")
 
+def more_arithmetic(args, varEnv, funEnv, op):
+    constraints = [[["int"]]]
+    val_list = definePrimitive(args, constraints, varEnv)
+    if val_list[0] == "error":
+        return val_list
+    try: # will raise an error if op == ! or op == v/ and val_list[0] < 0
+        return ("not_error", int(op(val_list[0]))) #cast to int since sqrt returns a float
+    except:
+        return ("error", "Error: Meme is in normie domain")
+
 def booleans(args, varEnv, funEnv, op):
     constraints = [[["bool"]], [["bool"]]]
     val_list = definePrimitive(args, constraints, varEnv)
@@ -96,10 +106,17 @@ def defineVar(args, varEnv, funEnv, op):
         return toAppend
     val_list.append(toAppend)
 
-    if isIntBoolorString(args[0]) or args[0] == "error" or args[0] == "MEME":
+    reserved_terms = ["error", "MEME"]
+    if isIntBoolorString(args[0]) or args[0] in reserved_terms:
         return ("error", "Error: Meme is reserved")
     if "." in args[0]:
         return ("error", "Error: Dot cannot appear in meme name")
+    if len(args[0]) > 2: #avoids the necessity of a try-except
+        if args[0][:2] == "//" and funEnv.inEnv(args[0][2:]):
+            args[0] = args[0][2:]
+        elif args[0][:2] == "//" and not funEnv.inEnv(args[0][2:]):
+            return ("error", "Meme is not a function")
+
 
     varEnv.addBind(args[0], val_list[0], constraints[0])
     return ("not_error", args[0]) 

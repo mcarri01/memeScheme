@@ -1,0 +1,54 @@
+
+
+!@ Comments #$
+
+!@ Tests dividing up I like memes at the top of the file #$
+!@My name is Matthew#$I!@My name is Matthew#$ !@My name is Matthew#$l!@My name is Matthew#$i!@My name is Matthew#$k!@My name is Matthew#$e!@My name is Matthew#$ !@My name is Matthew#$m!@My name is Matthew#$e!@My name is Matthew#$m!@My name is Matthew#$e!@My name is Matthew#$s!@My name is Matthew
+My name is Matthew
+#$
+
+empty
+
+!@ Checks various unusual commenting cases
+   The rest of the file serves to test all valid examples
+   All examples are wrapped in a comment #$
+
+!@ Checks comments that begins with the end #$
+!@
+3 --put an END_COMMENT here-- x meme check-error
+#$
+
+!@ Checks comments with lots of start indicators in a row #$
+!@!@!@!@something something #$
+!@
+!@
+!@
+!@
+!@
+something something
+#$
+
+I like memes
+
+!@ Checks multiple block comments in a line #$
+!@My name is Matthew#$ 2 !@My name is Matthew#$ 1 !@My name is Matthew#$ 1 !@My name is Matthew#$ + !@My name is Matthew#$ check-expect !@My name is Matthew#$
+
+!@ Checks comments that are enclosed on one line and another one starts on the same line #$
+3!@My name is Matthew#$ 1 2 + check-expect !@ check-error
+My name is Matthew
+My name is Matthew My name is Matthew#$
+
+!@ Tests dividing up I like memes with comments #$
+!@My name is Matthew#$I!@My name is Matthew#$ !@My name is Matthew#$l!@My name is Matthew#$i!@My name is Matthew#$k!@My name is Matthew#$e!@My name is Matthew#$ !@My name is Matthew#$m!@My name is Matthew#$e!@My name is Matthew#$m!@My name is Matthew#$e!@My name is Matthew#$s!@My name is Matthew
+My name is Matthew
+#$
+
+!@
+test
+#$
+
+!@
+--remove END_COMMENT for endless memer error--
+#$
+
+

@@ -1,0 +1,112 @@
+
+I like memes
+
+
+
+!@ Equal/Not equal #$
+
+empty
+
+!@ Errors #$
+1 a meme
+spicy b meme
+1 2 3 = check-error
+1.int 1 = check-error
+spicy.int 1 = check-error
+"hello".int 1 = check-error
+a.in 1 = check-error
+b.bool 1 = check-error
+b.int 1 = check-error
+c.int 1 = check-error
+1 c = check-error
+1 b = check-error
+spicy 1 = check-error
+"hello" 1 = check-error
+"hello" spicy = check-error
+"hello" 1 = check-error
+"hello" a meme
+a b = check-error
+
+
+
+!@ Test with two literals #$
+spicy 1 1 = check-expect
+spicy spicy spicy = check-expect
+spicy "hello" "hello" = check-expect
+
+
+!@ Tests with one variable of a singular type #$
+1 x meme
+spicy x.int 1 = check-expect
+spicy 1 x.int = check-expect
+spicy x 1 = check-expect
+spicy 1 x = check-expect
+spicy x.int x.int = check-expect
+spicy x x = check-expect
+
+"hello" g meme
+normie g.string "goodbye" = check-expect
+normie "goodbye" g.string = check-expect
+normie g "goodbye" = check-expect
+normie "goodbye" g = check-expect
+spicy g.string g.string = check-expect
+spicy g g = check-expect
+
+
+!@ Tests with one variable of multiple types
+   int was declared first #$
+"hello" x meme
+spicy x.int 1 = check-expect
+spicy 1 x.int = check-expect
+spicy x 1 = check-expect
+spicy 1 x = check-expect
+spicy x.int x.int = check-expect
+spicy x.string "hello" = check-expect
+spicy "hello" x.string = check-expect
+spicy x "hello" = check-expect
+spicy "hello" x = check-expect
+
+
+!@ Tests with two variables, one of a singular type, one of multiple types
+   int was declared first for both variables #$
+2 y meme
+normie x y = check-expect
+normie y.int x = check-expect
+normie x y.int = check-expect
+normie x.int y = check-expect
+normie y x.int = check-expect 
+normie x.int y.int = check-expect
+
+
+!@ Tests with two variables, both of multiple types
+   int was declared first for x;
+   string was declared first for z#$ 
+"hello" z meme
+2 z meme
+spicy x z = check-expect
+normie z x = check-expect
+normie z.int x = check-expect
+normie x z.int = check-expect
+normie x.int z = check-expect
+normie z x.int = check-expect
+normie x.int z.int = check-expect
+spicy z.string x = check-expect
+spicy x z.string = check-expect
+spicy x.string z = check-expect
+spicy z x.string = check-expect
+spicy x.string z.string = check-expect
+
+spicy q meme
+2 q meme
+"hello" q meme
+
+"hello" r meme
+1 r meme
+
+spicy q.string r.string = check-expect
+normie r.int q.int = check-expect
+spicy q r = check-expect
+normie r q = check-expect
+spicy q q = check-expect
+spicy r r = check-expect
+

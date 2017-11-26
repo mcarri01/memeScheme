@@ -1,0 +1,46 @@
+
+I like memes
+
+
+!@ Larger/Smaller #$
+empty
+
+!@ Errors #$
+
+1 a meme
+1 a larger? check-error
+larger? check-error
+spicy larger? check-error
+33.int larger? check-error
+"hello".int larger? check-error
+a.it larger? check-error
+b.int larger? check-error
+a.bool larger? check-error
+c larger? check-error
+"hello" larger? check-error
+
+
+!@ Tests with one literals #$
+1 larger?
+1 smaller?
+
+
+!@ Test with one variable of a singular type #$
+1 x meme
+x larger?
+x.int smaller?
+
+
+!@ Test with one variable of multiple types
+   bool was declared first #$
+spicy x meme
+x larger?
+x.int smaller?
+
+
+!@ Test with one variable of multiple types
+   int was declared first #$
+1 y meme
+spicy y meme
+y larger?
+y.int smaller?

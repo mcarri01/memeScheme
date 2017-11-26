@@ -31,6 +31,8 @@ c 1 + check-error
 3 2 6 / check-expect
 1 3 7 % check-expect
 8 3 2 ^ check-expect
+(720 (6 !) check-expect)
+(15 (225 v/) check-expect)
 
 
 
@@ -111,6 +113,7 @@ spicy normie normie nand check-expect
 spicy spicy normie nand check-expect
 spicy normie spicy nand check-expect
 normie spicy spicy nand check-expect
+(spicy (normie normie nor) check-expect)
 
 
 !@ Tests with one variable of a singular type #$
@@ -350,7 +353,8 @@ b x meme check-error
 1 error meme check-error
 1 MEME meme check-error
 1 b.int meme check-error
-!@ look at the "1 b.int check-error" case #$
+1 //x meme check-error
+1 b.int check-error
 
 
 
@@ -490,9 +494,11 @@ c d meme
 
 !@ Create a new variable by using an old dot-operated variable as the value #$
 1 e meme
-"hello" f meme
+(spicy (3 ("hello" f meme) meme) meme)
+!@"hello" f meme
 3 f meme
-spicy f meme
+spicy f meme#$
+
 f e meme
 
 3 e print check-expect
@@ -504,9 +510,8 @@ spicy f.bool print check-expect
 "hello" e.string print check-expect
 "hello" f.string print check-expect
 
-
-
-
+!@ nested meme with stress test#$
+(spicy (((spicy not) (normie (13 4 //+ meme 2 ! ^ - 13 4 3 + 5 * % / 1 13 4 2 ! ^ - 13 4 9 v/ + 5 * % / - <>) xor) nor) not) check-expect)
 
 I like memes
 
@@ -734,6 +739,7 @@ a.it print check-error
 b.bool print check-error
 a.bool print check-error
 c print check-error
+1 print 2 + check-error
 
 
 !@ Tests with one literals #$

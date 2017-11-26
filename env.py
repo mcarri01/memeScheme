@@ -98,6 +98,11 @@ class Environment:
         self.addBind("normie", False)
         self.addBind("mild", "mild")
 
+    def getArrity(self, var):
+        if self.inEnv(var):
+            return self.env[var][0][0][2]
+
+
 
 
     def __getType(self, arg):  #make this private
