@@ -1,0 +1,82 @@
+
+I like memes
+
+!@ Arithmetic #$
+
+empty
+
+!@ Errors #$
+
+1 a meme
+spicy b meme
+1 + check-error
+1 2 3 + check-error
+1.int 1 + check-error
+spicy.int 1 + check-error
+"hello".int 1 + check-error
+a.in 1 + check-error
+b.bool 1 + check-error
+b.int 1 + check-error
+c.int 1 + check-error
+spicy 1 + check-error
+"hello" 1 + check-error
+c 1 + check-error
+0 3 / check-error
+0 3 % check-error
+
+!@ Test with two literals #$
+2 1 1 + check-expect
+2 1 3 - check-expect
+6 2 3 * check-expect
+3 2 6 / check-expect
+1 3 7 % check-expect
+8 3 2 ^ check-expect
+(720 (6 !) check-expect)
+(15 (225 v/) check-expect)
+
+
+
+
+
+
+!@ Tests with one variable of a singular type #$
+1 x meme
+2 x.int 1 + check-expect
+2 1 x.int + check-expect
+2 x 1 + check-expect
+2 1 x + check-expect
+2 x.int x.int + check-expect
+2 x x + check-expect
+
+!@ Tests with one variable of multiple types
+   int was declared first #$
+spicy x meme
+2 x.int 1 + check-expect
+2 1 x.int + check-expect
+2 x 1 + check-expect
+2 1 x + check-expect
+2 x.int x.int + check-expect
+2 x x + check-expect
+
+!@ Tests with two variables, one of a singular type, one of multiple types
+   int was declared first for both variables #$
+1 y meme
+2 x y + check-expect
+2 y.int x + check-expect
+2 x y.int + check-expect
+2 x.int y + check-expect
+2 y x.int + check-expect 
+2 x.int y.int + check-expect
+
+!@ Tests with two variables, both of multiple types #$
+spicy y meme
+2 x y + check-expect
+2 y.int x + check-expect
+2 x y.int + check-expect
+2 x.int y + check-expect
+2 y x.int + check-expect 
+2 x.int y.int + check-expect
+
+
+
+
