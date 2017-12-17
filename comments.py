@@ -3,58 +3,106 @@ from exceptions_file import *
 
 comment = False
 comment_start_line = None
-COMMENT_START = "!@"
-COMMENT_END = "#$"
+C_START = "!@"
+C_END = "#$"
+QUOTE = "\""
+
+
+# ensures that comments are of the correct format
+def handle_strings(expression, lineCount, numLines, filename, origLines):
+    if expression.count("\"") % 2 == 0:
+        return
+    val = "Error: Endless memer"
+    origLines.RaiseException(filename, lineCount, numLines, val)
+
+
+
 
 # sanitizes comments from a line of code
+# I would like to apologize for the state of this function.  To the reader I
+# say only this: you deserve better.  No man should be forced to try to
+# understand such a function.  On behalf of memeScheme, I beg your forgiveness
+# and hope to do better in the future.
 def handle_comments(line, lines, lineCount, filename, origLines):
     loop = True
+    origLine = lines[line]
+    currLine = lines[line]
+    
+    # I'm so sorry about this
+    toReplace = "q"
+    while toReplace in lines[line]:
+        toReplace = toReplace + "q"
+    markerA = toReplace + '1'
+    markerB = toReplace + '2'
 
-    global comment, comment_start_line, COMMENT_START, COMMENT_END
+
+    global comment, comment_start_line, C_START, C_END
     while loop:
         loop = False
-        # deals with the end of block comments
-        if COMMENT_END in lines[line] and comment:
+        # deals with the end of block comments and the case of !@\n"#$"
+        if C_END in currLine and comment:
             comment = False
-            lines[line] = lines[line][str.find(lines[line], COMMENT_END)+2:]
+            currLine = currLine[str.find(currLine, C_END)+2:]
             loop = True       
         #deals with the middle of block comments
-        if comment and COMMENT_END not in lines[line] and lines[line] != "":
-            lines[line] = ""
+        if comment and C_END not in currLine and currLine != "":
+            currLine = ""
             loop = True
-        # deals with the start of block comments
-        if COMMENT_START in lines[line] and COMMENT_END not in lines[line]:
-            comment_start_line = lineCount
-            comment = True
-            lines[line] = lines[line][:str.find(lines[line], COMMENT_START)]
-            loop = False
-        # deals with comments that are contained on one line
-        # and comments that end without starting
-        if str.find(lines[line], COMMENT_START) < str.find(lines[line], COMMENT_END):
-            if str.find(lines[line], COMMENT_START) == -1:
-                val = "Error: Lil ending memer doesn't have a partner"
-                origLines.RaiseException(filename, lineCount, val)
-            else:
-                lines[line] = lines[line][:str.find(lines[line], COMMENT_START)] + \
-                              lines[line][str.find(lines[line], COMMENT_END)+2:]
+        # deals with the start of block comments and checks for the "!@" case
+        if C_START in currLine and C_END not in currLine:# and not comment:
+            if currLine[:str.find(currLine, C_START)].count(QUOTE) % 2  == 1:
+                currLine = currLine[:str.find(currLine, C_START)] + markerA + \
+                           currLine[str.find(currLine, C_START)+2:]
                 loop = True
+            else:
+                comment_start_line = lineCount
+                comment = True
+                currLine = currLine[:str.find(currLine, C_START)]
+                loop = False
+        # deals with comments that are contained on one line, comments that end
+        # without starting, and checks for the "#$" case
+        if str.find(currLine, C_START) < str.find(currLine, C_END) and not comment:
+            if str.find(currLine, C_START) == -1:
+                if currLine[:str.find(currLine, C_END)].count(QUOTE) % 2  == 1:
+                    currLine = currLine[:str.find(currLine, C_END)] + markerB \
+                             + currLine[str.find(currLine, C_END)+2:]
+                    loop = True
+                elif not comment:
+                    val = "Error: Lil ending memer doesn't have a partner"
+                    origLines.RaiseException(filename, lineCount, 1, val)
+                else:
+                    loop = True
+            else:
+                if currLine[:str.find(currLine, C_START)].count(QUOTE) % 2  == 1:
+                    currLine = currLine[:str.find(currLine, C_END)] \
+                            + markerB + currLine[str.find(currLine, C_END)+2:]
+                    loop = True
+                else:
+                    currLine = currLine[:str.find(currLine, C_START)] + \
+                                  currLine[str.find(currLine, C_END)+2:]
+                    loop = True
         # deals with the invalid case of comments in this format: #$___!@ when there is
         # no comment currently being written
-        elif str.find(lines[line], COMMENT_START) > str.find(lines[line], COMMENT_END) \
-           and not comment:
+        elif str.find(currLine, C_START) > str.find(currLine, C_END) and not comment:
+            if currLine[:str.find(currLine, C_END)].count(QUOTE) % 2  == 1:
+                currLine = currLine[:str.find(currLine, C_END)] \
+                 + markerB + currLine[str.find(currLine, C_END)+2:]
+                loop = True
+            else:
                 val = "Error: Lil ending memer doesn't have a partner"
-                origLines.RaiseException(filename, lineCount, val)
+                origLines.RaiseException(filename, lineCount, 1, val)
     if lineCount == len(lines) and comment:
-        origLines.RaiseException(filename, comment_start_line, "Error: Endless memer")
+        val = "Error: Endless memer"
+        origLines.RaiseException(filename, comment_start_line, 1, val)
 
-    return lines[line]
+    return currLine.replace(markerA, "!@").replace(markerB, "#$")
 
 
 # determines whether or not the first line of code is "I like memes"
 # necessary because we want to allow the use to put comments before "I like
 # memes"
 def userMemerCheck(lines, filename, origLines):
-    global COMMENT_START, COMMENT_END
+    global C_START, C_END
     comment = False
     s = "I like memes"
     k = 0
@@ -64,9 +112,9 @@ def userMemerCheck(lines, filename, origLines):
         if len(lines[i]) == 0:
                 continue
         if not comment and len(lines[i]) == 1:
-            origLines.RaiseException(filename, i+1, message)
+            origLines.RaiseException(filename, i+1, 1, message)
         for j in range(len(lines[i])):
-            if j != len(lines[i])-1 and lines[i][j]+lines[i][j+1] == COMMENT_START and not comment:
+            if j != len(lines[i])-1 and lines[i][j]+lines[i][j+1] == C_START and not comment:
                 comment = True
             if not comment:
                 if lines[i][j] == "$" and lines[i][j] != 0 and lines[i][j-1] == "#":
@@ -79,10 +127,10 @@ def userMemerCheck(lines, filename, origLines):
                 elif lines[i][j] == " ":
                     continue
                 else:
-                    origLines.RaiseException(filename, i+1, message)
-            if j != len(lines[i])-1 and lines[i][j]+lines[i][j+1] == COMMENT_END and comment:
+                    origLines.RaiseException(filename, i+1, 1, message)
+            if j != len(lines[i])-1 and lines[i][j]+lines[i][j+1] == C_END and comment:
                 comment = False
-    origLines.RaiseException(filename, i+1, message)
+    origLines.RaiseException(filename, i+1, 1, message)
 
 
 

@@ -41,7 +41,7 @@ class Environment:
                     (self.env[var]).append((val, self.__getType(val))) 
             else:
                 #if the new variable is completely new and has never been declared before
-                self.env[var] = [(val, self.__getType(val))] 
+                self.env[var] = [(val, self.__getType(val))]
 
 
     # this function is called if the variable is being assigned to the value(s)
@@ -102,19 +102,25 @@ class Environment:
         if self.inEnv(var):
             return self.env[var][0][0][2]
 
+    def isInt(x):        
+        s = "1234567890"
+        for digit in x:
+            if digit not in s:
+                return False
+        return True
 
 
-
-    def __getType(self, arg):  #make this private
-        if arg == "spicy" or arg == "normie" or arg == "mild":
+    def __getType(self, arg):
+        if arg == "spicy" or arg == "normie" or arg == "mild" \
+                          or arg == True or arg == False:
             return "bool"
+        argStr = str(arg)
+        if argStr[0] == "\"" and argStr[-1] == "\"":
+            return "string"
         try:
             if isinstance(int(arg), int):
                 return "int"
         except:
-            argStr = str(arg)
-            if argStr[0] == "\"" and argStr[-1] == "\"":
-                return "string"
             if arg == "MEME":
                 return "meme_type"
             if self.inEnv(arg):

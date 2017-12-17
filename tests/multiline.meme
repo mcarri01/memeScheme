@@ -1,0 +1,39 @@
+
+I like memes
+
+													   <~ normie if check-expect
+													   <~ 1
+											   <~ normie if
+											   <~ 1
+								  	 !@<~ normie if
+											 abc
+											 def
+											 ghi
+											  #$
+										       <~
+									   <~ normie if
+									   <~ 1
+							   <~ normie if
+							   <~ 1
+					   <~ normie if
+					   <~ 1
+			   <~ normie if
+		   	   <~ 1
+	   <~ normie if
+	   <~ 1
+<~ spicy if
+<~ 1
+1 1
+
+"my name is fred" x meme
+spicy ("my name is fred" x =) check-expect
+
+
+!@<~~"abc" print
+"def"#$
+
+
+1 <~abc meme check-error
+
+<~(1 x meme) + check-expect
+4 !@abc#$3

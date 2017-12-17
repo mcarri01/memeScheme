@@ -5,7 +5,7 @@ import itertools
 
 # Constraints must be of the form [[["constraint A"]] [["constraint B"]]] and
 # not [["constraint A"] ["constraint B"]] because the constraints cannot be
-# "linked" to each other in the latter form.
+# "linked" to each other in the latter format.
 
 def definePrimitive(args, constraints, varEnv):
     if len(args) != len(constraints):
@@ -23,6 +23,15 @@ def definePrimitive(args, constraints, varEnv):
     for i in range(len(cleanArgs)):
         val_list.append(getValofType(cleanArgs[i], constraints[i][0], varEnv))
 
+    for i in range(len(val_list)):
+        try:
+            if val_list[i][:2] == "//" and varEnv.inEnv(val_list[i][2:]):
+                val_list[i] = val_list[i][2:]
+            elif val_list[i][:2] == "//" and not funEnv.inEnv(val_list[i][2:]):
+                return ("error", "Meme does not exist")
+        except:
+            pass
+
     return val_list
 
 def arithmetic(args, varEnv, funEnv, op):
@@ -34,6 +43,13 @@ def arithmetic(args, varEnv, funEnv, op):
         return ("not_error", op(val_list[0], val_list[1]))
     except:
         return ("error", "Error: Memes unbounded")
+
+def for_testing(args, varEnv, funEnv, op):
+    constraints = [[["int", "string"]], [["int", "string"]]]
+    val_list = definePrimitive(args, constraints, varEnv)
+    if val_list[0] == "error":
+        return val_list
+    return ("not_error", op(val_list[0], val_list[1]))
 
 def more_arithmetic(args, varEnv, funEnv, op):
     constraints = [[["int"]]]
@@ -94,6 +110,15 @@ def printVar(args, varEnv, funEnv, op):
         return ("not_error", "spicy" if val_list[0] else "normie")
     return ("not_error", val_list[0])
 
+def seven(args, varEnv, funEnv, op):
+    if args != []:
+        return ("error", "Error: Incorrect number of memes")
+    return ("not_error", 7)
+
+    if isinstance(val_list[0], bool):
+        return ("not_error", "spicy" if val_list[0] else "normie")
+    return ("not_error", val_list[0])
+
 def defineVar(args, varEnv, funEnv, op):
     if len(args) != 2:
         return ("error", "Error: Incorrect number of memes")
@@ -109,6 +134,8 @@ def defineVar(args, varEnv, funEnv, op):
     reserved_terms = ["error", "MEME"]
     if isIntBoolorString(args[0]) or args[0] in reserved_terms:
         return ("error", "Error: Meme is reserved")
+    if "<~" in args[0][:2] == "<~":
+        return ("error", "Error: Meme begins with reserved symbol")
     if "." in args[0]:
         return ("error", "Error: Dot cannot appear in meme name")
     if len(args[0]) > 2: #avoids the necessity of a try-except
@@ -128,56 +155,70 @@ def empty(args, varEnv, funEnv, op):
     varEnv.empty()
     return ("not_error", "no memes left")
 
-def conditional(args, varEnv, funEnv):
-    op = args[0]
-    args.remove(op)
 
-    condArgs = list(itertools.takewhile(lambda x: not funEnv.inEnv(x), args))
+def conditional(args, varEnv, funEnv, op):
+    if len(args) != 3:
+        return ("error", "Error: Incorrect number of memes")
 
-    restList = list(itertools.dropwhile(lambda x: not funEnv.inEnv(x), args))
-    if len(filter(lambda x: funEnv.inEnv(x), restList)) != 2:
-        return ("error", "Error: Bad meme format")
-
-    trueOp = restList.pop(0)
-    trueOp = funEnv.getVal(trueOp, "function")
-    trueArgs = list(itertools.takewhile(lambda x: not funEnv.inEnv(x), restList))
-    try:    #handles the bad format case of 1 print + x normie = if
-        trueOp(trueArgs, varEnv, funEnv)
-    except:
-        return ("error", "Error: Bad meme format")
-
-    restList =  list(itertools.dropwhile(lambda x: not funEnv.inEnv(x), restList))
-
-    falseOp = restList.pop(0)
-    falseOp = funEnv.getVal(falseOp, "function")
-    falseArgs = list(itertools.takewhile(lambda x: not funEnv.inEnv(x), restList))
-    try:    #handles the bad format case of + 1 print x spicy = if
-        falseOp(falseArgs, varEnv, funEnv)
-    except:
-        return ("error", "Error: Bad meme format")
-
-    if varEnv.inEnv(op):
-        if (op == "mild" or varEnv.getVal(op, "bool") == "mild") and randint(0,1) == 0:
-            op = "spicy"
-        elif op == "mild" or varEnv.getVal(op, "bool") == "mild":
-            op = "normie"
-
-        if op == "spicy" or varEnv.getVal(op, "bool") == "spicy":
-            return trueOp(trueArgs, varEnv, funEnv)
-        elif op == "normie" or varEnv.getVal(op, "bool") == "normie":
-            return falseOp(falseArgs, varEnv, funEnv)
-        else:
-            return ("error", "Error: Normie meme type") 
-
-    condOp = funEnv.getVal(op, "function")
-
-    funResult = condOp(condArgs, varEnv, funEnv)
-    if funResult == ('not_error', 'spicy'):
-        return trueOp(trueArgs, varEnv, funEnv)
-    elif funResult == ('not_error', 'normie'):
-        return falseOp(falseArgs, varEnv, funEnv)
+    if isBool(args[0]):
+        args = map(lambda x: x if x!="mild" else "spicy" if randint(0,1)==0 else "normie", args)
+        return ("not_error", args[1] if getBoolVal(args[0]) else args[2])
     else:
-        return funResult
+        return ("error", "Error: Normie meme type")
+
+
+
+
+# def old_conditional(args, varEnv, funEnv):
+#     op = args[0]
+#     args.remove(op)
+
+#     condArgs = list(itertools.takewhile(lambda x: not funEnv.inEnv(x), args))
+
+#     restList = list(itertools.dropwhile(lambda x: not funEnv.inEnv(x), args))
+#     if len(filter(lambda x: funEnv.inEnv(x), restList)) != 2:
+#         return ("error", "Error: Bad meme format")
+
+#     trueOp = restList.pop(0)
+#     trueOp = funEnv.getVal(trueOp, "function")
+#     trueArgs = list(itertools.takewhile(lambda x: not funEnv.inEnv(x), restList))
+#     try:    #handles the bad format case of 1 print + x normie = if
+#         trueOp(trueArgs, varEnv, funEnv)
+#     except:
+#         return ("error", "Error: Bad meme format")
+
+#     restList =  list(itertools.dropwhile(lambda x: not funEnv.inEnv(x), restList))
+
+#     falseOp = restList.pop(0)
+#     falseOp = funEnv.getVal(falseOp, "function")
+#     falseArgs = list(itertools.takewhile(lambda x: not funEnv.inEnv(x), restList))
+#     try:    #handles the bad format case of + 1 print x spicy = if
+#         falseOp(falseArgs, varEnv, funEnv)
+#     except:
+#         return ("error", "Error: Bad meme format")
+
+#     if varEnv.inEnv(op):
+#         if (op == "mild" or varEnv.getVal(op, "bool") == "mild") and randint(0,1) == 0:
+#             op = "spicy"
+#         elif op == "mild" or varEnv.getVal(op, "bool") == "mild":
+#             op = "normie"
+
+#         if op == "spicy" or varEnv.getVal(op, "bool") == "spicy":
+#             return trueOp(trueArgs, varEnv, funEnv)
+#         elif op == "normie" or varEnv.getVal(op, "bool") == "normie":
+#             return falseOp(falseArgs, varEnv, funEnv)
+#         else:
+#             return ("error", "Error: Normie meme type") 
+
+#     condOp = funEnv.getVal(op, "function")
+
+#     funResult = condOp(condArgs, varEnv, funEnv)
+#     if funResult == ('not_error', 'spicy'):
+#         return trueOp(trueArgs, varEnv, funEnv)
+#     elif funResult == ('not_error', 'normie'):
+#         return falseOp(falseArgs, varEnv, funEnv)
+#     else:
+#         return funResult
 
 
 # def boolean_operations(op, args, varEnv):

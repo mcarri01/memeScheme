@@ -3,6 +3,9 @@ from random import *
 import operator
 
 
+# this function might not work once floats are added
+# if x is always a string there won't be a problem; if x is occassionally a
+# float there will be
 def isInt(x):
     try:
         isinstance(int(x), int)
@@ -14,7 +17,7 @@ def isBool(x):
     return (x == "spicy" or x == "normie" or x == "mild")
 
 def isString(x):
-    if x[0] == "\"" or x[-1] == "\"":   #if of the "___" format
+    if x[0] == "\"" or x[-1] == "\"":   #if x is of the "___" format
         return True
     return False
 
@@ -58,6 +61,12 @@ def check_expected_literal_type(arg, constraint):
 # called if the constraint is polymorphic (eg. a 'a)
 def general_type(arg, constraints, varEnv):
     arg_split = arg.split(".")
+
+    if len(arg_split[0]) > 2:
+        if arg_split[0][:2] == "//" and varEnv.inEnv(arg_split[0][2:]):
+            arg = arg_split[0][2:]
+            arg_split[0] = arg_split[0][2:]
+
     if arg_split[0] != arg: #if var contains a dot
         if isIntBoolorString(arg_split[0]):
             return (("error", "Error: Meme does not support dot operation"), constraints)
@@ -82,9 +91,9 @@ def general_type(arg, constraints, varEnv):
                     break
                 elif i == len(constraints[0])-1:
                     return (errorTest, constraints)
+        elif not varEnv.inEnv(arg):
+            return (("error", "Error: Meme does not exist"), constraints)
         else: #if var is a variable with no dot
-            if not varEnv.inEnv(arg):
-                return (("error", "Error: Meme does not exist"), constraints)
             typesOfArg = varEnv.getVarTypes(arg)
             intersection = [x for x in typesOfArg if x in constraints[0]]
             if intersection == []:

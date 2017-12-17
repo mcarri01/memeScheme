@@ -19,10 +19,22 @@ class OriginalLines:
         except:
             return self.lines[lineNum-1]
 
-    def RaiseException(self, filename, lineNum, error):
+    def RaiseException(self, filename, lineNum, numLines, error):
     	if self.handle_error:
     		self.toggleErrorCheck()
     		return
 
-        print("  File {} line {}\n    {} \n{}".format(filename, lineNum, self.getLine(lineNum-1), error))
+        lines = ""
+        for i in range(numLines,0,-1):
+            lines = lines + self.getLine(lineNum-i) + "\n"
+            if i != 1:
+                lines += "      "
+
+        if numLines != 1:
+            lineStr = "lines " + str(lineNum-numLines+1) +  "-" + str(lineNum)
+        else:
+            lineStr = "line " + str(lineNum)
+
+        print("  File {}; {}\n    {}{}".format(filename, lineStr, lines, error))
+        #print("  File {} line {}\n    {} \n{}".format(filename, lineNum, self.getLine(lineNum-1), error))
         exit(1)
