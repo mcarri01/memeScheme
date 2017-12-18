@@ -1,8 +1,8 @@
+import itertools
 from env import *
 from dot import *
 from random import *
-import itertools
-import re
+from list_string_conversion import *
 
 # Constraints must be of the form [[["constraint A"]] [["constraint B"]]] and
 # not [["constraint A"] ["constraint B"]] because the constraints cannot be
@@ -126,7 +126,9 @@ def listArrityOne(args, varEnv, funEnv, op):
     if val_list[0] == "[]":
         val_list[0] = []
     else:
-        val_list[0] = string_to_list(val_list[0])
+        val_list[0] = string_to_list(val_list[0][1:-1])
+
+
     return ("not_error", op(val_list[0]))
 
 def listArrityTwo(args, varEnv, funEnv, op):
@@ -143,54 +145,12 @@ def listArrityTwo(args, varEnv, funEnv, op):
     if isBool(args[0]):
         val_list[0] = args[0]
 
-    val_list[1].append(args[0]) # append the variable; not the variable's value
+    op(val_list[0], val_list[1])
     list_to_string(val_list[1])
     val_list[1] = list_to_string(val_list[1])
     defineVar([args[1], val_list[1]], varEnv, funEnv, None)
+    val_list[1] = val_list[1].replace("mild", "spicy" if randint(0,1)==0 else "normie")
     return ("not_error", val_list[1])
-
-
-
-# I have no idea why the lstrip()s are necessary.  Sometimes a leading space is
-# thrown in and the lstrip()s take care of that.
-def string_to_list(string):
-    new_list = []
-    if (re.sub('"[^"]*"', "\"\"", string)).find(",") == -1:
-        if isInt(string):
-            new_list.append(int(string))    
-        else:
-            new_list.append(string)
-        return new_list
-
-    while string != "":
-        if string[0] == "\"":
-            new_list.append((string[:string[1:].find("\"")+2]).lstrip())
-            string = string[(string[1:].find("\""))+3:]
-        else:
-            if string.find(",") != -1:
-                if isInt(string[:string.find(",")]):
-                    new_list.append(int(string[:string.find(",")]))
-                else:
-                    new_list.append((string[:string.find(",")]).lstrip())
-                string = string[(string.find(","))+2:]
-            else:
-                if isInt(string):
-                    new_list.append(int(string))
-                else:
-                    new_list.append(string.lstrip())
-                string = ""
-
-    return new_list
-
-def list_to_string(my_list):
-    new_string = "[" + str(my_list[0])
-    my_list = my_list[1:]
-
-    for x in my_list:
-        new_string = new_string + ", " + str(x)
-    new_string += "]"
-
-    return new_string
 
 
 def defineVar(args, varEnv, funEnv, op):

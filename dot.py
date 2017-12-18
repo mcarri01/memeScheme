@@ -1,6 +1,6 @@
+import operator
 from env import *
 from random import *
-import operator
 
 
 # this function might not work once floats are added

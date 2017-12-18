@@ -60,6 +60,7 @@ def addPrimitives():
     funEnv.addBind("length", (listArrityOne, (lambda x: len(x)), 1))
     funEnv.addBind("null?", (listArrityOne, (lambda x: "spicy" if len(x)==0 else "normie"), 1))
     funEnv.addBind("append", (listArrityTwo, (lambda x, y: y.append(x)), 2))
+    funEnv.addBind("push", (listArrityTwo, (lambda x, y: y.insert(0,x)), 2))
 #    funEnv.addBind("hitMe", (arrityZero, (lambda val, pos, ds: ds[pos-today()]), 2))
 
 
@@ -85,7 +86,7 @@ def getMatchingBracket(noQuotes):
 
 # this function is necessary because without it, the parser would divide up a
 # list of n elements into n different parts, instead of interpreting it as
-# a single thing.
+# a single entity.
 def handleQuotesAndBrackets(origExp):
     noQuotes = re.sub('"[^"]*"', "\"\"", origExp) #remove quotes
     #removes brackets
