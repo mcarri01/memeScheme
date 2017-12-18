@@ -17,6 +17,16 @@ def remove_brackets(noQuotes):
     return expression
 
 
+def getMatchingBracket(exp):
+    nestedCount = 0
+    for i in range(len(exp)):
+        if exp[i] == "[":
+            nestedCount += 1
+        elif exp[i] == "]":
+            nestedCount -=1
+            if nestedCount == 0:
+                return i+1
+
 # I have no idea why the lstrip()s are necessary.  Sometimes a leading space is
 # thrown in and the lstrip()s take care of that.
 def string_to_list(string):
@@ -32,10 +42,21 @@ def string_to_list(string):
         return new_list
 
     while expression != "":
+        #print expression.lstrip(), expression.lstrip()[0]
+        #print string
+        #print new_list
+        expression = expression.lstrip()
         if expression[0] == "\"":
+            #print "HERE"
             new_list.append((string[:string[1:].find("\"")+2]).lstrip())
             expression = expression[(expression[1:].find("\""))+3:]
             string = string[(string[1:].find("\""))+3:]
+        elif expression[0] == "[":
+            new_list.append((string[:getMatchingBracket(string)]).lstrip())
+            #noQuotes[noQuotes.find("["):getMatchingBracket(noQuotes)]
+            #new_list.append((string[:string[1:].find("]")+2]).lstrip())
+            expression = expression[(expression[1:].find("]"))+3:]
+            string = string[getMatchingBracket(string)+2:]
         else:
             if expression.find(",") != -1:
                 if isInt(expression[:expression.find(",")]):

@@ -3,7 +3,7 @@ import re
 import operator
 import math
 import shlex
-import datetime
+import time
 from primitives import *
 from exceptions_file import *
 from env import *
@@ -24,6 +24,7 @@ def addPrimitives():
     varEnv.addBind("spicy", True)
     varEnv.addBind("normie", False)
     varEnv.addBind("mild", None)
+    varEnv.addBind("today", today())
 
     funEnv = Environment(dict())
     funEnv.addBind("++", (for_testing, operator.add, 2))
@@ -59,16 +60,18 @@ def addPrimitives():
     funEnv.addBind("hitMe", (arrityZero, [], 0))
     funEnv.addBind("length", (listArrityOne, (lambda x: len(x)), 1))
     funEnv.addBind("null?", (listArrityOne, (lambda x: "spicy" if len(x)==0 else "normie"), 1))
-    funEnv.addBind("append", (listArrityTwo, (lambda x, y: y.append(x)), 2))
-    funEnv.addBind("push", (listArrityTwo, (lambda x, y: y.insert(0,x)), 2))
-#    funEnv.addBind("hitMe", (arrityZero, (lambda val, pos, ds: ds[pos-today()]), 2))
+    funEnv.addBind("append", (appendAndPush, (lambda val, ds: ds.append(val)), 2))
+    funEnv.addBind("push", (appendAndPush, (lambda val, ds: ds.insert(0,val)), 2))
+    funEnv.addBind("get", (listGet, (lambda pos, ds: ds[pos-today()]), 2))
 
 
     return (varEnv, funEnv)
 
 
-#def today():
-#    d = datetime.datetime.today()
+# returns the number day of the year it is today.  Jan 1 is 0; Dec 31 on a
+# non-leap year is 364.
+def today():
+    return (time.localtime().tm_yday-1)
 
 
 # returns the location of the closing brackets that corresponds to the first
@@ -209,7 +212,7 @@ def evaluate(filename, lines, origLines):
             if origLines.handleError():
                 origLines.toggleErrorCheck()
                 val = "Error: Meme didn't fail, ya ninny"
-                origLines.RaiseException(filename, lineCount, numlines, val)
+                origLines.RaiseException(filename, lineCount, numLines, val)
             if check_expect == True:
                 if str(val) == desired_val:
                     val = "Meme is " + desired_val + ", as expected"

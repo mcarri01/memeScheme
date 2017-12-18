@@ -1,3 +1,4 @@
+import time
 
 class Environment:
     def __init__(self, env):
@@ -97,6 +98,7 @@ class Environment:
         self.addBind("spicy", True)
         self.addBind("normie", False)
         self.addBind("mild", "mild")
+        self.addBind("today", (time.localtime().tm_yday)-1)
 
     def getArrity(self, var):
         if self.inEnv(var):

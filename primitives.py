@@ -131,7 +131,7 @@ def listArrityOne(args, varEnv, funEnv, op):
 
     return ("not_error", op(val_list[0]))
 
-def listArrityTwo(args, varEnv, funEnv, op):
+def appendAndPush(args, varEnv, funEnv, op):
     constraints = [[["int", "bool", "string", "list"]], [["list"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
@@ -151,6 +151,29 @@ def listArrityTwo(args, varEnv, funEnv, op):
     defineVar([args[1], val_list[1]], varEnv, funEnv, None)
     val_list[1] = val_list[1].replace("mild", "spicy" if randint(0,1)==0 else "normie")
     return ("not_error", val_list[1])
+
+def listGet(args, varEnv, funEnv, op):
+    constraints = [[["int"]], [["list"]]]
+    val_list = definePrimitive(args, constraints, varEnv)
+    if val_list[0] == "error":
+        return val_list
+
+    if val_list[1] == "[]":
+        val_list[1] = []
+    else:
+        val_list[1] = string_to_list(val_list[1][1:-1])
+
+    # will need to modify this once negative nubmers are handled
+    try:
+        #print val_list[1]
+        toReturn = str(op(val_list[0], val_list[1]))
+    except:
+        return ("error", "Error: Wow. You just seg-faulted in memeScheme. #feelsbadman")
+
+    list_to_string(val_list[1])
+    val_list[1] = list_to_string(val_list[1])
+    toReturn = toReturn.replace("mild", "spicy" if randint(0,1)==0 else "normie")
+    return ("not_error", toReturn)
 
 
 def defineVar(args, varEnv, funEnv, op):
