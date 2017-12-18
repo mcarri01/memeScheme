@@ -3,12 +3,15 @@ import re
 import operator
 import math
 import shlex
+import datetime
 from primitives import *
 from exceptions_file import *
 from env import *
 from comments import *
 from node import *
 from expTree import *
+
+
 
 check = False
 check_expect = False
@@ -31,7 +34,7 @@ def addPrimitives():
     funEnv.addBind("%", (arithmetic, operator.mod, 2))
     funEnv.addBind("^", (arithmetic, operator.pow, 2))
     funEnv.addBind("!", (more_arithmetic, math.factorial, 1))
-    funEnv.addBind("seven", (seven, (lambda: 7), 0)) #FOR TESTING PURPOSES
+    funEnv.addBind("seven", (arrityZero, 7, 0)) #FOR TESTING PURPOSES
     funEnv.addBind("v/", (more_arithmetic, math.sqrt, 1))
     funEnv.addBind("and", (booleans, operator.and_, 2))
     funEnv.addBind("or", (booleans, operator.or_, 2))
@@ -53,9 +56,77 @@ def addPrimitives():
     funEnv.addBind("check-expect", (check, None, -1))
     funEnv.addBind("empty", (empty, None, 0))
     funEnv.addBind("if", (conditional, None, 3))
+    funEnv.addBind("hitMe", (arrityZero, [], 0))
+    funEnv.addBind("length", (listArrityOne, (lambda x: len(x)), 1))
+    funEnv.addBind("null?", (listArrityOne, (lambda x: "spicy" if len(x)==0 else "normie"), 1))
+    funEnv.addBind("append", (listArrityTwo, (lambda x, y: y.append(x)), 2))
+#    funEnv.addBind("hitMe", (arrityZero, (lambda val, pos, ds: ds[pos-today()]), 2))
+
 
     return (varEnv, funEnv)
 
+
+#def today():
+#    d = datetime.datetime.today()
+
+
+# returns the location of the closing brackets that corresponds to the first
+# opening bracket.  is helpful for when brackets are nested
+def getMatchingBracket(noQuotes):
+    nestedCount = 0
+    for i in range(len(noQuotes)):
+        if noQuotes[i] == "[":
+            nestedCount += 1
+        elif noQuotes[i] == "]":
+            nestedCount -=1
+            if nestedCount == 0:
+                return i+1
+
+
+# this function is necessary because without it, the parser would divide up a
+# list of n elements into n different parts, instead of interpreting it as
+# a single thing.
+def handleQuotesAndBrackets(origExp):
+    noQuotes = re.sub('"[^"]*"', "\"\"", origExp) #remove quotes
+    #removes brackets
+    expression = ""
+    nestedCount = 0
+    for i in noQuotes:
+        if nestedCount == 0:
+            expression = expression + i
+        if i == "[":
+            nestedCount += 1
+        elif i == "]":
+            nestedCount -=1
+            if nestedCount == 0:
+                expression = expression + i
+    expression = re.findall(r'(?:[^\s,"]|"(?:\\.|[^"])*")+', expression) #literally no idea
+
+    # adds brackets back in
+    for i in range(len(expression)):
+        start = 0
+        while expression[i].find("[", start) != -1:
+            temp = expression[i][:expression[i].find("[", start)] + \
+                                 noQuotes[noQuotes.find("["):getMatchingBracket(noQuotes)]
+            expression[i] = temp + expression[i][expression[i].find("[", start)+2:]
+            start = len(temp)
+            noQuotes = noQuotes[getMatchingBracket(noQuotes):]
+
+    # adds quotes back in
+    temp = origExp
+    for i in range(len(expression)):
+        start = 0
+        while "\"\"" in expression[i] and expression[i].find("\"", start) != -1:
+            expression[i] = expression[i][:expression[i].find("\"", start)] + \
+                            temp[temp.find("\""):
+                            (temp.find("\"", (temp.find("\""))+2))+1] + \
+                            expression[i][(expression[i].find("\"", start))+2:]
+            temp = temp[(temp.find("\""))+1:]
+            start = expression[i].find("\"", start)+1
+            temp = temp[(temp.find("\""))+1:]
+            start = expression[i].find("\"", start)+1
+
+    return expression
 
 
 def makeTree(tree, funEnv):
@@ -102,16 +173,15 @@ def evaluate(filename, lines, origLines):
         if lines[line] == "I like memes":
             continue
 
-        expression = re.findall(r'(?:[^\s,"]|"(?:\\.|[^"])*")+', lines[line])
+        expression = handleQuotesAndBrackets(lines[line])
         expression.reverse()
-        #expression = shlex.split(lines[line])
-        #expression = lines[line].split()[::-1]
+
         if len(expression) != 0:
             try:
                 (expression, (fun, op, a), origLines) = checks(expression, origLines, funEnv)
             except:
                 if check and len(expression) == 0:
-                    val = "Error: Incorrect number of memes"
+                    val = "Error: Incorrect number of memes123"
                     origLines.RaiseException(filename, lineCount, numLines, val)
                 val = "Error: Where's the meme?"
                 if not check:
@@ -124,8 +194,10 @@ def evaluate(filename, lines, origLines):
             if emptyTree.get_string_length() == 0:
                 (error, val) = expTree.evaluate(varEnv, funEnv, True)
             else:
+                expTree.printTree()
                 (error, val) = ("error", "Error: Incorrect number of memes")
 
+            #print val, desired_val, val==desired_val
             varEnv.addBindMEME("MEME", val)
 
             if error == "error":
@@ -179,6 +251,8 @@ def main(filename):
     f = open(filename, 'r')
     lines = [line.rstrip('\n') for line in open(filename)]
     lines = map(lambda x: ' '.join(x.split()), lines)
+    # THE LINE DIRECTLY ABOVE NEEDS TO CHANGE SO THAT MULTPILE SPACES IN QUOTES
+    # WLL NOT BE CONDENSED
 
     origLines = OriginalLines(lines)
     regex = re.compile('[()]') # remove parentheses

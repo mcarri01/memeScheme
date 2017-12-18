@@ -1,44 +1,6 @@
 
 I like memes
 
-													   <~ normie if check-expect
-													   <~ 1
-											   <~ normie if
-											   <~ 1
-								  	 !@<~ normie if
-											 abc
-											 def
-											 ghi
-											  #$
-										       <~
-									   <~ normie if
-									   <~ 1
-							   <~ normie if
-							   <~ 1
-					   <~ normie if
-					   <~ 1
-			   <~ normie if
-		   	   <~ 1
-	   <~ normie if
-	   <~ 1
-<~ spicy if
-<~ 1
-1 1
-
-"my name is fred" x meme
-spicy ("my name is fred" x =) check-expect
-
-
-!@<~~"abc" print
-"def"#$
-
-
-1 <~abc meme check-error
-
-<~(1 x meme) + check-expect
-4 !@abc#$3
-I like memes
-
 !@ Arithmetic #$
 
 empty
@@ -522,7 +484,7 @@ q r meme
 1 r.int print check-expect
 spicy r.bool print check-expect
 
-	!@ assignment with dot operator #$
+   !@ assignment with dot operator #$
 1 s meme
 spicy s meme
 "hello" s meme
@@ -826,6 +788,56 @@ spicy y meme
 y larger?
 y.int smaller?
 
+I like memes
+
+empty
+
+
+                                          <~ normie if check-expect
+                                          <~ 1
+                                    <~ normie if
+                                    <~ 1
+                            !@<~ normie if
+                                  abc
+                                  def
+                                  ghi
+                                   #$
+                                     <~
+                              <~ normie if
+                              <~ 1
+                        <~ normie if
+                        <~ 1
+                  <~ normie if
+                  <~ 1
+            <~ normie if
+               <~ 1
+      <~ normie if
+      <~ 1
+<~ spicy if
+<~ 1
+1 1
+
+"my name is fred" x meme
+spicy ("my name is fred" x =) check-expect
+
+
+<~abc" y meme
+"def
+spicy ("def abc" y =) check-expect
+
+
+<~abc" z meme
+<~def ghi
+<~jkl
+"mno
+spicy ("mno jkl def ghi abc" z =) check-expect
+
+
+
+1 <~abc meme check-error
+
+<~(1 x meme) + check-expect
+4 !@abc#$3
 I like memes
 
 

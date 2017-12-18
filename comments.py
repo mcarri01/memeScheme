@@ -17,7 +17,6 @@ def handle_strings(expression, lineCount, numLines, filename, origLines):
 
 
 
-
 # sanitizes comments from a line of code
 # I would like to apologize for the state of this function.  To the reader I
 # say only this: you deserve better.  No man should be forced to try to

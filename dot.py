@@ -17,16 +17,21 @@ def isBool(x):
     return (x == "spicy" or x == "normie" or x == "mild")
 
 def isString(x):
-    if x[0] == "\"" or x[-1] == "\"":   #if x is of the "___" format
+    if x[0] == "\"" and x[-1] == "\"":   #if x is of the "___" format
         return True
     return False
 
-def isIntBoolorString(x):
-    return (isInt(x) or isBool(x) or isString(x))
+def isList(x):
+    if x[0] == "[" and x[-1] == "]":   #if x is of the [___] format
+        return True
+    return False
+
+def isIntBoolStringorList(x):
+    return (isInt(x) or isBool(x) or isString(x) or isList(x))
 
 # must update as more types are added
 def isValidType(x):
-    return (x == "int" or x == "bool" or x == "string")
+    return (x == "int" or x == "bool" or x == "string" or x == "list")
 
 def getLiteralType(x):
     if isInt(x):
@@ -34,7 +39,9 @@ def getLiteralType(x):
     if isBool(x):
         return "bool"
     if isString(x):
-        return "string"  
+        return "string"
+    if isList(x):
+        return "list"
     return ("error", "Error: Normie meme type")  
 
 
@@ -42,7 +49,7 @@ def getLiteralType(x):
 # desired_type is a list of types that would be valid
 # used to raise type errors in general_type
 def isUndesirableType(x, desired_type):
-    types = ["bool", "int", "string"]
+    types = ["bool", "int", "string", "list"]
     f = lambda y: False if (x!=y or y in desired_type) else True
     return reduce((lambda acc, a: operator.or_ (acc, f(a))), types, False)
 
@@ -55,10 +62,12 @@ def check_expected_literal_type(arg, constraint):
         return arg
     if isString(arg) and constraint == "string":
         return arg
+    if isList(arg) and constraint == "list":
+        return arg
     return ("error", "Error: Normie meme type")
 
 
-# called if the constraint is polymorphic (eg. a 'a)
+# called if the constraint is polymorphic (eg. 'a)
 def general_type(arg, constraints, varEnv):
     arg_split = arg.split(".")
 
@@ -68,10 +77,10 @@ def general_type(arg, constraints, varEnv):
             arg_split[0] = arg_split[0][2:]
 
     if arg_split[0] != arg: #if var contains a dot
-        if isIntBoolorString(arg_split[0]):
+        if isIntBoolStringorList(arg_split[0]):
             return (("error", "Error: Meme does not support dot operation"), constraints)
         if isUndesirableType(arg_split[1], constraints[0]):
-            return (("error", "Error: Normie meme type"), constraints)
+            return (("error", "Error: Normie meme type123"), constraints)
         if arg_split[1] not in constraints[0]:
             return (("error", "Error: Meme type does not exist"), constraints)
         if not varEnv.inEnvandType(arg_split[0], arg_split[1]):
@@ -82,7 +91,7 @@ def general_type(arg, constraints, varEnv):
         arg = arg_split[0]
         constraints = [arg_split[1]]
     else: #if var is a literal
-        if isIntBoolorString(arg):
+        if isIntBoolStringorList(arg):
             for i in range(len(constraints[0])):
                 errorTest = check_expected_literal_type(arg, constraints[0][i])
                 if errorTest[0] != "error":
@@ -122,6 +131,9 @@ def casted(arg):
         return getBoolVal(arg)
     if isString(arg):
         return str(arg)
+    if isList(arg):
+        return arg
+
 
 def getBoolVal(arg):
     if arg == "mild":
@@ -137,7 +149,7 @@ def getBoolVal(arg):
 # by the time this function is called, all potential errors should have been
 # handled so arg will either be a literal or variable of type constraint
 def getValofType(arg, constraint, varEnv):
-    if isIntBoolorString(arg):
+    if isIntBoolStringorList(arg):
         return casted(arg)
 
     if isinstance(constraint, list):

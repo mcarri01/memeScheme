@@ -102,13 +102,6 @@ class Environment:
         if self.inEnv(var):
             return self.env[var][0][0][2]
 
-    def isInt(x):        
-        s = "1234567890"
-        for digit in x:
-            if digit not in s:
-                return False
-        return True
-
 
     def __getType(self, arg):
         if arg == "spicy" or arg == "normie" or arg == "mild" \
@@ -117,6 +110,8 @@ class Environment:
         argStr = str(arg)
         if argStr[0] == "\"" and argStr[-1] == "\"":
             return "string"
+        if argStr[0] == "[" and argStr[-1] == "]":
+            return "list"
         try:
             if isinstance(int(arg), int):
                 return "int"

@@ -2,6 +2,7 @@ from env import *
 from dot import *
 from random import *
 import itertools
+import re
 
 # Constraints must be of the form [[["constraint A"]] [["constraint B"]]] and
 # not [["constraint A"] ["constraint B"]] because the constraints cannot be
@@ -101,7 +102,7 @@ def larger_and_smaller(args, varEnv, funEnv, op):
     return ("not_error", "spicy" if randint(0,1) == 0 else "normie")
 
 def printVar(args, varEnv, funEnv, op):
-    constraints = [[["int", "bool", "string"]]]#[[lambda: ["int", "bool", "string"]]]
+    constraints = [[["int", "bool", "string", "list"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
@@ -110,20 +111,93 @@ def printVar(args, varEnv, funEnv, op):
         return ("not_error", "spicy" if val_list[0] else "normie")
     return ("not_error", val_list[0])
 
-def seven(args, varEnv, funEnv, op):
+
+def arrityZero(args, varEnv, funEnv, returnVal):
     if args != []:
         return ("error", "Error: Incorrect number of memes")
-    return ("not_error", 7)
+    return ("not_error", returnVal)
 
-    if isinstance(val_list[0], bool):
-        return ("not_error", "spicy" if val_list[0] else "normie")
-    return ("not_error", val_list[0])
+def listArrityOne(args, varEnv, funEnv, op):
+    constraints = [[["list"]]]
+    val_list = definePrimitive(args, constraints, varEnv)
+    if val_list[0] == "error":
+        return val_list
+
+    if val_list[0] == "[]":
+        val_list[0] = []
+    else:
+        val_list[0] = string_to_list(val_list[0])
+    return ("not_error", op(val_list[0]))
+
+def listArrityTwo(args, varEnv, funEnv, op):
+    constraints = [[["int", "bool", "string", "list"]], [["list"]]]
+    val_list = definePrimitive(args, constraints, varEnv)
+    if val_list[0] == "error":
+        return val_list
+
+    if val_list[1] == "[]":
+        val_list[1] = []
+    else:
+        val_list[1] = string_to_list(val_list[1][1:-1])
+
+    if isBool(args[0]):
+        val_list[0] = args[0]
+
+    val_list[1].append(args[0]) # append the variable; not the variable's value
+    list_to_string(val_list[1])
+    val_list[1] = list_to_string(val_list[1])
+    defineVar([args[1], val_list[1]], varEnv, funEnv, None)
+    return ("not_error", val_list[1])
+
+
+
+# I have no idea why the lstrip()s are necessary.  Sometimes a leading space is
+# thrown in and the lstrip()s take care of that.
+def string_to_list(string):
+    new_list = []
+    if (re.sub('"[^"]*"', "\"\"", string)).find(",") == -1:
+        if isInt(string):
+            new_list.append(int(string))    
+        else:
+            new_list.append(string)
+        return new_list
+
+    while string != "":
+        if string[0] == "\"":
+            new_list.append((string[:string[1:].find("\"")+2]).lstrip())
+            string = string[(string[1:].find("\""))+3:]
+        else:
+            if string.find(",") != -1:
+                if isInt(string[:string.find(",")]):
+                    new_list.append(int(string[:string.find(",")]))
+                else:
+                    new_list.append((string[:string.find(",")]).lstrip())
+                string = string[(string.find(","))+2:]
+            else:
+                if isInt(string):
+                    new_list.append(int(string))
+                else:
+                    new_list.append(string.lstrip())
+                string = ""
+
+    return new_list
+
+def list_to_string(my_list):
+    new_string = "[" + str(my_list[0])
+    my_list = my_list[1:]
+
+    for x in my_list:
+        new_string = new_string + ", " + str(x)
+    new_string += "]"
+
+    return new_string
+
 
 def defineVar(args, varEnv, funEnv, op):
     if len(args) != 2:
         return ("error", "Error: Incorrect number of memes")
 
-    constraints = [[["int", "bool", "string"]]]#[[lambda: ["int", "bool", "string"]]]
+    constraints = [[["int", "bool", "string", "list"]]]
 
     val_list = []
     (toAppend, constraints[0][0]) = general_type(args[1], constraints[0], varEnv)
@@ -132,7 +206,7 @@ def defineVar(args, varEnv, funEnv, op):
     val_list.append(toAppend)
 
     reserved_terms = ["error", "MEME"]
-    if isIntBoolorString(args[0]) or args[0] in reserved_terms:
+    if isIntBoolStringorList(args[0]) or args[0] in reserved_terms:
         return ("error", "Error: Meme is reserved")
     if "<~" in args[0][:2] == "<~":
         return ("error", "Error: Meme begins with reserved symbol")
@@ -143,7 +217,6 @@ def defineVar(args, varEnv, funEnv, op):
             args[0] = args[0][2:]
         elif args[0][:2] == "//" and not funEnv.inEnv(args[0][2:]):
             return ("error", "Meme is not a function")
-
 
     varEnv.addBind(args[0], val_list[0], constraints[0])
     return ("not_error", args[0]) 

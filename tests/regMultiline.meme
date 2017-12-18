@@ -1,6 +1,9 @@
 
 I like memes
 
+empty
+
+
 													   <~ normie if check-expect
 													   <~ 1
 											   <~ normie if
@@ -29,8 +32,17 @@ I like memes
 spicy ("my name is fred" x =) check-expect
 
 
-!@<~~"abc" print
-"def"#$
+<~abc" y meme
+"def
+spicy ("def abc" y =) check-expect
+
+
+<~abc" z meme
+<~def ghi
+<~jkl
+"mno
+spicy ("mno jkl def ghi abc" z =) check-expect
+
 
 
 1 <~abc meme check-error
