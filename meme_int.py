@@ -63,7 +63,10 @@ def addPrimitives():
     funEnv.addBind("append", (appendAndPush, (lambda val, ds: ds.append(val)), 2))
     funEnv.addBind("push", (appendAndPush, (lambda val, ds: ds.insert(0,val)), 2))
     funEnv.addBind("get", (listGet, (lambda pos, ds: ds[pos-today()]), 2))
-
+    funEnv.addBind("put", (listPut, \
+        (lambda val,pos,ds: ds[:pos-today()]+[val]+ds[pos+1-today():] \
+                                if pos-today()+1!=0 \
+                                else ds[:pos-today()]+[val]), 3))
 
     return (varEnv, funEnv)
 
@@ -198,7 +201,7 @@ def evaluate(filename, lines, origLines):
             if emptyTree.get_string_length() == 0:
                 (error, val) = expTree.evaluate(varEnv, funEnv, True)
             else:
-                expTree.printTree()
+                #expTree.printTree()
                 (error, val) = ("error", "Error: Incorrect number of memes")
 
             #print val, desired_val, val==desired_val

@@ -163,16 +163,36 @@ def listGet(args, varEnv, funEnv, op):
     else:
         val_list[1] = string_to_list(val_list[1][1:-1])
 
-    # will need to modify this once negative nubmers are handled
     try:
-        #print val_list[1]
         toReturn = str(op(val_list[0], val_list[1]))
     except:
         return ("error", "Error: Wow. You just seg-faulted in memeScheme. #feelsbadman")
 
-    list_to_string(val_list[1])
     val_list[1] = list_to_string(val_list[1])
     toReturn = toReturn.replace("mild", "spicy" if randint(0,1)==0 else "normie")
+    return ("not_error", toReturn)
+
+def listPut(args, varEnv, funEnv, op):
+    constraints = [[["int", "bool", "string", "list"]], [["int"]], [["list"]]]
+    val_list = definePrimitive(args, constraints, varEnv)
+    if val_list[0] == "error":
+        return val_list
+
+    if val_list[2] == "[]":
+        val_list[2] = []
+    else:
+        val_list[2] = string_to_list(val_list[2][1:-1])
+
+    if isBool(args[0]):
+        val_list[0] = args[0]
+
+    if abs(val_list[1]-time.localtime().tm_yday+1) > len(val_list[2])-1:
+        return ("error", "Error: Wow. You just seg-faulted in memeScheme. #feelsbadman")
+    val_list[2] = op(val_list[0], val_list[1], val_list[2])
+
+    val_list[2] = list_to_string(val_list[2])
+    defineVar([args[2], val_list[2]], varEnv, funEnv, None)
+    toReturn = val_list[2].replace("mild", "spicy" if randint(0,1)==0 else "normie")
     return ("not_error", toReturn)
 
 
