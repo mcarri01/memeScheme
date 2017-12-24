@@ -217,7 +217,6 @@ def handle_checks(error, origLines, lineCount, numLines, val):
     if check_expect == True:
         if str(val) == desired_val:
             val = "Meme is " + desired_val + ", as expected"
-            check_expect == False #hullo?
             desired_val = None
         else:
             val = "Check was not the meme we expected"

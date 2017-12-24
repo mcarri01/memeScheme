@@ -133,7 +133,6 @@ def listArrityOne(args, varEnv, funEnv, op):
     return ("not_error", op(val_list[0]))
 
 def appendAndPush(args, varEnv, funEnv, op):
-    #print "what?"
     constraints = [[global_vars.ALL_TYPES], [["list"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
@@ -148,11 +147,8 @@ def appendAndPush(args, varEnv, funEnv, op):
         val_list[0] = args[0]
 
     op(val_list[0], val_list[1])
-    #list_to_string(val_list[1])
     val_list[1] = list_to_string(val_list[1])
-    #print "VAL: ", varEnv.getVal(args[1], "list")
     defineVar([args[1], val_list[1]], varEnv, funEnv, None)
-    #print "VAL: ", varEnv.getVal(args[1], "list")
     while "mild" in val_list[1]:
         val_list[1] = val_list[1].replace("mild", "spicy" if randint(0,1)==0 else "normie")
     return ("not_error", val_list[1])
