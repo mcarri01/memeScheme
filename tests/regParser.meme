@@ -1,0 +1,48 @@
+
+I like memes
+
+empty
+
+!@
+line of code here
+#$ !@""#$ !@
+#$
+
+empty check-expect check-error
+check-error check-expect check-error
+
+
+g check-error
+g] check-error
+g[ check-error
+
+
+1
+1 1 check-expect
+spicy
+spicy spicy check-expect
+"hello"
+"hello" "hello" check-expect
+[1, normie, "hello", [1, 2]]
+[1, normie, "hello", [1, 2]] [1, normie, "hello", [1, 2]] check-expect
+
+123 ab meme
+123 ab check-expect
+
+123 //seven meme
+7 seven check-expect
+
+123 //+ meme
+123 + check-expect
+123 * check-error
+
+
+"aldjksf!@#$%^&*()[][][]][[[[]]]]]]]]]][[[[[,,,meme<~" x meme
+"aldjksf!@#$%^&*()[][][]][[[[]]]]]]]]]][[[[[,,,meme<~" x print check-expect
+
+[[1, 2], 123, "didn't, hello", 2, [], normie, 123, normie] x meme
+<~  [[1, 2], 123, "didn't, hello", 2, [], normie, 123, normie]] 3 x.list init check-expect
+<~  [[1, 2], 123, "didn't, hello", 2, [], normie, 123, normie],
+   [[[1, 2], 123, "didn't, hello", 2, [], normie, 123, normie],
+
+

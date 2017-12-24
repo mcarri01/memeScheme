@@ -4,6 +4,7 @@ import operator
 import math
 import shlex
 import time
+import global_vars
 from primitives import *
 from exceptions_file import *
 from env import *
@@ -19,7 +20,6 @@ desired_val = None
 
 def addPrimitives():
     varEnv = Environment(dict())
-    #varEnv.addBind("+", 7)
     varEnv.addBind("MEME", None)
     varEnv.addBind("spicy", True)
     varEnv.addBind("normie", False)
@@ -57,6 +57,7 @@ def addPrimitives():
     funEnv.addBind("check-expect", (check, None, -1))
     funEnv.addBind("empty", (empty, None, 0))
     funEnv.addBind("if", (conditional, None, 3))
+    funEnv.addBind("while", (wloop, None, 2))
     funEnv.addBind("hitMe", (arrityZero, [], 0))
     funEnv.addBind("length", (listArrityOne, (lambda x: len(x)), 1))
     funEnv.addBind("null?", (listArrityOne, (lambda x: "spicy" if len(x)==0 else "normie"), 1))
@@ -67,6 +68,12 @@ def addPrimitives():
         (lambda val,pos,ds: ds[:pos-today()]+[val]+ds[pos+1-today():] \
                                 if pos-today()+1!=0 \
                                 else ds[:pos-today()]+[val]), 3))
+    funEnv.addBind("init", (listInit, (lambda val, size: [val]*size), 2))
+    funEnv.addBind("insert", (listInsert, (lambda val,pos,ds: ds.insert(pos-today(),val)), 3))
+    funEnv.addBind("rip", (listRemove,
+        (lambda pos,ds: ds[:pos-today()]+ds[pos+1-today():] \
+                                if pos-today()+1!=0 \
+                                else ds[:pos-today()]), 2))
 
     return (varEnv, funEnv)
 
@@ -90,24 +97,41 @@ def getMatchingBracket(noQuotes):
                 return i+1
 
 
+
 # this function is necessary because without it, the parser would divide up a
 # list of n elements into n different parts, instead of interpreting it as
 # a single entity.
 def handleQuotesAndBrackets(origExp):
     noQuotes = re.sub('"[^"]*"', "\"\"", origExp) #remove quotes
-    #removes brackets
     expression = ""
+
+    global check
+    if noQuotes[-11:] == "check-error":
+        check = True
+
+    #multiline statements sometimes get an extra space added to them
+    noQuotes = ' '.join(noQuotes.split())
+    # gets rid of parentheses
+    regex = re.compile('[()]')
+    noQuotes = regex.sub("", noQuotes)
+
     nestedCount = 0
-    for i in noQuotes:
+    for i in range(len(noQuotes)):
         if nestedCount == 0:
-            expression = expression + i
-        if i == "[":
+            expression = expression + noQuotes[i]
+        if noQuotes[i] == "[":
             nestedCount += 1
-        elif i == "]":
+        elif noQuotes[i] == "]":
             nestedCount -=1
             if nestedCount == 0:
-                expression = expression + i
+                expression = expression + noQuotes[i]
+            if nestedCount < 0:
+                return 1
+    if nestedCount != 0:
+        return 2
+
     expression = re.findall(r'(?:[^\s,"]|"(?:\\.|[^"])*")+', expression) #literally no idea
+
 
     # adds brackets back in
     for i in range(len(expression)):
@@ -124,6 +148,11 @@ def handleQuotesAndBrackets(origExp):
     for i in range(len(expression)):
         start = 0
         while "\"\"" in expression[i] and expression[i].find("\"", start) != -1:
+            if temp.find("\"") == temp.find("\"\""):
+                expression[i] = expression[i][:expression[i].find("\"", start)] + "\"\""
+                temp = temp[(temp.find("\"\""))+2:]
+                start = expression[i].find("\"\"")+2
+                continue
             expression[i] = expression[i][:expression[i].find("\"", start)] + \
                             temp[temp.find("\""):
                             (temp.find("\"", (temp.find("\""))+2))+1] + \
@@ -162,10 +191,14 @@ def evaluate(filename, lines, origLines):
     for line in range(len(lines)):
         check_expect = False
         lineCount += 1
-        lines[line] = handle_comments(line, lines, lineCount, filename, origLines)
 
+        lines[line] = handle_comments(line, lines, lineCount, filename, origLines)
+        if lines[line] == "":
+            continue
+        if lines[line] == len(lines[line]) * " ":
+            continue
         if lines[line][:2] == "<~":
-            fullExp = lines[line][2:] + ' ' + fullExp #it's "backwards" because of post-fix notation
+            fullExp = lines[line][2:] + ' ' + fullExp
             numLines += 1
             continue
         elif lines[line] == "" and origLines.getLine(line) != "":
@@ -181,22 +214,36 @@ def evaluate(filename, lines, origLines):
             continue
 
         expression = handleQuotesAndBrackets(lines[line])
+        if isinstance(expression, int):
+            if check:
+                check = False
+                val = "Meme failed, as expected"
+                print "-->", val
+                numLines = 1
+                continue
+            if not check:
+                if expression == 1:
+                    val = "Error: SIKE! That's the wrong bracket!"
+                if expression == 2:
+                    val = "Error: Endless memer"
+                origLines.RaiseException(filename, lineCount, numLines, val)
         expression.reverse()
 
-        if len(expression) != 0:
-            try:
-                (expression, (fun, op, a), origLines) = checks(expression, origLines, funEnv)
-            except:
-                if check and len(expression) == 0:
-                    val = "Error: Incorrect number of memes123"
-                    origLines.RaiseException(filename, lineCount, numLines, val)
-                val = "Error: Where's the meme?"
-                if not check:
-                    origLines.RaiseException(filename, lineCount, numLines, val)
 
+        if len(expression) != 0:
+            (expression, origLines) = checks(expression, origLines, funEnv)
+        if check and len(expression) == 0:
+            val = "Error: Incorrect number of memes"
+            origLines.RaiseException(filename, lineCount, numLines, val)
+        val = "Error: Where's the meme?"
+
+
+        first_iteration = True
+        while first_iteration or global_vars.WLOOP:
             emptyTree = ExpressionTree(None, expression)
             expTree = makeTree(emptyTree, funEnv)
-            expTree.epsteinCheck(varEnv, funEnv, emptyTree)
+            if first_iteration:
+                expTree.epsteinCheck(varEnv, funEnv, emptyTree)
 
             if emptyTree.get_string_length() == 0:
                 (error, val) = expTree.evaluate(varEnv, funEnv, True)
@@ -205,10 +252,18 @@ def evaluate(filename, lines, origLines):
                 (error, val) = ("error", "Error: Incorrect number of memes")
 
             #print val, desired_val, val==desired_val
+            if not first_iteration and not global_vars.WLOOP:
+                if not global_vars.WLOOP_PRINT:
+                    print "-->", prev_val
+                global_vars.WLOOP_PRINT = False
+                break
             varEnv.addBindMEME("MEME", val)
 
-            if error == "error":
-                origLines.RaiseException(filename, lineCount, numLines, val)
+            if error == "error" or error == "errorDec":
+                if error == "errorDec":
+                    origLines.RaiseException(filename, lineCount, numLines, val, True)
+                else:
+                    origLines.RaiseException(filename, lineCount, numLines, val)
                 if val == "Error: Can't check a check, ya doofus":
                     origLines.RaiseException(filename, lineCount, numLines, val)
                 val = "Meme failed, as expected"
@@ -224,46 +279,51 @@ def evaluate(filename, lines, origLines):
                 else:
                     val = "Check was not the meme we expected"
                     origLines.RaiseException(filename, lineCount, numLines, val)
-            print "-->", val
+            if first_iteration and not global_vars.WLOOP:
+                print "-->", val
+            else:
+                prev_val = val
+            first_iteration = False
         numLines = 1
+        check = False
 
     if fullExp != "":
-        val == "Error: Incorrect number of memes"
+        val = "Error: Incorrect number of memes"
         origLines.RaiseException(filename, lineCount, numLines, val)
 
 
 def checks(expression, origLines, funEnv):
     global check, check_expect, desired_val
-    try:
-        if expression[0] == "check-error":
-            check = True
-            expression.pop(0)
-            origLines.toggleErrorCheck()            
-        elif expression[0] == "check-expect":
-            check_expect = True
-            expression.pop(0)
-            desired_val = expression[-1]
-            expression = expression[:-1]
-            if desired_val == "check-expect" or desired_val == "check-error":
-                return (expression, None, origLines)
-            check = True
-        fun = funEnv.getVal(expression[0], "function")
-        return (expression, fun, origLines)
-    except:
-        fun = funEnv.getVal(expression[0], "function")
-        return (expression, fun, origLines)
+    #try:
+    if expression[0] == "check-error":
+        check = True
+        expression.pop(0)
+        origLines.toggleErrorCheck()            
+    elif expression[0] == "check-expect":
+        check_expect = True
+        expression.pop(0)
+        desired_val = expression[-1]
+        expression = expression[:-1]
+        if desired_val == "check-expect" or desired_val == "check-error":
+            return (expression, None, origLines)
+        check = True
+    return (expression, origLines)
 
 
 def main(filename):
-    f = open(filename, 'r')
+    open(filename, 'r')
     lines = [line.rstrip('\n') for line in open(filename)]
     lines = map(lambda x: ' '.join(x.split()), lines)
     # THE LINE DIRECTLY ABOVE NEEDS TO CHANGE SO THAT MULTPILE SPACES IN QUOTES
-    # WLL NOT BE CONDENSED
+    # WILL NOT BE CONDENSED
 
     origLines = OriginalLines(lines)
-    regex = re.compile('[()]') # remove parentheses
-    lines = [regex.sub("", line) for line in lines]
+    #regex = re.compile('[()]') # remove parentheses
+    #lines = [regex.sub("", line) for line in liness
+    ## FIX THE ABOVE LINES SO THAT YOU CAN HAVE PARENTHESES IN QUOTES
+    ### THIS HAS BEEN FIXED
+    #### SO WHY DON'T YOU DELETE THESE COMMENTS?!?!?
+    ##### THAT IS A GOOD QUESTION
     userMemerCheck(lines, filename, origLines)
     evaluate(filename, lines, origLines)
     
@@ -272,3 +332,64 @@ if __name__ == '__main__':
     assert (len(sys.argv) == 2)
     main(sys.argv[1])
     
+
+
+
+
+        # if len(expression) == 1:
+        #     print "HERE"
+        #     if isIntBoolStringorList(expression[0]):
+        #         val = expression[0]
+        #     elif varEnv.inEnv(expression[0]):
+        #         val = varEnv.getVal(expression[0], varEnv.getOrigType(expression[0]))
+        #     print "-->", val
+        #     numLines = 1
+        #     continue
+
+        # if len(expression) == 2 and check_expect:
+        #     print "HERE"
+        #     if isIntBoolStringorList(expression[0]):
+        #         isExpectedVal = (expression[0] == desired_val)
+        #     elif varEnv.inEnv(expression[0]):
+        #         isExpectedVal = (varEnv.getVal(expression[0], \
+        #                          varEnv.getOrigType(expression[0])) == desired_val)
+        #     if isExpectedVal:
+        #         val = "Meme is " + desired_val + ", as expected"
+        #         print "-->", val
+        #         numLines = 1
+        #         continue
+        #     else:
+        #         val = "Check was not the meme we expected"
+        #         origLines.RaiseException(filename, lineCount, numLines, val)
+
+
+
+             # or (check_expect and len(expression) == 2):
+             #    if funEnv.inEnv(expression[0]):
+             #        print "a"
+             #        if funEnv.getArrity(expression[0]) != 0:
+             #            if varEnv.inEnv(expression[0]):
+             #                if check_expect:
+             #                    val = "Meme is " + desired_val + ", as expected"
+             #                else:
+             #                    val = varEnv.getVal(expression[0], varEnv.getOrigType(expression[0]))
+             #    elif isIntBoolStringorList(expression[0]):
+             #        print "b"
+             #        val = expression[0]
+             #    elif varEnv.inEnv(expression[0]):
+             #        print "c"
+             #        val = varEnv.getVal(expression[0], varEnv.getOrigType(expression[0]))
+             #    # elif expression[0] == desired_val:
+             #    #     print "d"
+             #    #     val = "Meme is " + desired_val + ", as expected"
+             #    #     check_expect = False
+             #    else:
+             #        print "e"
+             #        val = "Check was not the meme we expected"
+             #        origLines.RaiseException(filename, lineCount, numLines, val)
+                # print "-->", val
+                # numLines = 1
+                # continue
+
+                # if not check:
+                #     origLines.RaiseException(filename, lineCount, numLines, val)

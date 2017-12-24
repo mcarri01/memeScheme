@@ -110,7 +110,7 @@ class Environment:
                           or arg == True or arg == False:
             return "bool"
         argStr = str(arg)
-        if argStr[0] == "\"" and argStr[-1] == "\"":
+        if argStr == "" or (argStr[0] == "\"" and argStr[-1] == "\""):
             return "string"
         if argStr[0] == "[" and argStr[-1] == "]":
             return "list"

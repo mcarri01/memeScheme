@@ -69,6 +69,9 @@ def string_to_list(string):
     return new_list
 
 def list_to_string(my_list):
+    if my_list == []:
+        return "[]"
+
     new_string = "[" + str(my_list[0])
     my_list = my_list[1:]
 

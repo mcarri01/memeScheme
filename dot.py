@@ -1,4 +1,5 @@
 import operator
+import global_vars
 from env import *
 from random import *
 
@@ -17,11 +18,17 @@ def isBool(x):
     return (x == "spicy" or x == "normie" or x == "mild")
 
 def isString(x):
+    if x == "":
+        return True
+
     if x[0] == "\"" and x[-1] == "\"":   #if x is of the "___" format
         return True
     return False
 
 def isList(x):
+    if x == "":
+        return False
+
     if x[0] == "[" and x[-1] == "]":   #if x is of the [___] format
         return True
     return False
@@ -79,22 +86,21 @@ def general_type(arg, constraints, varEnv):
     if arg_split[0] != arg: #if var contains a dot
         if isIntBoolStringorList(arg_split[0]):
             return (("error", "Error: Meme does not support dot operation"), constraints)
-        if isUndesirableType(arg_split[1], constraints[0]):
-            return (("error", "Error: Normie meme type123"), constraints)
-        if arg_split[1] not in constraints[0]:
+        if arg_split[1] not in global_vars.ALL_TYPES:
             return (("error", "Error: Meme type does not exist"), constraints)
-        if not varEnv.inEnvandType(arg_split[0], arg_split[1]):
-            if varEnv.inEnv(arg_split[0]):
-                return (("error", "Error: Normie meme type"), constraints)
-            else:
-                return (("error", "Error: Meme does not exist"), constraints)
+        if arg_split[1] not in constraints[0]:
+            return (("error", "Error: Normie meme type"), constraints)
+        if not varEnv.inEnv(arg_split[0]):
+            return (("error", "Error: Meme does not exist"), constraints)
+        if isUndesirableType(arg_split[1], varEnv.getVarTypes(arg_split[0])):
+            return (("error", "Error: Normie meme type"), constraints)
         arg = arg_split[0]
         constraints = [arg_split[1]]
     else: #if var is a literal
         if isIntBoolStringorList(arg):
             for i in range(len(constraints[0])):
                 errorTest = check_expected_literal_type(arg, constraints[0][i])
-                if errorTest[0] != "error":
+                if errorTest == "" or errorTest[0] != "error":
                     arg = errorTest
                     constraints = [getLiteralType(arg)]
                     break
@@ -160,6 +166,18 @@ def getValofType(arg, constraint, varEnv):
 
 
 
+
+        # if isIntBoolStringorList(arg_split[0]):
+        #     return (("error", "Error: Meme does not support dot operation"), constraints)
+        # if isUndesirableType(arg_split[1], constraints[0]):
+        #     return (("error", "Error: Normie meme type"), constraints)
+        # if arg_split[1] not in global_vars.ALL_TYPES: #constraints[0]
+        #     return (("error", "Error: Meme type does not exist"), constraints)
+        # if not varEnv.inEnvandType(arg_split[0], arg_split[1]):
+        #     if varEnv.inEnv(arg_split[0]):
+        #         return (("error", "Error: Normie meme type"), constraints)
+        #     else:
+        #         return (("error", "Error: Meme does not exist"), constraints)
 
 
 # THE FUNCTION BELOW IS OBSOLETE.  IT HAS BEEN REPLACED WITH THE general_type

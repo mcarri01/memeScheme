@@ -1,4 +1,3 @@
-
 I like memes
 
 !@ Comparison #$
@@ -58,23 +57,23 @@ spicy x.int x.int <= check-expect
 !@ Tests with two variables, one of a singular type, one of multiple types
    int was declared first for both variables #$
 2 y meme
-normie x y <= check-expect
-spicy y.int x <= check-expect
-normie x y.int <= check-expect
-normie x.int y <= check-expect
-spicy y x.int <= check-expect 
-normie x.int y.int <= check-expect
+spicy x y <= check-expect
+normie y.int x <= check-expect
+spicy x y.int <= check-expect
+spicy x.int y <= check-expect
+normie y x.int <= check-expect 
+spicy x.int y.int <= check-expect
 
 
 !@ Tests with two variables, both of multiple types #$
 "hello" y meme
-spicy x y > check-expect
-normie y.int x >= check-expect
-spicy x y.int >= check-expect
-spicy x.int y >= check-expect
-normie y x.int >= check-expect
-spicy x.int y.int >= check-expect
-normie y.int x.int >= check-expect
+normie x y > check-expect
+spicy y.int x >= check-expect
+normie x y.int >= check-expect
+normie x.int y >= check-expect
+spicy y x.int >= check-expect
+normie x.int y.int >= check-expect
+spicy y.int x.int >= check-expect
 
 spicy q meme
 2 q meme
@@ -83,7 +82,6 @@ spicy q meme
 1 r meme
 
 spicy q.string r.string <= check-expect
-normie r.int q.int <= check-expect
+spicy r.int q.int <= check-expect
 spicy q r <= check-expect
-normie r q <= check-expect
-
+spicy r q <= check-expect

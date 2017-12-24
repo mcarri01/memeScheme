@@ -1,0 +1,152 @@
+
+I like memes
+
+empty
+
+123 xyz meme
+
+
+hitMe a meme
+[1] a 1 append check-expect
+[2, 1] a 2 push check-expect
+[[2, 1]] ((hitMe b meme) a append) check-expect
+1 b length check-expect
+
+
+hitMe x meme
+0 x length check-expect
+spicy x null? check-expect
+[1] x 1 append check-expect
+1 x length check-expect
+normie x null? check-expect
+
+
+"      a" j meme
+j print
+
+
+!@ appending #$
+
+[1, "didn't, hello"] x "didn't, hello" append check-expect
+[1, "didn't, hello", 2] x 2 append check-expect
+[1, "didn't, hello", 2, []] x hitMe append check-expect
+[1, "didn't, hello", 2, [], " , [] ' "] x " , [] ' " append check-expect
+[1, "didn't, hello", 2, [], " , [] ' ", 123] x xyz append check-expect
+[1, "didn't, hello", 2, [], " , [] ' ", 123, normie] x normie append check-expect
+7 x length check-expect
+[[1, "didn't, hello", 2, [], " , [] ' ", 123, normie], 1, "didn't, hello", 2, [], " , [] ' ", 123, normie] x x push check-expect
+normie x null? check-expect
+8 x length check-expect
+
+
+!@ get #$
+
+[1, "didn't, hello", 2, [], " , [] ' ", 123, normie] (x today get) check-expect
+123 (x (6 today +) get) check-expect
+normie (x (1 today -) get) check-expect
+[1, "didn't, hello", 2, [], " , [] ' ", 123, normie] (x ((x length) today -) get) check-expect
+
+b (today 1 +) get check-error
+[2, 1] b today get check-expect
+[2, 1] b (1 today -) get check-expect
+b j get check-error
+b x get check-error
+b spicy get check-error
+spicy today get check-error
+j today get check-error
+1 today get check-error
+
+
+!@ put #$
+
+[[2, 1]] b print check-expect
+[1] (b today 1 put) check-expect
+[1] b print check-expect
+
+[[1, 2], 1, "didn't, hello", 2, [], " , [] ' ", 123, normie] (x today [1, 2] put) check-expect
+					<~ (x (today 5 +) "DAVID STERN IS REALLY COOL" put) check-expect
+[[1, 2], 1, "didn't, hello", 2, [], "DAVID STERN IS REALLY COOL", 123, normie]
+[[1, 2], 1, "didn't, hello", 2, [], normie, 123, normie] (x (3 today -) normie put) check-expect
+[[1, 2], 123, "didn't, hello", 2, [], normie, 123, normie] (x (today (b length) +) xyz put) check-expect
+[0, 123, "didn't, hello", 2, [], normie, 123, normie] (x ((x length) today -) 0 put) check-expect
+[[1, 2], 123, "didn't, hello", 2, [], normie, 123, normie] (x today [1, 2] put) check-expect
+
+(xyz today 1 put) check-error
+(j today 1 put) check-error
+(mild today 1 put) check-error
+(x spicy 1 put) check-error
+(x j 1 put) check-error
+(x x 1 put) check-error
+
+(x (today 8 +) x put) check-error
+(b (today 1 +) b put) check-error
+
+
+!@ init #$
+
+-1 6 init check-error
+[] 0 6 init check-expect
+[6, 6, 6, 6] 4 6 init check-expect
+spicy 6 init check-error
+j 6 init check-error
+x 6 init check-error
+hitMe 6 init check-error
+[6, 6, 6, 6] (xyz 127 -) 6 init check-expect
+
+<~  [[1, 2], 123, "didn't, hello", 2, [], normie, 123, normie]] 3 x init check-expect
+<~  [[1, 2], 123, "didn't, hello", 2, [], normie, 123, normie],
+   [[[1, 2], 123, "didn't, hello", 2, [], normie, 123, normie],
+[spicy, spicy, spicy] 3 spicy init check-expect
+[123, 123, 123] 3 xyz init check-expect
+["hello", "hello", "hello"] 3 "hello" init check-expect
+
+
+empty
+
+!@ insert #$
+
+hitMe x meme
+x (1 today -) 0 insert check-error
+[0] x today 0 insert check-expect
+[-1, 0] x (today) -1 insert check-expect
+[-1, 0, 2] x (today 2 +) 2 insert check-expect
+x (today 4 +) 2 insert check-error
+[-1, 0, 1, 2] x (1 today -) 1 insert check-expect
+
+
+("hello" (3 (normie a meme) meme) meme)
+hitMe y meme
+[spicy] y today spicy insert check-expect
+["hello", spicy] y today "hello" insert check-expect
+[["hello", spicy], "hello", spicy] y today y insert check-expect
+[3, ["hello", spicy], "hello", spicy] y today a.int insert check-expect
+
+(a.int today 1 insert) check-error
+(a.bool today 1 insert) check-error
+(a.string today 1 insert) check-error
+
+(y a.bool 0 insert) check-error
+(y a.string 0 insert) check-error
+(y y b insert) check-error
+
+
+!@ remove (rip) #$
+
+[-1, 0, 1] x (1 today -) rip check-expect
+[-1, 1] x (2 today -) rip check-expect
+[1] x today rip check-expect
+[] x today rip check-expect
+
+
+(y a.bool rip) check-error
+(y a.string rip) check-error
+(y y rip) check-error
+
+(a.int today rip) check-error
+(a.bool today rip) check-error
+(a.string today rip) check-error
+
+[["hello", spicy], "hello", spicy] (y (4 today -) rip) check-expect
+y
+y (3 today -) a.int put
+

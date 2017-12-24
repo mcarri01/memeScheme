@@ -6,7 +6,7 @@
 ###
 
 
-
+import global_vars
 from primitives import *
 from dot import *
 
@@ -29,16 +29,82 @@ class Node:
         self.children[i] = newChild
 
 
+    def __stripDot(self, varEnv):
+        temp_val = self.val
+        arg_split = self.val.split(".")
+
+        if len(arg_split) == 1:
+            if varEnv.inEnv(self.val):
+                return ("not_error", \
+                         varEnv.getVal(self.val, varEnv.getOrigType(self.val)))
+            else:
+                return ("error", "Error: Meme does not exist")
+
+        if len(arg_split[0]) > 2:
+            if arg_split[0][:2] == "//" and varEnv.inEnv(arg_split[0][2:]):
+                temp_val = arg_split[0][2:]
+                arg_split[0] = arg_split[0][2:]
+
+        if isIntBoolStringorList(arg_split[0]):
+            return ("error", "Error: Meme does not support dot operation")
+        if arg_split[1] not in global_vars.ALL_TYPES:
+            return ("error", "Error: Meme type does not exist")
+        if not varEnv.inEnv(arg_split[0]):
+            return ("error", "Error: Meme does not exist")
+        if isUndesirableType(arg_split[1], varEnv.getVarTypes(arg_split[0])):
+            return ("error", "Error: Normie meme type")
+        return ("not_error", varEnv.getVal(arg_split[0], arg_split[1]))
+
+
+    # This function takes in the node at the root of the expression tree and
+    # evaluates it by recursively calling this function on its children.  Along
+    # the way, the function checks to make sure it is not evaluating the false
+    # branch of an if-statement or the body of a while loop that has already
+    # terminated.  This is important because functions that update values
+    # and are in the garbage part of the if/while statements would be evaluated
+    # without this check.  A consequence of this method is that if there is an
+    # error in the garbage part of the if/while statement, the evaluator will
+    # not detect it (although this is not necessarily a bad thing).  This
+    # function also sets the WLOOP_PRINT variable which is responsible for
+    # letting the wloop primitive function to know if the result of the body
+    # of the loop should be printed (since otherwise putting a print statement
+    # in the while loop's body would have no effect other than printing the
+    # result of the last iteration of the loop).  There might be a bug here
+    # where if there are multiple while loops in an expression and one loop
+    # wants printing and the other doesn't either both loops will print or
+    # neither loop will print but I'm not sure.
     def evaluate(self, varEnv, funEnv, topDogCheck):
-        if self.val == "if" and self.numChildren > 0:
+        if self.root and self.val != None and self.numChildren == -1:
+            if isIntBoolStringorList(self.val):
+                return ("not_error", self.val)
+            return self.__stripDot(varEnv)
+        if (self.val == "if" or self.val == "while") and self.numChildren > 0:
             topDogCheck = False
         if self.numChildren != -1:
-            for i in range(self.numChildren):
-                self.children[i] = (self.children[i]).evaluate(varEnv, funEnv, topDogCheck)
+            if self.val == "if" and self.numChildren == 3:
+                self.children[0] = (self.children[0]).evaluate(varEnv, funEnv, topDogCheck)
+                if self.children[0] == ("not_error", "spicy"):
+                    self.children[1] = (self.children[1]).evaluate(varEnv, funEnv, topDogCheck)
+                    self.children[2] = ("not_error", "doesn't matter")
+                elif self.children[0] == ("not_error", "normie"):
+                    self.children[1] = ("not_error", "doesn't matter")
+                    self.children[2] =  (self.children[2]).evaluate(varEnv, funEnv, topDogCheck)
+            elif self.val == "while" and self.numChildren == 2:
+                self.children[0] = (self.children[0]).evaluate(varEnv, funEnv, topDogCheck)
+                if self.children[0] == ("not_error", "spicy"):
+                    if self.children[1].val == "print":
+                        global_vars.WLOOP_PRINT = True
+                    self.children[1] = (self.children[1]).evaluate(varEnv, funEnv, topDogCheck)
+                else:
+                    self.children[1] = ("not_error", "doesn't matter")
+            else:
+                for i in range(self.numChildren):
+                    self.children[i] = (self.children[i]).evaluate(varEnv, funEnv, topDogCheck)
         else:
             return ("not_error", self.val)
 
         (fun, op, arrity) = funEnv.getVal(self.val, "function")
+        # not sure if/why the line below is necessary
         self.children = [(a,b) for (a,b) in self.children if b != None]
 
         top_dogs = ["print", "empty"]
@@ -55,7 +121,6 @@ class Node:
 
         # cast to string because it will record the result of an arithmetic
         # operation as an int which screws things up
-        # REMEMBER TO CHANGE THIS WHEN DEALING WITH LISTS
         return (error, str(val))
 
 

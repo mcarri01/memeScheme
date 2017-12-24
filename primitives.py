@@ -1,8 +1,10 @@
 import itertools
+import global_vars
 from env import *
 from dot import *
 from random import *
 from list_string_conversion import *
+
 
 # Constraints must be of the form [[["constraint A"]] [["constraint B"]]] and
 # not [["constraint A"] ["constraint B"]] because the constraints cannot be
@@ -15,7 +17,7 @@ def definePrimitive(args, constraints, varEnv):
     cleanArgs = [] # strips dot from argument name
     for i in range(len(args)):
         (toAppend, constraints[i][0]) = general_type(args[i], constraints[i], varEnv)
-        if toAppend[0] == "error":
+        if toAppend != "" and toAppend[0] == "error":
             return toAppend
         cleanArgs.append(toAppend)    
 
@@ -83,10 +85,10 @@ def comparison(args, varEnv, funEnv, op):
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
-    return ("not_error", "spicy" if op(val_list[0], val_list[1]) else "normie")
+    return ("not_error", "spicy" if op(val_list[1], val_list[0]) else "normie")
 
 def equal_nequal(args, varEnv, funEnv, op):
-    constB = [["int", "bool", "string"]]
+    constB = [global_vars.ALL_TYPES]
     constA = constB
     constraints = [constA, constB]
     val_list = definePrimitive(args, constraints, varEnv)
@@ -102,7 +104,7 @@ def larger_and_smaller(args, varEnv, funEnv, op):
     return ("not_error", "spicy" if randint(0,1) == 0 else "normie")
 
 def printVar(args, varEnv, funEnv, op):
-    constraints = [[["int", "bool", "string", "list"]]]
+    constraints = [[global_vars.ALL_TYPES]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
@@ -128,11 +130,11 @@ def listArrityOne(args, varEnv, funEnv, op):
     else:
         val_list[0] = string_to_list(val_list[0][1:-1])
 
-
     return ("not_error", op(val_list[0]))
 
 def appendAndPush(args, varEnv, funEnv, op):
-    constraints = [[["int", "bool", "string", "list"]], [["list"]]]
+    #print "what?"
+    constraints = [[global_vars.ALL_TYPES], [["list"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
@@ -146,11 +148,15 @@ def appendAndPush(args, varEnv, funEnv, op):
         val_list[0] = args[0]
 
     op(val_list[0], val_list[1])
-    list_to_string(val_list[1])
+    #list_to_string(val_list[1])
     val_list[1] = list_to_string(val_list[1])
+    #print "VAL: ", varEnv.getVal(args[1], "list")
     defineVar([args[1], val_list[1]], varEnv, funEnv, None)
-    val_list[1] = val_list[1].replace("mild", "spicy" if randint(0,1)==0 else "normie")
+    #print "VAL: ", varEnv.getVal(args[1], "list")
+    while "mild" in val_list[1]:
+        val_list[1] = val_list[1].replace("mild", "spicy" if randint(0,1)==0 else "normie")
     return ("not_error", val_list[1])
+
 
 def listGet(args, varEnv, funEnv, op):
     constraints = [[["int"]], [["list"]]]
@@ -169,11 +175,13 @@ def listGet(args, varEnv, funEnv, op):
         return ("error", "Error: Wow. You just seg-faulted in memeScheme. #feelsbadman")
 
     val_list[1] = list_to_string(val_list[1])
-    toReturn = toReturn.replace("mild", "spicy" if randint(0,1)==0 else "normie")
+    while "mild" in val_list[1]:
+        toReturn = toReturn.replace("mild", "spicy" if randint(0,1)==0 else "normie")
     return ("not_error", toReturn)
 
+
 def listPut(args, varEnv, funEnv, op):
-    constraints = [[["int", "bool", "string", "list"]], [["int"]], [["list"]]]
+    constraints = [[global_vars.ALL_TYPES], [["int"]], [["list"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
@@ -186,21 +194,95 @@ def listPut(args, varEnv, funEnv, op):
     if isBool(args[0]):
         val_list[0] = args[0]
 
-    if abs(val_list[1]-time.localtime().tm_yday+1) > len(val_list[2])-1:
+    if abs(val_list[1]-time.localtime().tm_yday+1) > len(val_list[2])-1 and \
+        (val_list[1]-time.localtime().tm_yday+1) * (-1) != len(val_list[2]):
         return ("error", "Error: Wow. You just seg-faulted in memeScheme. #feelsbadman")
     val_list[2] = op(val_list[0], val_list[1], val_list[2])
 
     val_list[2] = list_to_string(val_list[2])
     defineVar([args[2], val_list[2]], varEnv, funEnv, None)
-    toReturn = val_list[2].replace("mild", "spicy" if randint(0,1)==0 else "normie")
-    return ("not_error", toReturn)
+    while "mild" in val_list[2]:
+        val_list[2] = val_list[2].replace("mild", "spicy" if randint(0,1)==0 else "normie")
+    return ("not_error", val_list[2])
+
+
+def listInsert(args, varEnv, funEnv, op):
+    constraints = [[global_vars.ALL_TYPES], [["int"]], [["list"]]]
+    val_list = definePrimitive(args, constraints, varEnv)
+    if val_list[0] == "error":
+        return val_list
+
+    if val_list[2] == "[]":
+        val_list[2] = []
+    else:
+        val_list[2] = string_to_list(val_list[2][1:-1])
+
+    if isBool(args[0]):
+        val_list[0] = args[0]
+
+    if abs(val_list[1]-time.localtime().tm_yday+1) > len(val_list[2]):
+        return ("errorDec", "____")
+    op(val_list[0], val_list[1], val_list[2])
+
+    val_list[2] = list_to_string(val_list[2])
+    defineVar([args[2], val_list[2]], varEnv, funEnv, None)
+    while "mild" in val_list[2]:
+        val_list[2] = val_list[2].replace("mild", "spicy" if randint(0,1)==0 else "normie")
+    return ("not_error", val_list[2])
+
+def listRemove(args, varEnv, funEnv, op):
+    constraints = [[["int"]], [["list"]]]
+    val_list = definePrimitive(args, constraints, varEnv)
+    if val_list[0] == "error":
+        return val_list
+
+    if val_list[1] == "[]":
+        return ("error", "Error: No meme to kill")
+    else:
+        val_list[1] = string_to_list(val_list[1][1:-1])
+
+    if abs(val_list[0]-time.localtime().tm_yday+1) > len(val_list[1])-1 and \
+        (val_list[0]-time.localtime().tm_yday+1) * (-1) != len(val_list[1]):
+        return ("error", "Error: No meme to kill")
+
+    if len(val_list[1]) == 1:
+        val_list[1] = []
+    else:
+        val_list[1] = op(val_list[0], val_list[1])
+
+    val_list[1] = list_to_string(val_list[1])
+    defineVar([args[1], val_list[1]], varEnv, funEnv, None)
+    while "mild" in val_list[1]:
+        val_list[1] = val_list[1].replace("mild", "spicy" if randint(0,1)==0 else "normie")
+    return ("not_error", val_list[1])
+
+
+def listInit(args, varEnv, funEnv, op):
+    constraints = [[global_vars.ALL_TYPES], [["int"]]]
+    val_list = definePrimitive(args, constraints, varEnv)
+    if val_list[0] == "error":
+        return val_list
+
+    if isBool(args[0]):
+        val_list[0] = args[0]
+
+    if val_list[1] == 0:
+        new_list = "[]"
+    elif val_list[1] < 0:
+        return ("error", "Error: Invalid list size.")
+    else:
+        new_list = op(val_list[0], val_list[1])
+        new_list = list_to_string(new_list)
+        while "mild" in new_list:
+            new_list = new_list.replace("mild", "spicy" if randint(0,1)==0 else "normie", 1)
+    return ("not_error", new_list)
 
 
 def defineVar(args, varEnv, funEnv, op):
     if len(args) != 2:
         return ("error", "Error: Incorrect number of memes")
 
-    constraints = [[["int", "bool", "string", "list"]]]
+    constraints = [[global_vars.ALL_TYPES]]
 
     val_list = []
     (toAppend, constraints[0][0]) = general_type(args[1], constraints[0], varEnv)
@@ -208,13 +290,18 @@ def defineVar(args, varEnv, funEnv, op):
         return toAppend
     val_list.append(toAppend)
 
-    reserved_terms = ["error", "MEME"]
+    reserved_terms = ["error", "MEME", "meme"]
+    reserved_symbols = ["\"", "[", "]", "<~", "."]
+
     if isIntBoolStringorList(args[0]) or args[0] in reserved_terms:
         return ("error", "Error: Meme is reserved")
-    if "<~" in args[0][:2] == "<~":
-        return ("error", "Error: Meme begins with reserved symbol")
-    if "." in args[0]:
-        return ("error", "Error: Dot cannot appear in meme name")
+    for i in reserved_symbols:
+        if i in args[0]:
+            return ("error", "Error: Meme contains reserved symbol")
+    # if "<~" in args[0][:2] == "<~":
+    #     return ("error", "Error: Meme begins with reserved symbol")
+    # if "." in args[0]:
+    #     return ("error", "Error: Dot cannot appear in meme name")
     if len(args[0]) > 2: #avoids the necessity of a try-except
         if args[0][:2] == "//" and funEnv.inEnv(args[0][2:]):
             args[0] = args[0][2:]
@@ -239,6 +326,24 @@ def conditional(args, varEnv, funEnv, op):
     if isBool(args[0]):
         args = map(lambda x: x if x!="mild" else "spicy" if randint(0,1)==0 else "normie", args)
         return ("not_error", args[1] if getBoolVal(args[0]) else args[2])
+    else:
+        return ("error", "Error: Normie meme type")
+
+
+def wloop(args, varEnv, funEnv, op):
+    if len(args) != 2:
+        return ("error", "Error: Incorrect number of memes")
+
+    if isBool(args[0]):
+        args = map(lambda x: x if x!="mild" else "spicy" if randint(0,1)==0 else "normie", args)
+        if getBoolVal(args[0]):
+            global_vars.WLOOP = True
+            if global_vars.WLOOP_PRINT:
+                print "-->", args[1]
+            return ("not_error", args[1])
+        else:
+            global_vars.WLOOP = False
+            return ("not_error", "doesn't matter")
     else:
         return ("error", "Error: Normie meme type")
 

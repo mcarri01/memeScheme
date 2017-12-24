@@ -28,11 +28,12 @@ spicy 1 = check-error
 a b = check-error
 
 
-
 !@ Test with two literals #$
 spicy 1 1 = check-expect
 spicy spicy spicy = check-expect
 spicy "hello" "hello" = check-expect
+spicy "" "" = check-expect
+spicy [] [] = check-expect
 
 
 !@ Tests with one variable of a singular type #$
