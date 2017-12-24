@@ -30,6 +30,13 @@ class Node:
 
 
     def __stripDot(self, varEnv):
+        if isIntBoolStringorList(self.val):
+            if self.val == "mild":
+                if randint(0,1) == 0:
+                    self.val = "spicy"
+                else:
+                    self.val = "normie"
+            return ("not_error", self.val)
         temp_val = self.val
         arg_split = self.val.split(".")
 
@@ -75,19 +82,22 @@ class Node:
     # neither loop will print but I'm not sure.
     def evaluate(self, varEnv, funEnv, topDogCheck):
         if self.root and self.val != None and self.numChildren == -1:
-            if isIntBoolStringorList(self.val):
-                return ("not_error", self.val)
             return self.__stripDot(varEnv)
         if (self.val == "if" or self.val == "while") and self.numChildren > 0:
             topDogCheck = False
         if self.numChildren != -1:
+            # for readability's sake, collapse the if and elif statements below
             if self.val == "if" and self.numChildren == 3:
                 self.children[0] = (self.children[0]).evaluate(varEnv, funEnv, topDogCheck)
                 if self.children[0] == ("not_error", "spicy"):
                     self.children[1] = (self.children[1]).evaluate(varEnv, funEnv, topDogCheck)
-                    self.children[2] = ("not_error", "doesn't matter")
+                    if self.children[2].val == None:
+                        self.children[2] = ("not_error", None)
+                    else:
+                        self.children[2] = ("not_error", "doesn't matter")
                 elif self.children[0] == ("not_error", "normie"):
-                    self.children[1] = ("not_error", "doesn't matter")
+                    if self.children[1].val != None:
+                        self.children[1] = ("not_error", "doesn't matter")
                     self.children[2] =  (self.children[2]).evaluate(varEnv, funEnv, topDogCheck)
             elif self.val == "while" and self.numChildren == 2:
                 self.children[0] = (self.children[0]).evaluate(varEnv, funEnv, topDogCheck)

@@ -9,11 +9,11 @@ QUOTE = "\""
 
 
 # ensures that comments are of the correct format
-def handle_strings(expression, lineCount, numLines, filename, origLines):
+def handle_strings(expression, lineCount, numLines, origLines):
     if expression.count("\"") % 2 == 0:
         return
     val = "Error: Endless memer"
-    origLines.RaiseException(filename, lineCount, numLines, val)
+    origLines.RaiseException(lineCount, numLines, val)
 
 
 
@@ -22,7 +22,7 @@ def handle_strings(expression, lineCount, numLines, filename, origLines):
 # say only this: you deserve better.  No man should be forced to try to
 # understand such a function.  On behalf of memeScheme, I beg your forgiveness
 # and hope to do better in the future.
-def handle_comments(line, lines, lineCount, filename, origLines):
+def handle_comments(line, lines, lineCount, origLines):
     loop = True
     origLine = lines[line]
     currLine = lines[line]
@@ -68,7 +68,7 @@ def handle_comments(line, lines, lineCount, filename, origLines):
                     loop = True
                 elif not comment:
                     val = "Error: Lil ending memer doesn't have a partner"
-                    origLines.RaiseException(filename, lineCount, 1, val)
+                    origLines.RaiseException(lineCount, 1, val)
                 else:
                     loop = True
             else:
@@ -89,10 +89,10 @@ def handle_comments(line, lines, lineCount, filename, origLines):
                 loop = True
             else:
                 val = "Error: Lil ending memer doesn't have a partner"
-                origLines.RaiseException(filename, lineCount, 1, val)
+                origLines.RaiseException(lineCount, 1, val)
     if lineCount == len(lines) and comment:
         val = "Error: Endless memer"
-        origLines.RaiseException(filename, comment_start_line, 1, val)
+        origLines.RaiseException(comment_start_line, 1, val)
 
     return currLine.replace(markerA, "!@").replace(markerB, "#$")
 
@@ -100,7 +100,7 @@ def handle_comments(line, lines, lineCount, filename, origLines):
 # determines whether or not the first line of code is "I like memes"
 # necessary because we want to allow the use to put comments before "I like
 # memes"
-def userMemerCheck(lines, filename, origLines):
+def userMemerCheck(lines, origLines):
     global C_START, C_END
     comment = False
     s = "I like memes"
@@ -111,7 +111,7 @@ def userMemerCheck(lines, filename, origLines):
         if len(lines[i]) == 0:
                 continue
         if not comment and len(lines[i]) == 1:
-            origLines.RaiseException(filename, i+1, 1, message)
+            origLines.RaiseException(i+1, 1, message)
         for j in range(len(lines[i])):
             if j != len(lines[i])-1 and lines[i][j]+lines[i][j+1] == C_START and not comment:
                 comment = True
@@ -126,10 +126,10 @@ def userMemerCheck(lines, filename, origLines):
                 elif lines[i][j] == " ":
                     continue
                 else:
-                    origLines.RaiseException(filename, i+1, 1, message)
+                    origLines.RaiseException(i+1, 1, message)
             if j != len(lines[i])-1 and lines[i][j]+lines[i][j+1] == C_END and comment:
                 comment = False
-    origLines.RaiseException(filename, i+1, 1, message)
+    origLines.RaiseException(i+1, 1, message)
 
 
 

@@ -343,7 +343,7 @@ def wloop(args, varEnv, funEnv, op):
             return ("not_error", args[1])
         else:
             global_vars.WLOOP = False
-            return ("not_error", "doesn't matter")
+            return ("not_error_loop_ended", "")
     else:
         return ("error", "Error: Normie meme type")
 

@@ -1,5 +1,6 @@
 
 import sys
+import global_vars
 
 class OriginalLines:
     def __init__(self, lines):
@@ -21,7 +22,7 @@ class OriginalLines:
             return self.lines[lineNum-1]
 
 
-    def RaiseException(self, filename, lineNum, numLines, error, dec=False):
+    def RaiseException(self, lineNum, numLines, error, dec=False):
     	if self.handle_error:
     		self.toggleErrorCheck()
     		return
@@ -40,11 +41,11 @@ class OriginalLines:
         if dec:
             open("dec.txt", 'r')
             decOfInd = [line.rstrip('\n') for line in open("dec.txt")]
-            sys.stdout.write("  File {}; {}\n    {}".format(filename, lineStr, lines))
+            sys.stdout.write("  File {}; {}\n    {}".format(global_vars.filename, lineStr, lines))
             for line in decOfInd:
                 print line
         else:
-            print("  File {}; {}\n    {}{}".format(filename, lineStr, lines, error))
-        #print("  File {} line {}\n    {} \n{}".format(filename, lineNum, self.getLine(lineNum-1), error))
+            print("  File {}; {}\n    {}{}".format(global_vars.filename, lineStr, lines, error))
+        #print("  File {} line {}\n    {} \n{}".format(global_vars.filename, lineNum, self.getLine(lineNum-1), error))
         exit(1)
 

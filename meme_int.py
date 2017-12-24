@@ -84,7 +84,7 @@ def today():
     return (time.localtime().tm_yday-1)
 
 
-# returns the location of the closing brackets that corresponds to the first
+# returns the location of the closing bracket that corresponds to the first
 # opening bracket.  is helpful for when brackets are nested
 def getMatchingBracket(noQuotes):
     nestedCount = 0
@@ -165,6 +165,24 @@ def handleQuotesAndBrackets(origExp):
     return expression
 
 
+def parse_checks(expression, origLines, funEnv):
+    global check, check_expect, desired_val
+    if expression[0] == "check-error":
+        check = True
+        expression.pop(0)
+        origLines.toggleErrorCheck()            
+    elif expression[0] == "check-expect":
+        check_expect = True
+        expression.pop(0)
+        desired_val = expression[-1]
+        expression = expression[:-1]
+        if desired_val == "check-expect" or desired_val == "check-error":
+            return (expression, None, origLines)
+        check = True
+    return (expression, origLines)
+
+
+
 def makeTree(tree, funEnv):
     val = tree.update_string()
     isRoot = tree.checkIfRoot()
@@ -181,7 +199,34 @@ def makeTree(tree, funEnv):
         return Node(val, -1, isRoot)
 
 
-def evaluate(filename, lines, origLines):
+def handle_checks(error, origLines, lineCount, numLines, val):
+    global check_expect, desired_val
+
+    if error == "error" or error == "errorDec":
+        if error == "errorDec":
+            origLines.RaiseException(lineCount, numLines, val, True)
+        else:
+            origLines.RaiseException(lineCount, numLines, val)
+        if val == "Error: Can't check a check, ya doofus":
+            origLines.RaiseException(lineCount, numLines, val)
+        val = "Meme failed, as expected"
+    if origLines.handleError():
+        origLines.toggleErrorCheck()
+        val = "Error: Meme didn't fail, ya ninny"
+        origLines.RaiseException(lineCount, numLines, val)
+    if check_expect == True:
+        if str(val) == desired_val:
+            val = "Meme is " + desired_val + ", as expected"
+            check_expect == False #hullo?
+            desired_val = None
+        else:
+            val = "Check was not the meme we expected"
+            origLines.RaiseException(lineCount, numLines, val)
+    return val
+
+
+
+def evaluate(lines, origLines):
     global check, check_expect, desired_val
     fullExp = "" #
     numLines = 1 #number of lines a multiline expression is
@@ -192,7 +237,7 @@ def evaluate(filename, lines, origLines):
         check_expect = False
         lineCount += 1
 
-        lines[line] = handle_comments(line, lines, lineCount, filename, origLines)
+        lines[line] = handle_comments(line, lines, lineCount, origLines)
         if lines[line] == "":
             continue
         if lines[line] == len(lines[line]) * " ":
@@ -208,7 +253,7 @@ def evaluate(filename, lines, origLines):
             lines[line] = lines[line] + ' ' + fullExp
             fullExp = ""
             expLength = numLines
-        handle_strings(lines[line], lineCount, numLines, filename, origLines)
+        handle_strings(lines[line], lineCount, numLines, origLines)
 
         if lines[line] == "I like memes":
             continue
@@ -226,15 +271,15 @@ def evaluate(filename, lines, origLines):
                     val = "Error: SIKE! That's the wrong bracket!"
                 if expression == 2:
                     val = "Error: Endless memer"
-                origLines.RaiseException(filename, lineCount, numLines, val)
+                origLines.RaiseException(lineCount, numLines, val)
         expression.reverse()
 
 
         if len(expression) != 0:
-            (expression, origLines) = checks(expression, origLines, funEnv)
+            (expression, origLines) = parse_checks(expression, origLines, funEnv)
         if check and len(expression) == 0:
             val = "Error: Incorrect number of memes"
-            origLines.RaiseException(filename, lineCount, numLines, val)
+            origLines.RaiseException(lineCount, numLines, val)
         val = "Error: Where's the meme?"
 
 
@@ -244,6 +289,7 @@ def evaluate(filename, lines, origLines):
             expTree = makeTree(emptyTree, funEnv)
             if first_iteration:
                 expTree.epsteinCheck(varEnv, funEnv, emptyTree)
+                #expTree.printTree()
 
             if emptyTree.get_string_length() == 0:
                 (error, val) = expTree.evaluate(varEnv, funEnv, True)
@@ -251,35 +297,24 @@ def evaluate(filename, lines, origLines):
                 #expTree.printTree()
                 (error, val) = ("error", "Error: Incorrect number of memes")
 
+
+            if error == "error" or error == "errorDec" and not check:
+                varEnv.addBindMEME("MEME", "\"" + val + "\"")
+                val = handle_checks(error, origLines, lineCount, numLines, val)
+                print "-->", val
+                break
+
             #print val, desired_val, val==desired_val
             if not first_iteration and not global_vars.WLOOP:
-                if not global_vars.WLOOP_PRINT:
-                    print "-->", prev_val
+                if check or not global_vars.WLOOP_PRINT:
+                    val = handle_checks(error, origLines, lineCount, numLines, prev_val)
+                    print "-->", val
                 global_vars.WLOOP_PRINT = False
                 break
-            varEnv.addBindMEME("MEME", val)
 
-            if error == "error" or error == "errorDec":
-                if error == "errorDec":
-                    origLines.RaiseException(filename, lineCount, numLines, val, True)
-                else:
-                    origLines.RaiseException(filename, lineCount, numLines, val)
-                if val == "Error: Can't check a check, ya doofus":
-                    origLines.RaiseException(filename, lineCount, numLines, val)
-                val = "Meme failed, as expected"
-            if origLines.handleError():
-                origLines.toggleErrorCheck()
-                val = "Error: Meme didn't fail, ya ninny"
-                origLines.RaiseException(filename, lineCount, numLines, val)
-            if check_expect == True:
-                if str(val) == desired_val:
-                    val = "Meme is " + desired_val + ", as expected"
-                    check_expect == False
-                    desired_val = None
-                else:
-                    val = "Check was not the meme we expected"
-                    origLines.RaiseException(filename, lineCount, numLines, val)
-            if first_iteration and not global_vars.WLOOP:
+            varEnv.addBindMEME("MEME", val)
+            if first_iteration and not global_vars.WLOOP and error != "not_error_loop_ended":
+                val = handle_checks(error, origLines, lineCount, numLines, val)
                 print "-->", val
             else:
                 prev_val = val
@@ -289,30 +324,12 @@ def evaluate(filename, lines, origLines):
 
     if fullExp != "":
         val = "Error: Incorrect number of memes"
-        origLines.RaiseException(filename, lineCount, numLines, val)
+        origLines.RaiseException(lineCount, numLines, val)
 
 
-def checks(expression, origLines, funEnv):
-    global check, check_expect, desired_val
-    #try:
-    if expression[0] == "check-error":
-        check = True
-        expression.pop(0)
-        origLines.toggleErrorCheck()            
-    elif expression[0] == "check-expect":
-        check_expect = True
-        expression.pop(0)
-        desired_val = expression[-1]
-        expression = expression[:-1]
-        if desired_val == "check-expect" or desired_val == "check-error":
-            return (expression, None, origLines)
-        check = True
-    return (expression, origLines)
-
-
-def main(filename):
-    open(filename, 'r')
-    lines = [line.rstrip('\n') for line in open(filename)]
+def main():
+    open(global_vars.filename, 'r')
+    lines = [line.rstrip('\n') for line in open(global_vars.filename)]
     lines = map(lambda x: ' '.join(x.split()), lines)
     # THE LINE DIRECTLY ABOVE NEEDS TO CHANGE SO THAT MULTPILE SPACES IN QUOTES
     # WILL NOT BE CONDENSED
@@ -324,13 +341,14 @@ def main(filename):
     ### THIS HAS BEEN FIXED
     #### SO WHY DON'T YOU DELETE THESE COMMENTS?!?!?
     ##### THAT IS A GOOD QUESTION
-    userMemerCheck(lines, filename, origLines)
-    evaluate(filename, lines, origLines)
+    userMemerCheck(lines, origLines)
+    evaluate(lines, origLines)
     
 
 if __name__ == '__main__':
     assert (len(sys.argv) == 2)
-    main(sys.argv[1])
+    global_vars.filename = sys.argv[1]
+    main()
     
 
 
