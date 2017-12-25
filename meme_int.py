@@ -312,7 +312,7 @@ def evaluate(lines, origLines):
                 break
 
             varEnv.addBindMEME("MEME", val)
-            if first_iteration and not global_vars.WLOOP and error != "not_error_loop_ended":
+            if first_iteration and not global_vars.WLOOP:
                 val = handle_checks(error, origLines, lineCount, numLines, val)
                 print "-->", val
             else:

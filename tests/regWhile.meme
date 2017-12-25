@@ -1,0 +1,54 @@
+
+I like memes
+
+empty
+
+				-1 x meme
+		 <~ (5 x <) while
+((1 x +) x meme) print 
+      5 MEME check-expect
+
+			   											hitMe (1 y meme) meme
+													 <~ 10 (y length) < while
+										(y (((y 3 *) 2 +) y meme) append)
+  [5, 17, 53, 161, 485, 1457, 4373, 13121, 39365, 118097] y.list check-expect
+
+
+-1 x meme
+  	        <~	        spicy if check-expect check-error
+  		    <~ spicy while
+<~	((1 x +) x meme) print  
+					  normie
+"Error: Incorrect number of memes" MEME check-expect							   
+
+
+
+  	        <~	        spicy if check-expect
+  		    <~ (8 x <) while
+<~	((1 x +) x meme) print  
+<~					  normie
+							   8
+8 MEME check-expect
+
+
+
+5 a meme
+<~ (5 a <) while check-expect
+<~ 	   a print
+				""
+"" MEME check-expect
+
+
+"" normie while check-expect
+"" MEME check-expect
+
+
+(1 (spicy g meme) meme)
+spicy MEME check-expect
+(1 (spicy g meme) meme)
+1 MEME.int check-expect
+1 MEME check-expect
+1 MEME check-expect
+
+
+

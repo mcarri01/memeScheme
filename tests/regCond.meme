@@ -1,0 +1,17 @@
+
+
+I like memes
+
+empty
+
+!@ "should" return an error but we don't go to the bad branch so it's kosher #$
+1 (2 spicy +) 1 spicy if check-expect
+1 1 (2 spicy +) normie if check-expect
+
+!@ the bad branch is completely empty #$
+1 spicy if check-error
+1 normie if check-error
+"Error: Incorrect number of memes" MEME check-expect
+normie if check-error
+"Error: Incorrect number of memes" MEME check-expect
+if check-error

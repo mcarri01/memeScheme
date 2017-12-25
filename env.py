@@ -22,7 +22,15 @@ class Environment:
             return False
 
     def addBindMEME(self, var, val):
-        self.env[var] = [(val, self.__getType(val))]
+        if self.__getType(val) == "variable":
+            self.env[var] = self.env[val]
+        else:
+            self.env[var] = [(val, self.__getType(val))]
+        ## NEED TO MAKE IT SO THAT PRIMITIVES CAN'T BE REDEFINED
+        ## AND SO THAT __getType CAN TELL THE DIFFERENCE BETWEEN
+        ## A VARIABLE THAT WERE JUST DEFINED.  THINKING ABOUT
+        ## PUTTING A GLOBAL FUNCTION "FLAG" THAT IS TURNED ON
+        ## WHEN A FUNCTION IS DEFINED.
 
     def addBind(self, var, val, constraints=None):
         if self.__getType(val) == "variable":
@@ -118,11 +126,8 @@ class Environment:
             if isinstance(int(arg), int):
                 return "int"
         except:
-            if arg == "MEME":
-                return "meme_type"
             if self.inEnv(arg):
                 return "variable"
-                # need to make it so that a function can't be redefined
             else:
                 return "function"
 

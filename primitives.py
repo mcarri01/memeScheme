@@ -85,7 +85,7 @@ def comparison(args, varEnv, funEnv, op):
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
-    return ("not_error", "spicy" if op(val_list[1], val_list[0]) else "normie")
+    return ("not_error", "spicy" if op(val_list[0], val_list[1]) else "normie")
 
 def equal_nequal(args, varEnv, funEnv, op):
     constB = [global_vars.ALL_TYPES]
@@ -339,7 +339,7 @@ def wloop(args, varEnv, funEnv, op):
             return ("not_error", args[1])
         else:
             global_vars.WLOOP = False
-            return ("not_error_loop_ended", "")
+            return ("not_error", "\"\"")
     else:
         return ("error", "Error: Normie meme type")
 
