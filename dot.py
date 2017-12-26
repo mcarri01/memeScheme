@@ -8,8 +8,9 @@ from random import *
 # if x is always a string there won't be a problem; if x is occassionally a
 # float there will be
 def isInt(x):
+    #print "HERE", isinstance(int(x), int)
     try:
-        isinstance(int(x), int)
+        isinstance(float(x), float)
         return True
     except:
         return False
@@ -38,15 +39,15 @@ def isIntBoolStringorList(x):
 
 # must update as more types are added
 def isValidType(x):
-    return (x == "int" or x == "bool" or x == "string" or x == "list")
+    return (x == "num" or x == "bool" or x == "str" or x == "list")
 
 def getLiteralType(x):
     if isInt(x):
-        return "int"
+        return "num"
     if isBool(x):
         return "bool"
     if isString(x):
-        return "string"
+        return "str"
     if isList(x):
         return "list"
     return ("error", "Error: Normie meme type")  
@@ -55,19 +56,19 @@ def getLiteralType(x):
 # must update as more types are added
 # desired_type is a list of types that would be valid
 # used to raise type errors in general_type
-def isUndesirableType(x, desired_type):
-    types = ["bool", "int", "string", "list"]
-    f = lambda y: False if (x!=y or y in desired_type) else True
-    return reduce((lambda acc, a: operator.or_ (acc, f(a))), types, False)
+def isUndesirableType(x, desired_types):
+    #types = ["bool", "num", "string", "list"]
+    f = lambda y: False if (x!=y or y in desired_types) else True
+    return reduce((lambda acc, a: operator.or_ (acc, f(a))), global_vars.ALL_TYPES, False)
 
 
 # makes sure that a literal matches the constraint
 def check_expected_literal_type(arg, constraint):
-    if isInt(arg) and constraint == "int":
+    if isInt(arg) and constraint == "num":
         return arg
     if isBool(arg) and constraint == "bool":
         return arg
-    if isString(arg) and constraint == "string":
+    if isString(arg) and constraint == "str":
         return arg
     if isList(arg) and constraint == "list":
         return arg
@@ -76,7 +77,10 @@ def check_expected_literal_type(arg, constraint):
 
 # called if the constraint is polymorphic (eg. 'a)
 def general_type(arg, constraints, varEnv):
-    arg_split = arg.split(".")
+    if not isIntBoolStringorList(arg):
+        arg_split = arg.split(".")
+    else:
+        arg_split = [arg]
 
     if len(arg_split[0]) > 2:
         if arg_split[0][:2] == "//" and varEnv.inEnv(arg_split[0][2:]):
@@ -132,7 +136,9 @@ def constraintCheck(arg, constraints, varEnv):
 # must update as more types are added
 def casted(arg):
     if isInt(arg):
-        return int(arg)
+        if float(arg) == int(float(arg)):
+            return int(float(arg))
+        return float(arg)
     if isBool(arg):
         return getBoolVal(arg)
     if isString(arg):

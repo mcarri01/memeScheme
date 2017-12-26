@@ -119,12 +119,12 @@ class Environment:
             return "bool"
         argStr = str(arg)
         if argStr == "" or (argStr[0] == "\"" and argStr[-1] == "\""):
-            return "string"
+            return "str"
         if argStr[0] == "[" and argStr[-1] == "]":
             return "list"
         try:
-            if isinstance(int(arg), int):
-                return "int"
+            if isinstance(float(arg), float):
+                return "num"
         except:
             if self.inEnv(arg):
                 return "variable"

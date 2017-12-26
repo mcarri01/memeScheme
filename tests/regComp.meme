@@ -8,13 +8,13 @@ empty
 1 a meme
 spicy b meme
 1 2 3 < check-error
-1.int 1 < check-error
-spicy.int 1 < check-error
-"hello".int 1 < check-error
+1.num 1 < check-error
+spicy.num 1 < check-error
+"hello".num 1 < check-error
 a.in 1 < check-error
 b.bool 1 < check-error
-b.int 1 < check-error
-c.int 1 < check-error
+b.num 1 < check-error
+c.num 1 < check-error
 1 c < check-error
 1 b > check-error
 spicy 1 < check-error
@@ -29,51 +29,51 @@ spicy "hello" "hello" <= check-expect
 
 !@ Tests with one variable of a singular type #$
 1 x meme
-spicy x.int 1 <= check-expect
-spicy 1 x.int <= check-expect
+spicy x.num 1 <= check-expect
+spicy 1 x.num <= check-expect
 spicy x 1 <= check-expect
 spicy 1 x <= check-expect
-spicy x.int x.int <= check-expect
+spicy x.num x.num <= check-expect
 spicy x x <= check-expect
 
 "hello" a meme
-spicy a.string "hello" <= check-expect
-spicy "hello" a.string <= check-expect
+spicy a.str "hello" <= check-expect
+spicy "hello" a.str <= check-expect
 spicy a "hello" <= check-expect
 spicy "hello" a <= check-expect
-spicy a.string a.string <= check-expect
+spicy a.str a.str <= check-expect
 spicy a a <= check-expect
 
 
 !@ Tests with one variable of multiple types
-   int was declared first #$
+   num was declared first #$
 "hello" x meme
-spicy x.int 1 <= check-expect
-spicy 1 x.int <= check-expect
+spicy x.num 1 <= check-expect
+spicy 1 x.num <= check-expect
 spicy x 1 <= check-expect
 spicy 1 x <= check-expect
-spicy x.int x.int <= check-expect
+spicy x.num x.num <= check-expect
 
 !@ Tests with two variables, one of a singular type, one of multiple types
-   int was declared first for both variables #$
+   num was declared first for both variables #$
 2 y meme
 normie x y <= check-expect
-spicy y.int x <= check-expect
-normie x y.int <= check-expect
-normie x.int y <= check-expect
-spicy y x.int <= check-expect 
-normie x.int y.int <= check-expect
+spicy y.num x <= check-expect
+normie x y.num <= check-expect
+normie x.num y <= check-expect
+spicy y x.num <= check-expect 
+normie x.num y.num <= check-expect
 
 
 !@ Tests with two variables, both of multiple types #$
 "hello" y meme
 spicy x y > check-expect
-normie y.int x >= check-expect
-spicy x y.int >= check-expect
-spicy x.int y >= check-expect
-normie y x.int >= check-expect
-spicy x.int y.int >= check-expect
-normie y.int x.int >= check-expect
+normie y.num x >= check-expect
+spicy x y.num >= check-expect
+spicy x.num y >= check-expect
+normie y x.num >= check-expect
+spicy x.num y.num >= check-expect
+normie y.num x.num >= check-expect
 
 spicy q meme
 2 q meme
@@ -81,8 +81,8 @@ spicy q meme
 "hello" r meme
 1 r meme
 
-spicy q.string r.string <= check-expect
-normie r.int q.int <= check-expect
+spicy q.str r.str <= check-expect
+normie r.num q.num <= check-expect
 spicy q r <= check-expect
 normie r q <= check-expect
 

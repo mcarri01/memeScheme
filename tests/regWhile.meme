@@ -46,7 +46,7 @@ empty
 (1 (spicy g meme) meme)
 spicy MEME check-expect
 (1 (spicy g meme) meme)
-1 MEME.int check-expect
+1 MEME.num check-expect
 1 MEME check-expect
 1 MEME check-expect
 

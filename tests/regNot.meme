@@ -15,7 +15,7 @@ spicy.bool not check-error
 "hello".bool not check-error
 a.bol not check-error
 b.bool not check-error
-a.int not check-error
+a.num not check-error
 c not check-error
 33 not check-error
 
@@ -43,7 +43,7 @@ normie x.bool not check-expect
 
 
 !@ Test with one variable of multiple types
-   int was declared first #$
+   num was declared first #$
 1 y meme
 spicy y meme 
 normie y not check-expect

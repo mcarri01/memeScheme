@@ -36,7 +36,7 @@ spicy normie spicy and normie normie or nand normie spicy spicy and or and check
 - "hello" spicy 1 //- meme meme meme check-expect
 1 - print check-expect
 spicy -.bool print check-expect
-"hello" -.string print check-expect
+"hello" -.str print check-expect
 * 1 //* meme check-expect
 * 2 * meme check-expect
 12 7 5 - meme + check-expect

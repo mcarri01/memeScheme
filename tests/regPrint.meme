@@ -10,7 +10,7 @@ empty
 1 a meme
 spicy a print check-error
 print check-error
-1.int print check-error
+1.num print check-error
 33.bool print check-error
 "hello".bool print check-error
 a.it print check-error
@@ -29,13 +29,13 @@ spicy spicy print check-expect
 !@ Test with one variable of a singular type #$
 1 x meme
 1 x print check-expect
-1 x.int print check-expect
+1 x.num print check-expect
 
 
 !@ Test with one variable of multiple types
-   int was declared first #$
+   num was declared first #$
 spicy x meme
 "hello" x meme
 1 x print check-expect
 spicy x.bool print check-expect
-"hello" x.string print check-expect
+"hello" x.str print check-expect

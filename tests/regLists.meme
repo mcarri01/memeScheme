@@ -119,14 +119,14 @@ hitMe y meme
 [spicy] y today spicy insert check-expect
 ["hello", spicy] y today "hello" insert check-expect
 [["hello", spicy], "hello", spicy] y today y insert check-expect
-[3, ["hello", spicy], "hello", spicy] y today a.int insert check-expect
+[3, ["hello", spicy], "hello", spicy] y today a.num insert check-expect
 
-(a.int today 1 insert) check-error
+(a.num today 1 insert) check-error
 (a.bool today 1 insert) check-error
-(a.string today 1 insert) check-error
+(a.str today 1 insert) check-error
 
 (y a.bool 0 insert) check-error
-(y a.string 0 insert) check-error
+(y a.str 0 insert) check-error
 (y y b insert) check-error
 
 
@@ -139,14 +139,14 @@ hitMe y meme
 
 
 (y a.bool rip) check-error
-(y a.string rip) check-error
+(y a.str rip) check-error
 (y y rip) check-error
 
-(a.int today rip) check-error
+(a.num today rip) check-error
 (a.bool today rip) check-error
-(a.string today rip) check-error
+(a.str today rip) check-error
 
 [["hello", spicy], "hello", spicy] (y (4 today -) rip) check-expect
 y
-y (3 today -) a.int put
+y (3 today -) a.num put
 

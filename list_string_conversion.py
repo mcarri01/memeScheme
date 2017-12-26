@@ -27,6 +27,13 @@ def getMatchingBracket(exp):
             if nestedCount == 0:
                 return i+1
 
+
+def int_float_handling(arg):
+    if float(arg) == int(float(arg)):
+         return int(arg)
+    else:
+        return float(arg)
+
 # I have no idea why the lstrip()s are necessary.  But sometimes a leading
 # space is thrown in and the lstrip()s take care of them.
 def string_to_list(string):
@@ -36,7 +43,7 @@ def string_to_list(string):
 
     if expression.find(",") == -1:
         if isInt(string):
-            new_list.append(int(string))    
+            new_list.append(int_float_handling(string))
         else:
             new_list.append(string)
         return new_list
@@ -54,14 +61,14 @@ def string_to_list(string):
         else:
             if expression.find(",") != -1:
                 if isInt(expression[:expression.find(",")]):
-                    new_list.append(int(expression[:expression.find(",")]))
+                    new_list.append(int_float_handling(expression[:expression.find(",")]))
                 else:
                     new_list.append((expression[:expression.find(",")]).lstrip())
                 expression = expression[(expression.find(","))+2:]
                 string = string[(string.find(","))+2:]
             else:
                 if isInt(expression):
-                    new_list.append(int(expression))
+                    new_list.append(int_float_handling(expression))
                 else:
                     new_list.append(expression.lstrip())
                 expression = ""

@@ -11,13 +11,13 @@ empty
 spicy b meme
 1 + check-error
 1 2 3 + check-error
-1.int 1 + check-error
-spicy.int 1 + check-error
-"hello".int 1 + check-error
+1.num 1 + check-error
+spicy.num 1 + check-error
+"hello".num 1 + check-error
 a.in 1 + check-error
 b.bool 1 + check-error
-b.int 1 + check-error
-c.int 1 + check-error
+b.num 1 + check-error
+c.num 1 + check-error
 spicy 1 + check-error
 "hello" 1 + check-error
 c 1 + check-error
@@ -41,41 +41,41 @@ c 1 + check-error
 
 !@ Tests with one variable of a singular type #$
 1 x meme
-2 x.int 1 + check-expect
-2 1 x.int + check-expect
+2 x.num 1 + check-expect
+2 1 x.num + check-expect
 2 x 1 + check-expect
 2 1 x + check-expect
-2 x.int x.int + check-expect
+2 x.num x.num + check-expect
 2 x x + check-expect
 
 !@ Tests with one variable of multiple types
-   int was declared first #$
+   num was declared first #$
 spicy x meme
-2 x.int 1 + check-expect
-2 1 x.int + check-expect
+2 x.num 1 + check-expect
+2 1 x.num + check-expect
 2 x 1 + check-expect
 2 1 x + check-expect
-2 x.int x.int + check-expect
+2 x.num x.num + check-expect
 2 x x + check-expect
 
 !@ Tests with two variables, one of a singular type, one of multiple types
-   int was declared first for both variables #$
+   num was declared first for both variables #$
 1 y meme
 2 x y + check-expect
-2 y.int x + check-expect
-2 x y.int + check-expect
-2 x.int y + check-expect
-2 y x.int + check-expect 
-2 x.int y.int + check-expect
+2 y.num x + check-expect
+2 x y.num + check-expect
+2 x.num y + check-expect
+2 y x.num + check-expect 
+2 x.num y.num + check-expect
 
 !@ Tests with two variables, both of multiple types #$
 spicy y meme
 2 x y + check-expect
-2 y.int x + check-expect
-2 x y.int + check-expect
-2 x.int y + check-expect
-2 y x.int + check-expect 
-2 x.int y.int + check-expect
+2 y.num x + check-expect
+2 x y.num + check-expect
+2 x.num y + check-expect
+2 y x.num + check-expect 
+2 x.num y.num + check-expect
 
 
 

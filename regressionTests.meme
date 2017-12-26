@@ -11,13 +11,13 @@ empty
 spicy b meme
 1 + check-error
 1 2 3 + check-error
-1.int 1 + check-error
-spicy.int 1 + check-error
-"hello".int 1 + check-error
+1.num 1 + check-error
+spicy.num 1 + check-error
+"hello".num 1 + check-error
 a.in 1 + check-error
 b.bool 1 + check-error
-b.int 1 + check-error
-c.int 1 + check-error
+b.num 1 + check-error
+c.num 1 + check-error
 spicy 1 + check-error
 "hello" 1 + check-error
 c 1 + check-error
@@ -41,41 +41,41 @@ c 1 + check-error
 
 !@ Tests with one variable of a singular type #$
 1 x meme
-2 x.int 1 + check-expect
-2 1 x.int + check-expect
+2 x.num 1 + check-expect
+2 1 x.num + check-expect
 2 x 1 + check-expect
 2 1 x + check-expect
-2 x.int x.int + check-expect
+2 x.num x.num + check-expect
 2 x x + check-expect
 
 !@ Tests with one variable of multiple types
-   int was declared first #$
+   num was declared first #$
 spicy x meme
-2 x.int 1 + check-expect
-2 1 x.int + check-expect
+2 x.num 1 + check-expect
+2 1 x.num + check-expect
 2 x 1 + check-expect
 2 1 x + check-expect
-2 x.int x.int + check-expect
+2 x.num x.num + check-expect
 2 x x + check-expect
 
 !@ Tests with two variables, one of a singular type, one of multiple types
-   int was declared first for both variables #$
+   num was declared first for both variables #$
 1 y meme
 2 x y + check-expect
-2 y.int x + check-expect
-2 x y.int + check-expect
-2 x.int y + check-expect
-2 y x.int + check-expect 
-2 x.int y.int + check-expect
+2 y.num x + check-expect
+2 x y.num + check-expect
+2 x.num y + check-expect
+2 y x.num + check-expect 
+2 x.num y.num + check-expect
 
 !@ Tests with two variables, both of multiple types #$
 spicy y meme
 2 x y + check-expect
-2 y.int x + check-expect
-2 x y.int + check-expect
-2 x.int y + check-expect
-2 y x.int + check-expect 
-2 x.int y.int + check-expect
+2 y.num x + check-expect
+2 x y.num + check-expect
+2 x.num y + check-expect
+2 y x.num + check-expect 
+2 x.num y.num + check-expect
 
 
 
@@ -98,7 +98,7 @@ spicy.bool spicy and check-error
 "hello".bool spicy and check-error
 a.bol spicy and check-error
 b.bool spicy and check-error
-a.int spicy and check-error
+a.num spicy and check-error
 c.bool spicy and check-error
 33 spicy and check-error
 "hello" spicy and check-error
@@ -126,7 +126,7 @@ spicy x.bool x.bool and check-expect
 spicy x x and check-expect
 
 !@ Tests with one variable of multiple types
-   int was declared first #$
+   num was declared first #$
 33 x meme
 spicy x.bool spicy and check-expect
 spicy spicy x.bool and check-expect
@@ -136,7 +136,7 @@ spicy x.bool x.bool and check-expect
 spicy x x and check-expect
 
 !@ Tests with two variables, one of a singular type, one of multiple types
-   int was declared first for both variables #$
+   num was declared first for both variables #$
 normie y meme
 normie x y and check-expect
 normie y.bool x and check-expect
@@ -301,13 +301,13 @@ empty
 1 a meme
 spicy b meme
 1 2 3 < check-error
-1.int 1 < check-error
-spicy.int 1 < check-error
-"hello".int 1 < check-error
+1.num 1 < check-error
+spicy.num 1 < check-error
+"hello".num 1 < check-error
 a.in 1 < check-error
 b.bool 1 < check-error
-b.int 1 < check-error
-c.int 1 < check-error
+b.num 1 < check-error
+c.num 1 < check-error
 1 c < check-error
 1 b > check-error
 spicy 1 < check-error
@@ -322,51 +322,51 @@ spicy "hello" "hello" <= check-expect
 
 !@ Tests with one variable of a singular type #$
 1 x meme
-spicy x.int 1 <= check-expect
-spicy 1 x.int <= check-expect
+spicy x.num 1 <= check-expect
+spicy 1 x.num <= check-expect
 spicy x 1 <= check-expect
 spicy 1 x <= check-expect
-spicy x.int x.int <= check-expect
+spicy x.num x.num <= check-expect
 spicy x x <= check-expect
 
 "hello" a meme
-spicy a.string "hello" <= check-expect
-spicy "hello" a.string <= check-expect
+spicy a.str "hello" <= check-expect
+spicy "hello" a.str <= check-expect
 spicy a "hello" <= check-expect
 spicy "hello" a <= check-expect
-spicy a.string a.string <= check-expect
+spicy a.str a.str <= check-expect
 spicy a a <= check-expect
 
 
 !@ Tests with one variable of multiple types
-   int was declared first #$
+   num was declared first #$
 "hello" x meme
-spicy x.int 1 <= check-expect
-spicy 1 x.int <= check-expect
+spicy x.num 1 <= check-expect
+spicy 1 x.num <= check-expect
 spicy x 1 <= check-expect
 spicy 1 x <= check-expect
-spicy x.int x.int <= check-expect
+spicy x.num x.num <= check-expect
 
 !@ Tests with two variables, one of a singular type, one of multiple types
-   int was declared first for both variables #$
+   num was declared first for both variables #$
 2 y meme
 normie x y <= check-expect
-spicy y.int x <= check-expect
-normie x y.int <= check-expect
-normie x.int y <= check-expect
-spicy y x.int <= check-expect 
-normie x.int y.int <= check-expect
+spicy y.num x <= check-expect
+normie x y.num <= check-expect
+normie x.num y <= check-expect
+spicy y x.num <= check-expect 
+normie x.num y.num <= check-expect
 
 
 !@ Tests with two variables, both of multiple types #$
 "hello" y meme
 spicy x y > check-expect
-normie y.int x >= check-expect
-spicy x y.int >= check-expect
-spicy x.int y >= check-expect
-normie y x.int >= check-expect
-spicy x.int y.int >= check-expect
-normie y.int x.int >= check-expect
+normie y.num x >= check-expect
+spicy x y.num >= check-expect
+spicy x.num y >= check-expect
+normie y x.num >= check-expect
+spicy x.num y.num >= check-expect
+normie y.num x.num >= check-expect
 
 spicy q meme
 2 q meme
@@ -374,8 +374,8 @@ spicy q meme
 "hello" r meme
 1 r meme
 
-spicy q.string r.string <= check-expect
-normie r.int q.int <= check-expect
+spicy q.str r.str <= check-expect
+normie r.num q.num <= check-expect
 spicy q r <= check-expect
 normie r q <= check-expect
 
@@ -405,14 +405,14 @@ empty
 
 !@ Errors #$
 
-1.int x meme check-error
+1.num x meme check-error
 spicy.bool x meme check-error
-"hello".string x meme check-error
+"hello".str x meme check-error
 1 g meme
 g.in x meme check-error
 g.bool x meme check-error
-g.string x meme check-error
-b.string x meme check-error
+g.str x meme check-error
+b.str x meme check-error
 b x meme check-error
 1 12 meme check-error
 1 spicy meme check-error
@@ -421,9 +421,9 @@ b x meme check-error
 1 "hello" meme check-error
 1 error meme check-error
 1 MEME meme check-error
-1 b.int meme check-error
+1 b.num meme check-error
 1 //x meme check-error
-1 b.int check-error
+1 b.num check-error
 1 ab"cd" meme check-error
 1 ab]cd meme check-error
 1 ab[cd meme check-error
@@ -437,34 +437,34 @@ b x meme check-error
 !@ Tests with one literal as assignment #$
 1 x meme
 1 x print check-expect
-1 x.int print check-expect
+1 x.num print check-expect
 spicy x meme
 1 x print check-expect
 spicy x.bool print check-expect
 2 x meme
 2 x print check-expect
-2 x.int print check-expect
+2 x.num print check-expect
 spicy y meme
 spicy y print check-expect
 spicy x.bool print check-expect
 "hello" z meme
 "hello" z print check-expect
-"hello" z.string print check-expect
+"hello" z.str print check-expect
 1 z meme
 "hello" z meme
 "hello" z print check-expect
-"hello" z.string print check-expect
-1 z.int print check-expect
+"hello" z.str print check-expect
+1 z.num print check-expect
 2 z meme
 "hello" z print check-expect
-2 z.int print check-expect
+2 z.num print check-expect
 
 
 !@ Tests with one variable of a singular type as assignment #$
 1 a meme
 a b meme
 1 b print check-expect
-1 b.int print check-expect
+1 b.num print check-expect
 spicy c meme
 c d meme
 spicy d print check-expect
@@ -472,19 +472,19 @@ spicy d.bool print check-expect
 "hello" e meme
 e f meme
 "hello" f print check-expect
-"hello" f.string print check-expect
+"hello" f.str print check-expect
 
 
 !@ Test with one variable of multiple types as assignment
-   int was declared first #$
+   num was declared first #$
 1 m meme
 spicy m meme
 "hello" m meme
 m n meme
 1 n print check-expect
-1 n.int print check-expect
+1 n.num print check-expect
 spicy n.bool print check-expect
-"hello" n.string print check-expect
+"hello" n.str print check-expect
 
    !@ bool was declared first #$
 spicy o meme
@@ -493,34 +493,34 @@ spicy o meme
 o p meme
 spicy p print check-expect
 spicy p.bool print check-expect
-"hello" p.string print check-expect
-1 p.int print check-expect
+"hello" p.str print check-expect
+1 p.num print check-expect
 
-   !@ string was declared first #$
+   !@ str was declared first #$
 "hello" q meme
 1 q meme
 spicy q meme
 q r meme
 "hello" r print check-expect
-"hello" r.string print check-expect
-1 r.int print check-expect
+"hello" r.str print check-expect
+1 r.num print check-expect
 spicy r.bool print check-expect
 
 	!@ assignment with dot operator #$
 1 s meme
 spicy s meme
 "hello" s meme
-s.int t meme
+s.num t meme
 1 t print check-expect
-1 t.int print check-expect
+1 t.num print check-expect
 
 s.bool u meme
 spicy u print check-expect
 spicy u.bool print check-expect
 
-s.string v meme
+s.str v meme
 "hello" v print check-expect
-"hello" v.string print check-expect
+"hello" v.str print check-expect
 
 
 !@ Define a variable from a previous variable
@@ -532,10 +532,10 @@ empty
 a b meme
 1 a print check-expect
 1 b print check-expect
-1 a.int print check-expect
-1 b.int print check-expect
-"hello" a.string print check-expect
-"hello" b.string print check-expect
+1 a.num print check-expect
+1 b.num print check-expect
+"hello" a.str print check-expect
+"hello" b.str print check-expect
 
 empty
 
@@ -545,13 +545,13 @@ empty
 !@ Create a new variable by using an old dot-operated variable as the value #$
 1 a meme
 "hello" a meme
-a.string b meme
+a.str b meme
 
 1 a print check-expect
 "hello" b print check-expect
-1 a.int print check-expect
-"hello" a.string print check-expect
-b.int print check-error
+1 a.num print check-expect
+"hello" a.str print check-expect
+b.num print check-error
 
 !@ Create a new variable by using an old non-dot-operated variable as the value #$
 1 c meme
@@ -560,8 +560,8 @@ c d meme
 
 1 c print check-expect
 1 d print check-expect
-1 c.int print check-expect
-1 d.int print check-expect
+1 c.num print check-expect
+1 d.num print check-expect
 
 
 
@@ -578,12 +578,12 @@ f e meme
 
 3 e print check-expect
 "hello" f print check-expect
-3 e.int print check-expect
-3 f.int print check-expect
+3 e.num print check-expect
+3 f.num print check-expect
 spicy e.bool print check-expect
 spicy f.bool print check-expect
-"hello" e.string print check-expect
-"hello" f.string print check-expect
+"hello" e.str print check-expect
+"hello" f.str print check-expect
 
 !@ nested meme with stress test#$
 (spicy (((spicy not) (normie (13 4 //+ meme 2 ! ^ - 13 4 3 + 5 * % / 1 13 4 2 ! ^ - 13 4 9 v/ + 5 * % / - <>) xor) nor) not) check-expect)
@@ -600,13 +600,13 @@ empty
 1 a meme
 spicy b meme
 1 2 3 = check-error
-1.int 1 = check-error
-spicy.int 1 = check-error
-"hello".int 1 = check-error
+1.num 1 = check-error
+spicy.num 1 = check-error
+"hello".num 1 = check-error
 a.in 1 = check-error
 b.bool 1 = check-error
-b.int 1 = check-error
-c.int 1 = check-error
+b.num 1 = check-error
+c.num 1 = check-error
 1 c = check-error
 1 b = check-error
 spicy 1 = check-error
@@ -627,64 +627,64 @@ spicy [] [] = check-expect
 
 !@ Tests with one variable of a singular type #$
 1 x meme
-spicy x.int 1 = check-expect
-spicy 1 x.int = check-expect
+spicy x.num 1 = check-expect
+spicy 1 x.num = check-expect
 spicy x 1 = check-expect
 spicy 1 x = check-expect
-spicy x.int x.int = check-expect
+spicy x.num x.num = check-expect
 spicy x x = check-expect
 
 "hello" g meme
-normie g.string "goodbye" = check-expect
-normie "goodbye" g.string = check-expect
+normie g.str "goodbye" = check-expect
+normie "goodbye" g.str = check-expect
 normie g "goodbye" = check-expect
 normie "goodbye" g = check-expect
-spicy g.string g.string = check-expect
+spicy g.str g.str = check-expect
 spicy g g = check-expect
 
 
 !@ Tests with one variable of multiple types
-   int was declared first #$
+   num was declared first #$
 "hello" x meme
-spicy x.int 1 = check-expect
-spicy 1 x.int = check-expect
+spicy x.num 1 = check-expect
+spicy 1 x.num = check-expect
 spicy x 1 = check-expect
 spicy 1 x = check-expect
-spicy x.int x.int = check-expect
-spicy x.string "hello" = check-expect
-spicy "hello" x.string = check-expect
+spicy x.num x.num = check-expect
+spicy x.str "hello" = check-expect
+spicy "hello" x.str = check-expect
 spicy x "hello" = check-expect
 spicy "hello" x = check-expect
 
 
 !@ Tests with two variables, one of a singular type, one of multiple types
-   int was declared first for both variables #$
+   num was declared first for both variables #$
 2 y meme
 normie x y = check-expect
-normie y.int x = check-expect
-normie x y.int = check-expect
-normie x.int y = check-expect
-normie y x.int = check-expect 
-normie x.int y.int = check-expect
+normie y.num x = check-expect
+normie x y.num = check-expect
+normie x.num y = check-expect
+normie y x.num = check-expect 
+normie x.num y.num = check-expect
 
 
 !@ Tests with two variables, both of multiple types
-   int was declared first for x;
-   string was declared first for z#$ 
+   num was declared first for x;
+   str was declared first for z#$ 
 "hello" z meme
 2 z meme
 spicy x z = check-expect
 normie z x = check-expect
-normie z.int x = check-expect
-normie x z.int = check-expect
-normie x.int z = check-expect
-normie z x.int = check-expect
-normie x.int z.int = check-expect
-spicy z.string x = check-expect
-spicy x z.string = check-expect
-spicy x.string z = check-expect
-spicy z x.string = check-expect
-spicy x.string z.string = check-expect
+normie z.num x = check-expect
+normie x z.num = check-expect
+normie x.num z = check-expect
+normie z x.num = check-expect
+normie x.num z.num = check-expect
+spicy z.str x = check-expect
+spicy x z.str = check-expect
+spicy x.str z = check-expect
+spicy z x.str = check-expect
+spicy x.str z.str = check-expect
 
 spicy q meme
 2 q meme
@@ -693,8 +693,8 @@ spicy q meme
 "hello" r meme
 1 r meme
 
-spicy q.string r.string = check-expect
-normie r.int q.int = check-expect
+spicy q.str r.str = check-expect
+normie r.num q.num = check-expect
 spicy q r = check-expect
 normie r q = check-expect
 spicy q q = check-expect
@@ -738,7 +738,7 @@ spicy normie spicy and normie normie or nand normie spicy spicy and or and check
 - "hello" spicy 1 //- meme meme meme check-expect
 1 - print check-expect
 spicy -.bool print check-expect
-"hello" -.string print check-expect
+"hello" -.str print check-expect
 * 1 //* meme check-expect
 * 2 * meme check-expect
 12 7 5 - meme + check-expect
@@ -767,6 +767,48 @@ A TOMORROW PROBLEM:
 
 I like memes
 
+empty
+
+3 1 2 + check-expect
+3.2 1 2.2 + check-expect
+3.1 1.1 2 + check-expect
+3.3 1.1 2.2 + check-expect
+4 1.1 2.9 + check-expect
+
+2.86356421266 8.2 v/ check-expect
+4 16 v/ check-expect
+8.2 ! check-error
+42.4399889428 4.5 2.3 ^ check-expect
+
+hitMe x meme
+[-1.2] x -1.2 append check-expect
+[-1.2, -1] x -1.0 append check-expect
+[2.3, -1.2, -1] x 2.3 push check-expect
+[2.3, 0, -1.2, -1] x (today 1 +) 0.0 insert check-expect
+[2.3, 0, -1.2, -3.2] (x (today 3.0 +) ((x (today 1.0 +) get) -3.2 +) put) check-expect
+
+3.0 a meme
+3 MEME check-expect
+3 b meme
+3 MEME check-expect
+3.2 c meme
+3.2 MEME check-expect
+
+(1.2 (3 d meme) meme)
+1.2 d check-expect
+(3 (1.2 e meme) meme)
+3 e check-expect
+
+3 1.2.num meme check-error
+2 d.num .8 + check-expect
+2 d.num 0.8 + check-expect
+2 d.num .80000000000 + check-expect
+2 d.num 00000000000.8 + check-expect
+2 d.num 0000000000.800000000 + check-expect
+d.str check-error
+
+I like memes
+
 
 !@ Larger/Smaller #$
 empty
@@ -777,10 +819,10 @@ empty
 1 a larger? check-error
 larger? check-error
 spicy larger? check-error
-33.int larger? check-error
-"hello".int larger? check-error
+33.num larger? check-error
+"hello".num larger? check-error
 a.it larger? check-error
-b.int larger? check-error
+b.num larger? check-error
 a.bool larger? check-error
 c larger? check-error
 "hello" larger? check-error
@@ -794,22 +836,22 @@ c larger? check-error
 !@ Test with one variable of a singular type #$
 1 x meme
 x larger?
-x.int smaller?
+x.num smaller?
 
 
 !@ Test with one variable of multiple types
    bool was declared first #$
 spicy x meme
 x larger?
-x.int smaller?
+x.num smaller?
 
 
 !@ Test with one variable of multiple types
-   int was declared first #$
+   num was declared first #$
 1 y meme
 spicy y meme
 y larger?
-y.int smaller?
+y.num smaller?
 
 I like memes
 
@@ -931,14 +973,14 @@ hitMe y meme
 [spicy] y today spicy insert check-expect
 ["hello", spicy] y today "hello" insert check-expect
 [["hello", spicy], "hello", spicy] y today y insert check-expect
-[3, ["hello", spicy], "hello", spicy] y today a.int insert check-expect
+[3, ["hello", spicy], "hello", spicy] y today a.num insert check-expect
 
-(a.int today 1 insert) check-error
+(a.num today 1 insert) check-error
 (a.bool today 1 insert) check-error
-(a.string today 1 insert) check-error
+(a.str today 1 insert) check-error
 
 (y a.bool 0 insert) check-error
-(y a.string 0 insert) check-error
+(y a.str 0 insert) check-error
 (y y b insert) check-error
 
 
@@ -951,16 +993,16 @@ hitMe y meme
 
 
 (y a.bool rip) check-error
-(y a.string rip) check-error
+(y a.str rip) check-error
 (y y rip) check-error
 
-(a.int today rip) check-error
+(a.num today rip) check-error
 (a.bool today rip) check-error
-(a.string today rip) check-error
+(a.str today rip) check-error
 
 [["hello", spicy], "hello", spicy] (y (4 today -) rip) check-expect
 y
-y (3 today -) a.int put
+y (3 today -) a.num put
 
 
 I like memes
@@ -1029,7 +1071,7 @@ spicy.bool not check-error
 "hello".bool not check-error
 a.bol not check-error
 b.bool not check-error
-a.int not check-error
+a.num not check-error
 c not check-error
 33 not check-error
 
@@ -1057,7 +1099,7 @@ normie x.bool not check-expect
 
 
 !@ Test with one variable of multiple types
-   int was declared first #$
+   num was declared first #$
 1 y meme
 spicy y meme 
 normie y not check-expect
@@ -1122,7 +1164,7 @@ empty
 1 a meme
 spicy a print check-error
 print check-error
-1.int print check-error
+1.num print check-error
 33.bool print check-error
 "hello".bool print check-error
 a.it print check-error
@@ -1141,16 +1183,16 @@ spicy spicy print check-expect
 !@ Test with one variable of a singular type #$
 1 x meme
 1 x print check-expect
-1 x.int print check-expect
+1 x.num print check-expect
 
 
 !@ Test with one variable of multiple types
-   int was declared first #$
+   num was declared first #$
 spicy x meme
 "hello" x meme
 1 x print check-expect
 spicy x.bool print check-expect
-"hello" x.string print check-expect
+"hello" x.str print check-expect
 
 I like memes
 
@@ -1199,7 +1241,7 @@ empty
 (1 (spicy g meme) meme)
 spicy MEME check-expect
 (1 (spicy g meme) meme)
-1 MEME.int check-expect
+1 MEME.num check-expect
 1 MEME check-expect
 1 MEME check-expect
 

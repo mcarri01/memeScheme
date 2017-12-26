@@ -38,29 +38,35 @@ def definePrimitive(args, constraints, varEnv):
     return val_list
 
 def arithmetic(args, varEnv, funEnv, op):
-    constraints = [[["int"]], [["int"]]]
+    constraints = [[["num"]], [["num"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
     try: # will raise an error if op == / or op == % and val_list[1] == 0
-        return ("not_error", op(val_list[0], val_list[1]))
+        result = op(val_list[0], val_list[1])
+        if int(result) == result:
+            result = int(result)
+        return ("not_error", result)
     except:
         return ("error", "Error: Memes unbounded")
 
 def for_testing(args, varEnv, funEnv, op):
-    constraints = [[["int", "string"]], [["int", "string"]]]
+    constraints = [[["num", "str"]], [["num", "str"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
     return ("not_error", op(val_list[0], val_list[1]))
 
 def more_arithmetic(args, varEnv, funEnv, op):
-    constraints = [[["int"]]]
+    constraints = [[["num"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
     try: # will raise an error if op == ! or op == v/ and val_list[0] < 0
-        return ("not_error", int(op(val_list[0]))) #cast to int since sqrt returns a float
+        result = op(val_list[0])
+        if int(result) == result:
+            result = int(result)
+        return ("not_error", result)
     except:
         return ("error", "Error: Meme is in normie domain")
 
@@ -79,7 +85,7 @@ def boolNot(args, varEnv, funEnv, op):
     return ("not_error", "spicy" if op(val_list[0]) else "normie")
 
 def comparison(args, varEnv, funEnv, op):
-    constB = [["int", "string"]]
+    constB = [["num", "str"]]
     constA = constB
     constraints = [constA, constB]
     val_list = definePrimitive(args, constraints, varEnv)
@@ -97,7 +103,7 @@ def equal_nequal(args, varEnv, funEnv, op):
     return ("not_error", "spicy" if op(val_list[0], val_list[1]) else "normie")
 
 def larger_and_smaller(args, varEnv, funEnv, op):
-    constraints = [[["int"]]]
+    constraints = [[["num"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
@@ -148,14 +154,16 @@ def appendAndPush(args, varEnv, funEnv, op):
 
     op(val_list[0], val_list[1])
     val_list[1] = list_to_string(val_list[1])
+    #print "A: ", varEnv.getVal(args[1], "list"), args[1], val_list[1]
     defineVar([args[1], val_list[1]], varEnv, funEnv, None)
+    #print "C: ", varEnv.getVal(args[1], "list"), args[1], val_list[1]
     while "mild" in val_list[1]:
         val_list[1] = val_list[1].replace("mild", "spicy" if randint(0,1)==0 else "normie")
     return ("not_error", val_list[1])
 
 
 def listGet(args, varEnv, funEnv, op):
-    constraints = [[["int"]], [["list"]]]
+    constraints = [[["num"]], [["list"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
@@ -177,7 +185,7 @@ def listGet(args, varEnv, funEnv, op):
 
 
 def listPut(args, varEnv, funEnv, op):
-    constraints = [[global_vars.ALL_TYPES], [["int"]], [["list"]]]
+    constraints = [[global_vars.ALL_TYPES], [["num"]], [["list"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
@@ -203,7 +211,7 @@ def listPut(args, varEnv, funEnv, op):
 
 
 def listInsert(args, varEnv, funEnv, op):
-    constraints = [[global_vars.ALL_TYPES], [["int"]], [["list"]]]
+    constraints = [[global_vars.ALL_TYPES], [["num"]], [["list"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
@@ -217,6 +225,7 @@ def listInsert(args, varEnv, funEnv, op):
         val_list[0] = args[0]
 
     if abs(val_list[1]-time.localtime().tm_yday+1) > len(val_list[2]):
+        val_list[1]-time.localtime().tm_yday+1
         return ("errorDec", "____")
     op(val_list[0], val_list[1], val_list[2])
 
@@ -227,7 +236,7 @@ def listInsert(args, varEnv, funEnv, op):
     return ("not_error", val_list[2])
 
 def listRemove(args, varEnv, funEnv, op):
-    constraints = [[["int"]], [["list"]]]
+    constraints = [[["num"]], [["list"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
@@ -254,7 +263,7 @@ def listRemove(args, varEnv, funEnv, op):
 
 
 def listInit(args, varEnv, funEnv, op):
-    constraints = [[global_vars.ALL_TYPES], [["int"]]]
+    constraints = [[global_vars.ALL_TYPES], [["num"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
@@ -277,7 +286,6 @@ def listInit(args, varEnv, funEnv, op):
 def defineVar(args, varEnv, funEnv, op):
     if len(args) != 2:
         return ("error", "Error: Incorrect number of memes")
-
     constraints = [[global_vars.ALL_TYPES]]
 
     val_list = []
@@ -303,6 +311,12 @@ def defineVar(args, varEnv, funEnv, op):
             args[0] = args[0][2:]
         elif args[0][:2] == "//" and not funEnv.inEnv(args[0][2:]):
             return ("error", "Meme is not a function")
+
+    if isInt(val_list[0]):
+        if float(val_list[0]) == int(float(val_list[0])):
+             val_list[0] = str(int(float(val_list[0]))) #eg. "3.0"->3.0->3->"3"
+        else:
+            val_list[0] = str(float(val_list[0]))
 
     varEnv.addBind(args[0], val_list[0], constraints[0])
     return ("not_error", args[0]) 

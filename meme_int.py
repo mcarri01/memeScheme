@@ -35,8 +35,8 @@ def addPrimitives():
     funEnv.addBind("%", (arithmetic, operator.mod, 2))
     funEnv.addBind("^", (arithmetic, operator.pow, 2))
     funEnv.addBind("!", (more_arithmetic, math.factorial, 1))
-    funEnv.addBind("seven", (arrityZero, 7, 0)) #FOR TESTING PURPOSES
     funEnv.addBind("v/", (more_arithmetic, math.sqrt, 1))
+    funEnv.addBind("seven", (arrityZero, 7, 0)) #FOR TESTING PURPOSES
     funEnv.addBind("and", (booleans, operator.and_, 2))
     funEnv.addBind("or", (booleans, operator.or_, 2))
     funEnv.addBind("xor", (booleans, operator.xor, 2))
@@ -174,10 +174,14 @@ def parse_checks(expression, origLines, funEnv):
     elif expression[0] == "check-expect":
         check_expect = True
         expression.pop(0)
-        desired_val = expression[-1]
-        expression = expression[:-1]
+        try:
+            desired_val = expression[-1]
+            expression = expression[:-1]
+        except:
+            check = True
+            return (expression, origLines)
         if desired_val == "check-expect" or desired_val == "check-error":
-            return (expression, None, origLines)
+            return (expression, origLines)
         check = True
     return (expression, origLines)
 
@@ -197,6 +201,7 @@ def makeTree(tree, funEnv):
         if val == None:
             tree.updateNoneCount(1)
         return Node(val, -1, isRoot)
+
 
 
 def handle_checks(error, origLines, lineCount, numLines, val):
@@ -278,6 +283,9 @@ def evaluate(lines, origLines):
             (expression, origLines) = parse_checks(expression, origLines, funEnv)
         if check and len(expression) == 0:
             val = "Error: Incorrect number of memes"
+            origLines.RaiseException(lineCount, numLines, val)
+            # need two because if the code is (check-error) the first one
+            # toggles and the second one raises the error
             origLines.RaiseException(lineCount, numLines, val)
         val = "Error: Where's the meme?"
 

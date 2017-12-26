@@ -1,0 +1,42 @@
+
+I like memes
+
+empty
+
+3 1 2 + check-expect
+3.2 1 2.2 + check-expect
+3.1 1.1 2 + check-expect
+3.3 1.1 2.2 + check-expect
+4 1.1 2.9 + check-expect
+
+2.86356421266 8.2 v/ check-expect
+4 16 v/ check-expect
+8.2 ! check-error
+42.4399889428 4.5 2.3 ^ check-expect
+
+hitMe x meme
+[-1.2] x -1.2 append check-expect
+[-1.2, -1] x -1.0 append check-expect
+[2.3, -1.2, -1] x 2.3 push check-expect
+[2.3, 0, -1.2, -1] x (today 1 +) 0.0 insert check-expect
+[2.3, 0, -1.2, -3.2] (x (today 3.0 +) ((x (today 1.0 +) get) -3.2 +) put) check-expect
+
+3.0 a meme
+3 MEME check-expect
+3 b meme
+3 MEME check-expect
+3.2 c meme
+3.2 MEME check-expect
+
+(1.2 (3 d meme) meme)
+1.2 d check-expect
+(3 (1.2 e meme) meme)
+3 e check-expect
+
+3 1.2.num meme check-error
+2 d.num .8 + check-expect
+2 d.num 0.8 + check-expect
+2 d.num .80000000000 + check-expect
+2 d.num 00000000000.8 + check-expect
+2 d.num 0000000000.800000000 + check-expect
+d.str check-error
