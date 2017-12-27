@@ -1,0 +1,10 @@
+
+I like memes
+
+!@ Checks that MEME is correct at the start 
+   Must be the first lines of code, hence the file name#$
+
+Nothing MEME check-expect
+
+empty
+Nothing MEME check-expect

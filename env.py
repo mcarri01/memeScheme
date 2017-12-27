@@ -102,11 +102,6 @@ class Environment:
 
     def empty(self):
         self.env = dict()
-        self.addBind("MEME", 0)
-        self.addBind("spicy", True)
-        self.addBind("normie", False)
-        self.addBind("mild", "mild")
-        self.addBind("today", (time.localtime().tm_yday)-1)
 
     def getArrity(self, var):
         if self.inEnv(var):

@@ -352,7 +352,7 @@ def check_error (args, varEnv, funEnv, op):
 
 def empty(args, varEnv, funEnv, op):
     varEnv.empty()
-    return ("not_error", "no memes left")
+    return ("not_error", "Nothing")
 
 
 def conditional(args, varEnv, funEnv, op):

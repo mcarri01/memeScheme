@@ -16,12 +16,7 @@ from expTree import *
 
 def addPrimitives():
     varEnv = Environment(dict())
-    varEnv.addBind("MEME", None)
-    varEnv.addBind("spicy", True)
-    varEnv.addBind("normie", False)
-    varEnv.addBind("mild", None)
-    varEnv.addBind("today", today())
-    varEnv.addBind("Nothing", None)
+    varEnv.addBind("MEME", "Nothing")
 
     funEnv = Environment(dict())
     funEnv.addBind("++", (for_testing, operator.add, 2))
@@ -55,6 +50,7 @@ def addPrimitives():
     funEnv.addBind("empty", (empty, None, 0))
     funEnv.addBind("if", (conditional, None, 3))
     funEnv.addBind("while", (wloop, None, 2))
+    funEnv.addBind("today", (arrityZero, (time.localtime().tm_yday-1), 0))
     funEnv.addBind("hitMe", (arrityZero, [], 0))
     funEnv.addBind("length", (listArrityOne, (lambda x: len(x)), 1))
     funEnv.addBind("null?", (listArrityOne, (lambda x: "spicy" if len(x)==0 else "normie"), 1))
@@ -304,6 +300,12 @@ if __name__ == '__main__':
 
 
 
+
+    #varEnv.addBind("spicy", True)
+    #varEnv.addBind("normie", False)
+    #varEnv.addBind("mild", None)
+    #varEnv.addBind("today", today())
+    #varEnv.addBind("Nothing", None)
 
 # def parse_checks(expression, origLines, funEnv):
 #     global check, check_expect, desired_val
