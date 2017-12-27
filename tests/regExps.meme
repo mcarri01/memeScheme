@@ -7,16 +7,16 @@ empty
 7 //+ meme
 
 !@mild 3 larger? not normie spicy or and check-expect#$
-2 1 + mild 1 print meme meme check-error
-1 "hello" spicy 1 x meme meme meme print check-expect
-1 print print check-error
+2 1 + mild 1 meme meme check-error
+1 "hello" spicy 1 x meme meme meme check-expect
+Nothing 1 print print check-expect
 3 2 1 + check-expect
 18 6 5 4 3 2 1 - + - + * check-expect
 3 3 4 - 2 1 * + 0 //xor meme + check-expect
 spicy 13 4 x meme 2 ! ^ - 13 4 3 + 5 * % / 1 13 4 2 ! ^ - 13 4 9 v/ + 5 * % / - <> check-expect
 spicy normie normie nor 9 v/ 3 4 - 1 2 * + + + 4 = if check-expect
 3 normie normie nor 9 v/ 3 4 - 1 2 * + + + 10 = if check-expect
-"3" "3" y meme print check-expect
+"3" "3" y meme check-expect
 y x + check-error
 "3" b meme 3 a meme = check-error
 !@10 3 4 - 2 1 * + + + check-expect#$
@@ -27,17 +27,18 @@ y x + check-error
 5 spicy 3 * + check-error
 / 3 0 check-error
 + 3 empty check-error
-1 1 print check-expect
+1 1 check-expect
 14 seven + + check-expect
 3 13 4 2 ^ - 13 4 3 + 5 * % / check-expect
 spicy normie spicy and normie normie or nand normie spicy spicy and or and check-expect
 13 1 4 3 * + check-expect
-7 + print check-expect
-- "hello" spicy 1 //- meme meme meme check-expect
-1 - print check-expect
-spicy -.bool print check-expect
-"hello" -.str print check-expect
-* 1 //* meme check-expect
+7 + check-expect
+//- "hello" spicy 1 //- meme meme meme check-expect
+1 "hello" spicy 1 //- meme meme meme check-expect
+1 - check-expect
+spicy -.bool check-expect
+"hello" -.str check-expect
+//* 1 //* meme check-expect
 * 2 * meme check-expect
 12 7 5 - meme + check-expect
 25 4 ! 1 //! meme + check-expect
@@ -46,14 +47,17 @@ spicy //and spicy //and meme and check-expect
 14 //+ + + check-expect
 14 + //+ + check-expect
 14 + + //+ check-error
-"3" "3" q meme print check-expect
-3 4 - 1 2 * //+ + + 10 =  print
+"3" "3" q meme check-expect
+3 4 - 1 2 * //+ + + 10 = 
 3 normie normie nor 9 v/ 3 4 - 1 2 * //+ + + 10 = if check-expect
 3 normie normie nor 9 v/ 3 4 - 1 2 * + //+ + 10 = if check-expect
 spicy normie normie nor 9 v/ 3 4 - 1 2 * + + //+ 10 = if check-expect
-1 2 print 1 print 1 2 * 2 = if check-expect
-2 2 print 1 print 1 2 * 4 = if check-expect
-
+1 2 1 ((1 2 *) 2 =) if check-expect
+2 2 1 ((1 2 *) 4 =) if check-expect
+5 "hello" //- meme check-expect 
+35 7 5 - meme * check-expect
+2 2 //- meme check-expect
+224 7 5 - ^ * check-expect
 
 
 !@

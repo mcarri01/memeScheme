@@ -59,9 +59,9 @@ j today get check-error
 
 !@ put #$
 
-[[2, 1]] b print check-expect
+[[2, 1]] b check-expect
 [1] (b today 1 put) check-expect
-[1] b print check-expect
+[1] b check-expect
 
 [[1, 2], 1, "didn't, hello", 2, [], " , [] ' ", 123, normie] (x today [1, 2] put) check-expect
 					<~ (x (today 5 +) "DAVID STERN IS REALLY COOL" put) check-expect

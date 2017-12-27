@@ -10,13 +10,13 @@ I like memes
 !@check-expect#$
 !@1 check-expect#$
 !@check-error check-error#$
-!@    check-error check-expect#$
+!@check-error check-expect#$
 !@check-expect check-error#$
-!@    check-expect check-expect#$
+!@check-expect check-expect#$
 !@2 + 1 1 check-expect check-error#$
 !@3 + 1 1 check-expect check-error#$
 !@error check-error check-expect#$
 !@check-error check-expect check-error#$
-!@    check-expect check-error check-expect#$
+!@check-expect check-error check-expect#$
 
 

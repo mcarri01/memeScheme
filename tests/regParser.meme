@@ -38,7 +38,7 @@ spicy spicy check-expect
 
 
 "aldjksf!@#$%^&*()[][][]][[[[]]]]]]]]]][[[[[,,,meme<~" x meme
-"aldjksf!@#$%^&*()[][][]][[[[]]]]]]]]]][[[[[,,,meme<~" x print check-expect
+"aldjksf!@#$%^&*()[][][]][[[[]]]]]]]]]][[[[[,,,meme<~" x check-expect
 
 [[1, 2], 123, "didn't, hello", 2, [], normie, 123, normie] x meme
 <~  [[1, 2], 123, "didn't, hello", 2, [], normie, 123, normie]] 3 x.list init check-expect

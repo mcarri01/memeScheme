@@ -65,23 +65,14 @@ class Node:
 
     # This function takes in the node at the root of the expression tree and
     # evaluates it by recursively calling this function on its children.  Along
-    # the way, the function checks to make sure it is not evaluating the false
+    # the way, the function checks to make sure it is not evaluating the "bad"
     # branch of an if-statement or the body of a while loop that has already
     # terminated.  This is important because functions that update values
     # and are in the garbage part of the if/while statements would be evaluated
     # without this check.  A consequence of this method is that if there is an
     # error in the garbage part of the if/while statement, the evaluator will
-    # not detect it (although this is not necessarily a bad thing).  This
-    # function also sets the WLOOP_PRINT variable which is responsible for
-    # letting the wloop primitive function to know if the result of the body
-    # of the loop should be printed (since otherwise putting a print statement
-    # in the while loop's body would have no effect other than printing the
-    # result of the last iteration of the loop).  There might be a bug here
-    # where if there are multiple while loops in an expression and one loop
-    # wants printing and the other doesn't either both loops will print or
-    # neither loop will print but I'm not sure.
+    # not detect it (although this is not necessarily a bad thing).
     def evaluate(self, varEnv, funEnv, topDogCheck):
-        #print self.val
         if not self.root and (self.val == "check-error" or self.val == "check-expect"):
             return ("error", "Error: Meme has top-dog status")
         if self.root and self.val != None and self.numChildren == -1:
@@ -109,8 +100,6 @@ class Node:
                 global_vars.wloop = True
                 self.children[0] = (self.children[0]).evaluate(varEnv, funEnv, topDogCheck)
                 if self.children[0] == ("not_error", "spicy"):
-                    #if self.children[1].val == "print":
-                    #    global_vars.WLOOP_PRINT = True
                     self.children[1] = (self.children[1]).evaluate(varEnv, funEnv, topDogCheck)
                 else:
                     self.children[1] = ("not_error", "doesn't matter")
@@ -187,18 +176,21 @@ class Node:
 
     def __findSubtree(self, varEnv, funEnv, tree):
         # don't need to check if a literal since literals can't have children
-        #lit = isIntBoolStringorList(self.val)
         var = varEnv.inEnv(self.val)
         fun = funEnv.inEnv(self.val) and (funEnv.getArrity(self.val) == 0)
+        left = False
 
         # variables/literals and functions of arrity zero will both always be
         # leafs and are therefore treated the same
         found = False
         if self.numChildren > 0:
-            for child in reversed(self.children):
-                #print "CHILD.VAL: ", child.val
-                if child.val != None:
-                    subtreeRoot = child.__findSubtree(varEnv, funEnv, tree)
+            for i in range((len(self.children)-1), -1, -1):
+                if self.children[i].val != None:
+                    for j in range(i-1, -1, -1):
+                        left = self.children[j].__backInTime(varEnv, funEnv)
+                        if left:
+                            break
+                    subtreeRoot = self.children[i].__findSubtree(varEnv, funEnv, tree)
                     found = True
                     break
             if not found:
@@ -209,8 +201,7 @@ class Node:
         if subtreeRoot[0] == "yes":
             return subtreeRoot
         if subtreeRoot[0] == "maybe":
-            #print "HERE: ", self.val
-            if var or fun:
+            if var or fun or left:
                 for i in range(self.numChildren):
                     if self.children[i] == subtreeRoot[1]:
                         self.addChild(Node(None, -1, False), i)
@@ -221,6 +212,25 @@ class Node:
                 return ("yes", subtreeRoot[1])
 
         return ("maybe", self) # occurs if var is false
+
+
+    # Says whether or not their is a potential value to be moved that is to
+    # the left of the value we're looking at.  Necessary for something like
+    # 3 normie normie nor 9 v/ 3 4 - 1 2 * + + + 10 = if check-expect
+    # since the 3 will be on the middle branch of the if.  Without this
+    # function an error would be returned since 3's parent is not a variable
+    # or a function with arrity zero.
+    def __backInTime(self, varEnv, funEnv):
+        var = varEnv.inEnv(self.val)
+        fun = funEnv.inEnv(self.val) and (funEnv.getArrity(self.val) == 0)
+        if self.numChildren > 0 and (var or fun):
+            return True
+
+        for i in range(self.numChildren):
+            if (self.children[i].__backInTime(varEnv, funEnv)):
+                return True
+        return False
+
 
 
     def __check(self):

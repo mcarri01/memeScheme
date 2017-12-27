@@ -59,20 +59,22 @@ test
 !@"#$ "!@" e meme
 !@"#$ "#$" f meme
 
-"!@" a print check-expect
-"#$" b print check-expect
-"!@" c print check-expect
-"#$" d print check-expect
-"!@" e print check-expect
-"#$" f print check-expect
+Nothing a print check-expect
+Nothing b print check-expect
+Nothing c print check-expect
+Nothing d print check-expect
+Nothing e print check-expect
+Nothing f print check-expect
 
+!@ hey there how are you doing?#$
+"#$!@" x meme !@#$
 
-!@ hey there how are you doing
-"#$!@" x meme --remove start and end comment and you should get an endless memer error from the leftover quote #$
+!@ hey there how are you doing#$
+"#$!@" x meme !@--remove start and end comment and you should get an endless memer error from the leftover quote #$
 
 
 "!@#$" g meme
-"!@#$" g print check-expect
+Nothing g print check-expect
 
 
 !@
@@ -96,7 +98,7 @@ line of code here
 
 !@
 "hell #$ "#$" z meme
-"#$" z print check-expect
+Nothing z print check-expect
 
 
 

@@ -11,7 +11,7 @@ empty
 !@ the bad branch is completely empty #$
 1 spicy if check-error
 1 normie if check-error
-"Error: Incorrect number of memes" MEME check-expect
+"Meme failed, as expected" MEME check-expect
 normie if check-error
-"Error: Incorrect number of memes" MEME check-expect
+"Meme failed, as expected" MEME check-expect
 if check-error

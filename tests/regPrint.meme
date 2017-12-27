@@ -21,21 +21,32 @@ c print check-error
 
 
 !@ Tests with one literals #$
-1 1 print check-expect
-spicy spicy print check-expect
-"hello" "hello" print check-expect
+Nothing 1 print check-expect
+Nothing spicy print check-expect
+Nothing "hello" print check-expect
 
 
 !@ Test with one variable of a singular type #$
 1 x meme
-1 x print check-expect
-1 x.num print check-expect
+Nothing x print check-expect
+Nothing x.num print check-expect
 
 
 !@ Test with one variable of multiple types
    num was declared first #$
 spicy x meme
 "hello" x meme
-1 x print check-expect
-spicy x.bool print check-expect
-"hello" x.str print check-expect
+Nothing x print check-expect
+Nothing x.bool print check-expect
+Nothing x.str print check-expect
+
+"Nothing" i meme
+Nothing j meme
+"Nothing" i check-expect
+Nothing j check-expect
+i.nonetype check-error
+j.str check-error
+normie i j = check-error
+
+
+

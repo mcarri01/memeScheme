@@ -35,36 +35,41 @@ def handle_comments(line, lines, lineCount, origLines):
     markerB = toReplace + '2'
 
 
-    global comment, comment_start_line, C_START, C_END
+    global comment, comment_start_line, C_START, C_END, QUOTE
     while loop:
+        #print currLine
         loop = False
         # deals with the end of block comments and the case of !@\n"#$"
         if C_END in currLine and comment:
+            # print "a"
             comment = False
-            currLine = currLine[str.find(currLine, C_END)+2:]
+            currLine = currLine[currLine.find(C_END)+2:]
             loop = True       
         #deals with the middle of block comments
         if comment and C_END not in currLine and currLine != "":
+            # print "b"
             currLine = ""
             loop = True
         # deals with the start of block comments and checks for the "!@" case
         if C_START in currLine and C_END not in currLine:# and not comment:
-            if currLine[:str.find(currLine, C_START)].count(QUOTE) % 2  == 1:
-                currLine = currLine[:str.find(currLine, C_START)] + markerA + \
-                           currLine[str.find(currLine, C_START)+2:]
+            # print "c"
+            if currLine[:currLine.find(C_START)].count(QUOTE) % 2  == 1:
+                currLine = currLine[:currLine.find(C_START)] + markerA + \
+                           currLine[currLine.find(C_START)+2:]
                 loop = True
             else:
                 comment_start_line = lineCount
                 comment = True
-                currLine = currLine[:str.find(currLine, C_START)]
+                currLine = currLine[:currLine.find(C_START)]
                 loop = False
         # deals with comments that are contained on one line, comments that end
         # without starting, and checks for the "#$" case
-        if str.find(currLine, C_START) < str.find(currLine, C_END) and not comment:
-            if str.find(currLine, C_START) == -1:
-                if currLine[:str.find(currLine, C_END)].count(QUOTE) % 2  == 1:
-                    currLine = currLine[:str.find(currLine, C_END)] + markerB \
-                             + currLine[str.find(currLine, C_END)+2:]
+        if currLine.find(C_START) < currLine.find(C_END) and not comment:
+            # print "d"
+            if currLine.find(C_START) == -1:
+                if currLine[:currLine.find(C_END)].count(QUOTE) % 2  == 1:
+                    currLine = currLine[:currLine.find(C_END)] + markerB \
+                             + currLine[currLine.find(C_END)+2:]
                     loop = True
                 elif not comment:
                     val = "Error: Lil ending memer doesn't have a partner"
@@ -72,20 +77,25 @@ def handle_comments(line, lines, lineCount, origLines):
                 else:
                     loop = True
             else:
-                if currLine[:str.find(currLine, C_START)].count(QUOTE) % 2  == 1:
-                    currLine = currLine[:str.find(currLine, C_END)] \
-                            + markerB + currLine[str.find(currLine, C_END)+2:]
+                if currLine[:currLine.find(C_START)].count(QUOTE) % 2  == 1:
+                    currLine = currLine[:currLine.find(C_START)] \
+                            + markerA + currLine[currLine.find(C_START)+2:]
                     loop = True
                 else:
-                    currLine = currLine[:str.find(currLine, C_START)] + \
-                                  currLine[str.find(currLine, C_END)+2:]
+                    currLine = currLine[:currLine.find(C_START)] + \
+                                  currLine[currLine.find(C_END)+2:]
                     loop = True
         # deals with the invalid case of comments in this format: #$___!@ when there is
         # no comment currently being written
-        elif str.find(currLine, C_START) > str.find(currLine, C_END) and not comment:
-            if currLine[:str.find(currLine, C_END)].count(QUOTE) % 2  == 1:
-                currLine = currLine[:str.find(currLine, C_END)] \
-                 + markerB + currLine[str.find(currLine, C_END)+2:]
+        elif currLine.find(C_START) > currLine.find(C_END) and not comment:
+            # print "e"
+            if currLine[:currLine.find(C_END)].count(QUOTE) % 2  == 1:
+                currLine = currLine[:currLine.find(C_END)] \
+                 + markerB + currLine[currLine.find(C_END)+2:]
+                loop = True
+            elif currLine[:currLine.find(C_START)].count(QUOTE) % 2  == 1:
+                currLine = currLine[:currLine.find(C_START)] \
+                 + markerA + currLine[currLine.find(C_START)+2:]
                 loop = True
             else:
                 val = "Error: Lil ending memer doesn't have a partner"

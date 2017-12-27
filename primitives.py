@@ -110,20 +110,15 @@ def larger_and_smaller(args, varEnv, funEnv, op):
     return ("not_error", "spicy" if randint(0,1) == 0 else "normie")
 
 def printVar(args, varEnv, funEnv, op):
-    #if not global_vars.wloop:
-    #    val = "Error: Meme is only allowed inside body of while loop"
-    #    for _ in range(500):
-    #        val = val + " loop"
-    #    return ("error", val)
     constraints = [[global_vars.ALL_TYPES]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
 
-    # CHECK THIS LINE BELOW
     if isinstance(val_list[0], bool):
         print "-->", "spicy" if val_list[0] else "normie"
-    print "-->", val_list[0]
+    else:
+        print "-->", val_list[0]
     return ("not_error", "Nothing")
 
 

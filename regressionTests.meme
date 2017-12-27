@@ -168,7 +168,6 @@ I like memes
    The rest of the file serves to test all valid examples of the two #$
 
 !@check-error#$
-!@check-error#$
 !@check-expect#$
 !@1 check-expect#$
 !@check-error check-error#$
@@ -180,9 +179,6 @@ I like memes
 !@error check-error check-expect#$
 !@check-error check-expect check-error#$
 !@check-expect check-error check-expect#$
-!@!@ check-error#$
-!@#$!@ check-error#$
-!@2 #$!@ 1 1 + check-expect#$
 
 
 
@@ -246,20 +242,22 @@ test
 !@"#$ "!@" e meme
 !@"#$ "#$" f meme
 
-"!@" a print check-expect
-"#$" b print check-expect
-"!@" c print check-expect
-"#$" d print check-expect
-"!@" e print check-expect
-"#$" f print check-expect
+Nothing a print check-expect
+Nothing b print check-expect
+Nothing c print check-expect
+Nothing d print check-expect
+Nothing e print check-expect
+Nothing f print check-expect
 
+!@ hey there how are you doing?#$
+"#$!@" x meme !@#$
 
-!@ hey there how are you doing
-"#$!@" x meme --remove start and end comment and you should get an endless memer error from the leftover quote #$
+!@ hey there how are you doing#$
+"#$!@" x meme !@--remove start and end comment and you should get an endless memer error from the leftover quote #$
 
 
 "!@#$" g meme
-"!@#$" g print check-expect
+Nothing g print check-expect
 
 
 !@
@@ -283,7 +281,7 @@ line of code here
 
 !@
 "hell #$ "#$" z meme
-"#$" z print check-expect
+Nothing z print check-expect
 
 
 
@@ -392,9 +390,9 @@ empty
 !@ the bad branch is completely empty #$
 1 spicy if check-error
 1 normie if check-error
-"Error: Incorrect number of memes" MEME check-expect
+"Meme failed, as expected" MEME check-expect
 normie if check-error
-"Error: Incorrect number of memes" MEME check-expect
+"Meme failed, as expected" MEME check-expect
 if check-error
 
 I like memes
@@ -431,48 +429,49 @@ b x meme check-error
 1 ab][cd meme check-error
 1 ab.cd meme check-error
 1 a<~bcd meme check-error
+1 a<'>bcd meme check-error
 
 
 
 !@ Tests with one literal as assignment #$
 1 x meme
-1 x print check-expect
-1 x.num print check-expect
+1 x check-expect
+1 x.num check-expect
 spicy x meme
-1 x print check-expect
-spicy x.bool print check-expect
+1 x check-expect
+spicy x.bool check-expect
 2 x meme
-2 x print check-expect
-2 x.num print check-expect
+2 x check-expect
+2 x.num check-expect
 spicy y meme
-spicy y print check-expect
-spicy x.bool print check-expect
+spicy y check-expect
+spicy x.bool check-expect
 "hello" z meme
-"hello" z print check-expect
-"hello" z.str print check-expect
+"hello" z check-expect
+"hello" z.str check-expect
 1 z meme
 "hello" z meme
-"hello" z print check-expect
-"hello" z.str print check-expect
-1 z.num print check-expect
+"hello" z check-expect
+"hello" z.str check-expect
+1 z.num check-expect
 2 z meme
-"hello" z print check-expect
-2 z.num print check-expect
+"hello" z check-expect
+2 z.num check-expect
 
 
 !@ Tests with one variable of a singular type as assignment #$
 1 a meme
 a b meme
-1 b print check-expect
-1 b.num print check-expect
+1 b check-expect
+1 b.num check-expect
 spicy c meme
 c d meme
-spicy d print check-expect
-spicy d.bool print check-expect
+spicy d check-expect
+spicy d.bool check-expect
 "hello" e meme
 e f meme
-"hello" f print check-expect
-"hello" f.str print check-expect
+"hello" f check-expect
+"hello" f.str check-expect
 
 
 !@ Test with one variable of multiple types as assignment
@@ -481,46 +480,46 @@ e f meme
 spicy m meme
 "hello" m meme
 m n meme
-1 n print check-expect
-1 n.num print check-expect
-spicy n.bool print check-expect
-"hello" n.str print check-expect
+1 n check-expect
+1 n.num check-expect
+spicy n.bool check-expect
+"hello" n.str check-expect
 
    !@ bool was declared first #$
 spicy o meme
 "hello" o meme
 1 o meme
 o p meme
-spicy p print check-expect
-spicy p.bool print check-expect
-"hello" p.str print check-expect
-1 p.num print check-expect
+spicy p check-expect
+spicy p.bool check-expect
+"hello" p.str check-expect
+1 p.num check-expect
 
    !@ str was declared first #$
 "hello" q meme
 1 q meme
 spicy q meme
 q r meme
-"hello" r print check-expect
-"hello" r.str print check-expect
-1 r.num print check-expect
-spicy r.bool print check-expect
+"hello" r check-expect
+"hello" r.str check-expect
+1 r.num check-expect
+spicy r.bool check-expect
 
 	!@ assignment with dot operator #$
 1 s meme
 spicy s meme
 "hello" s meme
 s.num t meme
-1 t print check-expect
-1 t.num print check-expect
+1 t check-expect
+1 t.num check-expect
 
 s.bool u meme
-spicy u print check-expect
-spicy u.bool print check-expect
+spicy u check-expect
+spicy u.bool check-expect
 
 s.str v meme
-"hello" v print check-expect
-"hello" v.str print check-expect
+"hello" v check-expect
+"hello" v.str check-expect
 
 
 !@ Define a variable from a previous variable
@@ -530,12 +529,12 @@ empty
 1 a meme
 "hello" a meme
 a b meme
-1 a print check-expect
-1 b print check-expect
-1 a.num print check-expect
-1 b.num print check-expect
-"hello" a.str print check-expect
-"hello" b.str print check-expect
+1 a check-expect
+1 b check-expect
+1 a.num check-expect
+1 b.num check-expect
+"hello" a.str check-expect
+"hello" b.str check-expect
 
 empty
 
@@ -547,21 +546,21 @@ empty
 "hello" a meme
 a.str b meme
 
-1 a print check-expect
-"hello" b print check-expect
-1 a.num print check-expect
-"hello" a.str print check-expect
-b.num print check-error
+1 a check-expect
+"hello" b check-expect
+1 a.num check-expect
+"hello" a.str check-expect
+b.num check-error
 
 !@ Create a new variable by using an old non-dot-operated variable as the value #$
 1 c meme
 "hello" c meme
 c d meme
 
-1 c print check-expect
-1 d print check-expect
-1 c.num print check-expect
-1 d.num print check-expect
+1 c check-expect
+1 d check-expect
+1 c.num check-expect
+1 d.num check-expect
 
 
 
@@ -576,14 +575,14 @@ spicy f meme#$
 
 f e meme
 
-3 e print check-expect
-"hello" f print check-expect
-3 e.num print check-expect
-3 f.num print check-expect
-spicy e.bool print check-expect
-spicy f.bool print check-expect
-"hello" e.str print check-expect
-"hello" f.str print check-expect
+3 e check-expect
+"hello" f check-expect
+3 e.num check-expect
+3 f.num check-expect
+spicy e.bool check-expect
+spicy f.bool check-expect
+"hello" e.str check-expect
+"hello" f.str check-expect
 
 !@ nested meme with stress test#$
 (spicy (((spicy not) (normie (13 4 //+ meme 2 ! ^ - 13 4 3 + 5 * % / 1 13 4 2 ! ^ - 13 4 9 v/ + 5 * % / - <>) xor) nor) not) check-expect)
@@ -709,16 +708,16 @@ empty
 7 //+ meme
 
 !@mild 3 larger? not normie spicy or and check-expect#$
-2 1 + mild 1 print meme meme check-error
-1 "hello" spicy 1 x meme meme meme print check-expect
-1 print print check-error
+2 1 + mild 1 meme meme check-error
+1 "hello" spicy 1 x meme meme meme check-expect
+Nothing 1 print print check-expect
 3 2 1 + check-expect
 18 6 5 4 3 2 1 - + - + * check-expect
 3 3 4 - 2 1 * + 0 //xor meme + check-expect
 spicy 13 4 x meme 2 ! ^ - 13 4 3 + 5 * % / 1 13 4 2 ! ^ - 13 4 9 v/ + 5 * % / - <> check-expect
 spicy normie normie nor 9 v/ 3 4 - 1 2 * + + + 4 = if check-expect
 3 normie normie nor 9 v/ 3 4 - 1 2 * + + + 10 = if check-expect
-"3" "3" y meme print check-expect
+"3" "3" y meme check-expect
 y x + check-error
 "3" b meme 3 a meme = check-error
 !@10 3 4 - 2 1 * + + + check-expect#$
@@ -729,17 +728,18 @@ y x + check-error
 5 spicy 3 * + check-error
 / 3 0 check-error
 + 3 empty check-error
-1 1 print check-expect
+1 1 check-expect
 14 seven + + check-expect
 3 13 4 2 ^ - 13 4 3 + 5 * % / check-expect
 spicy normie spicy and normie normie or nand normie spicy spicy and or and check-expect
 13 1 4 3 * + check-expect
-7 + print check-expect
-- "hello" spicy 1 //- meme meme meme check-expect
-1 - print check-expect
-spicy -.bool print check-expect
-"hello" -.str print check-expect
-* 1 //* meme check-expect
+7 + check-expect
+//- "hello" spicy 1 //- meme meme meme check-expect
+1 "hello" spicy 1 //- meme meme meme check-expect
+1 - check-expect
+spicy -.bool check-expect
+"hello" -.str check-expect
+//* 1 //* meme check-expect
 * 2 * meme check-expect
 12 7 5 - meme + check-expect
 25 4 ! 1 //! meme + check-expect
@@ -748,14 +748,17 @@ spicy //and spicy //and meme and check-expect
 14 //+ + + check-expect
 14 + //+ + check-expect
 14 + + //+ check-error
-"3" "3" q meme print check-expect
-3 4 - 1 2 * //+ + + 10 =  print
+"3" "3" q meme check-expect
+3 4 - 1 2 * //+ + + 10 = 
 3 normie normie nor 9 v/ 3 4 - 1 2 * //+ + + 10 = if check-expect
 3 normie normie nor 9 v/ 3 4 - 1 2 * + //+ + 10 = if check-expect
 spicy normie normie nor 9 v/ 3 4 - 1 2 * + + //+ 10 = if check-expect
-1 2 print 1 print 1 2 * 2 = if check-expect
-2 2 print 1 print 1 2 * 4 = if check-expect
-
+1 2 1 ((1 2 *) 2 =) if check-expect
+2 2 1 ((1 2 *) 4 =) if check-expect
+5 "hello" //- meme check-expect 
+35 7 5 - meme * check-expect
+2 2 //- meme check-expect
+224 7 5 - ^ * check-expect
 
 
 !@
@@ -913,9 +916,9 @@ j today get check-error
 
 !@ put #$
 
-[[2, 1]] b print check-expect
+[[2, 1]] b check-expect
 [1] (b today 1 put) check-expect
-[1] b print check-expect
+[1] b check-expect
 
 [[1, 2], 1, "didn't, hello", 2, [], " , [] ' ", 123, normie] (x today [1, 2] put) check-expect
 					<~ (x (today 5 +) "DAVID STERN IS REALLY COOL" put) check-expect
@@ -1055,55 +1058,32 @@ spicy ("mno jkl def ghi abc" z =) check-expect
 
 <~(1 x meme) + check-expect
 4 !@abc#$3
+
+
 I like memes
 
-
-!@ Bool #$
 empty
 
-!@ Errors #$
+Nothing x meme
+Nothing y meme
 
-spicy a meme
-spicy 1 not check-error
-not check-error
-spicy.bool not check-error
-33.bool not check-error
-"hello".bool not check-error
-a.bol not check-error
-b.bool not check-error
-a.num not check-error
-c not check-error
-33 not check-error
+spicy x y = check-expect
 
+(Nothing (1 z meme) meme)
+Nothing z.nonetype check-expect
+z.nonetype
+Nothing MEME check-expect
+1.2
+2 1 z + check-expect
+1 z.nonetype + check-error
 
-!@ Tests with one literals #$
-normie spicy not check-expect
-spicy normie not check-expect
-mild not
-mild not
-mild not
-mild not
+[Nothing, Nothing, Nothing, Nothing, Nothing] ((5 Nothing init) a meme) check-expect
+a (today 2 +) get
+a (today 2 +) get "Nothing" = check-error
+spicy a (today 2 +) get Nothing = check-expect
 
+1 Nothing meme check-error
 
-!@ Test with one variable of a singular type #$
-spicy x meme
-normie x not check-expect
-normie x.bool not check-expect
-
-
-!@ Test with one variable of multiple types
-   bool was declared first #$
-1 x meme
-normie x not check-expect
-normie x.bool not check-expect
-
-
-!@ Test with one variable of multiple types
-   num was declared first #$
-1 y meme
-spicy y meme 
-normie y not check-expect
-normie y.bool not check-expect
 
 I like memes
 
@@ -1144,7 +1124,7 @@ spicy spicy check-expect
 
 
 "aldjksf!@#$%^&*()[][][]][[[[]]]]]]]]]][[[[[,,,meme<~" x meme
-"aldjksf!@#$%^&*()[][][]][[[[]]]]]]]]]][[[[[,,,meme<~" x print check-expect
+"aldjksf!@#$%^&*()[][][]][[[[]]]]]]]]]][[[[[,,,meme<~" x check-expect
 
 [[1, 2], 123, "didn't, hello", 2, [], normie, 123, normie] x meme
 <~  [[1, 2], 123, "didn't, hello", 2, [], normie, 123, normie]] 3 x.list init check-expect
@@ -1175,33 +1155,47 @@ c print check-error
 
 
 !@ Tests with one literals #$
-1 1 print check-expect
-spicy spicy print check-expect
-"hello" "hello" print check-expect
+Nothing 1 print check-expect
+Nothing spicy print check-expect
+Nothing "hello" print check-expect
 
 
 !@ Test with one variable of a singular type #$
 1 x meme
-1 x print check-expect
-1 x.num print check-expect
+Nothing x print check-expect
+Nothing x.num print check-expect
 
 
 !@ Test with one variable of multiple types
    num was declared first #$
 spicy x meme
 "hello" x meme
-1 x print check-expect
-spicy x.bool print check-expect
-"hello" x.str print check-expect
+Nothing x print check-expect
+Nothing x.bool print check-expect
+Nothing x.str print check-expect
+
+"Nothing" i meme
+Nothing j meme
+"Nothing" i check-expect
+Nothing j check-expect
+i.nonetype check-error
+j.str check-error
+normie i j = check-error
+
+
+
 
 I like memes
 
+
 empty
+
+spicy spicy check-expect
 
 				-1 x meme
 		 <~ (5 x <) while
 ((1 x +) x meme) print 
-      5 MEME check-expect
+Nothing MEME check-expect
 
 			   											hitMe (1 y meme) meme
 													 <~ 10 (y length) < while
@@ -1209,41 +1203,54 @@ empty
   [5, 17, 53, 161, 485, 1457, 4373, 13121, 39365, 118097] y.list check-expect
 
 
+3 1 2 + check-expect check-error
+
 -1 x meme
   	        <~	        spicy if check-expect check-error
   		    <~ spicy while
 <~	((1 x +) x meme) print  
 					  normie
-"Error: Incorrect number of memes" MEME check-expect							   
+"Meme failed, as expected" MEME check-expect							   
+
+
+!@Infinite loop hooray!#$
+!@
+-1 x meme
+<~				        spicy if
+<~			      spicy while
+<~	((1 x +) x meme) print
+					   normie
+#$
 
 
 
   	        <~	        spicy if check-expect
-  		    <~ (8 x <) while
+  		    <~ (5 x <) while
 <~	((1 x +) x meme) print  
 <~					  normie
-							   8
-8 MEME check-expect
+						 Nothing
+MEME
+"Check was Nothing, as expected" MEME check-expect
 
 
 
 5 a meme
 <~ (5 a <) while check-expect
 <~ 	   a print
-				""
-"" MEME check-expect
+				Nothing
+"Check was Nothing, as expected" MEME check-expect
 
 
-"" normie while check-expect
-"" MEME check-expect
+Nothing "" normie while check-expect
+"Check was Nothing, as expected" MEME check-expect
 
 
 (1 (spicy g meme) meme)
 spicy MEME check-expect
 (1 (spicy g meme) meme)
 1 MEME.num check-expect
-1 MEME check-expect
-1 MEME check-expect
-
+"Check was 1, as expected" MEME check-expect
+"Check was <'>Check was 1, as expected<'>, as expected" MEME check-expect
+"Check was <'>Check was <'>Check was 1, as expected<'>, as expected<'>, as expected" MEME check-expect
 
 

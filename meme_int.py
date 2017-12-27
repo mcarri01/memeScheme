@@ -192,7 +192,7 @@ def makeTree(tree, funEnv):
 
 
 def evaluate(lines, origLines):
-    fullExp = "" #
+    fullExp = ""
     numLines = 1 #number of lines a multiline expression is
     (varEnv, funEnv) = addPrimitives()
 
@@ -259,7 +259,7 @@ def evaluate(lines, origLines):
                 (error, val) = origLines.RaiseException(lineCount, numLines, val, True)
 
             if not first_iteration and not global_vars.wloop:
-                print "-->", global_vars.prev_val #(?)
+                print "-->", global_vars.prev_val
                 break
 
             if global_vars.check_error or global_vars.check_expect:
@@ -268,14 +268,9 @@ def evaluate(lines, origLines):
                 varEnv.addBindMEME("MEME", val)
             if first_iteration and not global_vars.wloop:
                 print "-->", val
-            #else:
-            #    global_vars.prev_val = val #<--- LOOK AT THIS
             first_iteration = False
         numLines = 1
-        global_vars.check_error = False
-        global_vars.check_expect = False
-        global_vars.prev_val = "Nothing"
-        #check = False
+        global_vars.reset()
 
     if fullExp != "":
         val = "Error: Incorrect number of memes"
