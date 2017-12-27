@@ -1,50 +1,27 @@
 
+
+
 I like memes
 
-
-!@ Bool #$
 empty
 
-!@ Errors #$
+Nothing x meme
+Nothing y meme
 
-spicy a meme
-spicy 1 not check-error
-not check-error
-spicy.bool not check-error
-33.bool not check-error
-"hello".bool not check-error
-a.bol not check-error
-b.bool not check-error
-a.num not check-error
-c not check-error
-33 not check-error
+spicy x y = check-expect
 
+(Nothing (1 z meme) meme)
+Nothing z.nonetype check-expect
+z.nonetype
+Nothing MEME check-expect
+1.2
+2 1 z + check-expect
+1 z.nonetype + check-error
 
-!@ Tests with one literals #$
-normie spicy not check-expect
-spicy normie not check-expect
-mild not
-mild not
-mild not
-mild not
+[Nothing, Nothing, Nothing, Nothing, Nothing] ((5 Nothing init) a meme) check-expect
+a (today 2 +) get
+a (today 2 +) get "Nothing" = check-error
+spicy a (today 2 +) get Nothing = check-expect
 
+1 Nothing meme check-error
 
-!@ Test with one variable of a singular type #$
-spicy x meme
-normie x not check-expect
-normie x.bool not check-expect
-
-
-!@ Test with one variable of multiple types
-   bool was declared first #$
-1 x meme
-normie x not check-expect
-normie x.bool not check-expect
-
-
-!@ Test with one variable of multiple types
-   num was declared first #$
-1 y meme
-spicy y meme 
-normie y not check-expect
-normie y.bool not check-expect

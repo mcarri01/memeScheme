@@ -14,10 +14,6 @@ from expTree import *
 
 
 
-check = False
-check_expect = False
-desired_val = None
-
 def addPrimitives():
     varEnv = Environment(dict())
     varEnv.addBind("MEME", None)
@@ -25,6 +21,7 @@ def addPrimitives():
     varEnv.addBind("normie", False)
     varEnv.addBind("mild", None)
     varEnv.addBind("today", today())
+    varEnv.addBind("Nothing", None)
 
     funEnv = Environment(dict())
     funEnv.addBind("++", (for_testing, operator.add, 2))
@@ -53,8 +50,8 @@ def addPrimitives():
     funEnv.addBind("smaller?", (larger_and_smaller, None, 1))
     funEnv.addBind("print", (printVar, None, 1))
     funEnv.addBind("meme", (defineVar, None, 2))
-    funEnv.addBind("check-error", (check, None, -1))
-    funEnv.addBind("check-expect", (check, None, -1))
+    funEnv.addBind("check-error", (check_error, None, 1))
+    funEnv.addBind("check-expect", (check_expect, None, 2))
     funEnv.addBind("empty", (empty, None, 0))
     funEnv.addBind("if", (conditional, None, 3))
     funEnv.addBind("while", (wloop, None, 2))
@@ -95,6 +92,7 @@ def getMatchingBracket(noQuotes):
             nestedCount -=1
             if nestedCount == 0:
                 return i+1
+    return -1
 
 
 
@@ -105,10 +103,6 @@ def handleQuotesAndBrackets(origExp):
     noQuotes = re.sub('"[^"]*"', "\"\"", origExp) #remove quotes
     expression = ""
 
-    global check
-    if noQuotes[-11:] == "check-error":
-        check = True
-
     #multiline statements sometimes get an extra space added to them
     noQuotes = ' '.join(noQuotes.split())
     # gets rid of parentheses
@@ -116,21 +110,35 @@ def handleQuotesAndBrackets(origExp):
     noQuotes = regex.sub("", noQuotes)
 
     nestedCount = 0
+    toReturn = 0
     for i in range(len(noQuotes)):
         if nestedCount == 0:
             expression = expression + noQuotes[i]
         if noQuotes[i] == "[":
-            nestedCount += 1
+            if getMatchingBracket(noQuotes[i:]) != -1:
+                nestedCount += 1
+            else:
+                toReturn = 2
+                break
         elif noQuotes[i] == "]":
             nestedCount -=1
             if nestedCount == 0:
                 expression = expression + noQuotes[i]
             if nestedCount < 0:
-                return 1
-    if nestedCount != 0:
-        return 2
+                toReturn = 1
+                break
+
+    if toReturn != 0:
+        expression = noQuotes
 
     expression = re.findall(r'(?:[^\s,"]|"(?:\\.|[^"])*")+', expression) #literally no idea
+
+    if expression[-1] == "check-error":
+        global_vars.check_error = True
+    if expression[-1] == "check-expect":
+        global_vars.check_expect = True
+    if toReturn != 0:
+        return toReturn
 
 
     # adds brackets back in
@@ -162,29 +170,8 @@ def handleQuotesAndBrackets(origExp):
             temp = temp[(temp.find("\""))+1:]
             start = expression[i].find("\"", start)+1
 
+    expression = map(lambda x: x.replace("<'>", "\""), expression)
     return expression
-
-
-def parse_checks(expression, origLines, funEnv):
-    global check, check_expect, desired_val
-    if expression[0] == "check-error":
-        check = True
-        expression.pop(0)
-        origLines.toggleErrorCheck()            
-    elif expression[0] == "check-expect":
-        check_expect = True
-        expression.pop(0)
-        try:
-            desired_val = expression[-1]
-            expression = expression[:-1]
-        except:
-            check = True
-            return (expression, origLines)
-        if desired_val == "check-expect" or desired_val == "check-error":
-            return (expression, origLines)
-        check = True
-    return (expression, origLines)
-
 
 
 def makeTree(tree, funEnv):
@@ -204,53 +191,25 @@ def makeTree(tree, funEnv):
 
 
 
-def handle_checks(error, origLines, lineCount, numLines, val):
-    global check_expect, desired_val
-
-    if error == "error" or error == "errorDec":
-        if error == "errorDec":
-            origLines.RaiseException(lineCount, numLines, val, True)
-        else:
-            origLines.RaiseException(lineCount, numLines, val)
-        if val == "Error: Can't check a check, ya doofus":
-            origLines.RaiseException(lineCount, numLines, val)
-        val = "Meme failed, as expected"
-    if origLines.handleError():
-        origLines.toggleErrorCheck()
-        val = "Error: Meme didn't fail, ya ninny"
-        origLines.RaiseException(lineCount, numLines, val)
-    if check_expect == True:
-        if str(val) == desired_val:
-            val = "Meme is " + desired_val + ", as expected"
-            desired_val = None
-        else:
-            val = "Check was not the meme we expected"
-            origLines.RaiseException(lineCount, numLines, val)
-    return val
-
-
-
 def evaluate(lines, origLines):
-    global check, check_expect, desired_val
     fullExp = "" #
     numLines = 1 #number of lines a multiline expression is
     (varEnv, funEnv) = addPrimitives()
 
     lineCount = 0
     for line in range(len(lines)):
-        check_expect = False
         lineCount += 1
 
         lines[line] = handle_comments(line, lines, lineCount, origLines)
-        if lines[line] == "":
+        if lines[line] == "" and numLines == 1:
+            continue
+        if lines[line] == "" and numLines != 1:
+            numLines += 1
             continue
         if lines[line] == len(lines[line]) * " ":
             continue
         if lines[line][:2] == "<~":
             fullExp = lines[line][2:] + ' ' + fullExp
-            numLines += 1
-            continue
-        elif lines[line] == "" and origLines.getLine(line) != "":
             numLines += 1
             continue
         elif fullExp != "":
@@ -263,14 +222,15 @@ def evaluate(lines, origLines):
             continue
 
         expression = handleQuotesAndBrackets(lines[line])
+
         if isinstance(expression, int):
-            if check:
-                check = False
+            if global_vars.check_error:
+                global_vars.check_error = False
                 val = "Meme failed, as expected"
                 print "-->", val
                 numLines = 1
                 continue
-            if not check:
+            else:
                 if expression == 1:
                     val = "Error: SIKE! That's the wrong bracket!"
                 if expression == 2:
@@ -279,24 +239,12 @@ def evaluate(lines, origLines):
         expression.reverse()
 
 
-        if len(expression) != 0:
-            (expression, origLines) = parse_checks(expression, origLines, funEnv)
-        if check and len(expression) == 0:
-            val = "Error: Incorrect number of memes"
-            origLines.RaiseException(lineCount, numLines, val)
-            # need two because if the code is (check-error) the first one
-            # toggles and the second one raises the error
-            origLines.RaiseException(lineCount, numLines, val)
-        val = "Error: Where's the meme?"
-
-
         first_iteration = True
-        while first_iteration or global_vars.WLOOP:
+        while first_iteration or global_vars.wloop:
             emptyTree = ExpressionTree(None, expression)
             expTree = makeTree(emptyTree, funEnv)
-            if first_iteration:
-                expTree.epsteinCheck(varEnv, funEnv, emptyTree)
-                #expTree.printTree()
+            expTree.epsteinCheck(varEnv, funEnv, emptyTree)
+            #expTree.printTree()
 
             if emptyTree.get_string_length() == 0:
                 (error, val) = expTree.evaluate(varEnv, funEnv, True)
@@ -305,29 +253,29 @@ def evaluate(lines, origLines):
                 (error, val) = ("error", "Error: Incorrect number of memes")
 
 
-            if error == "error" or error == "errorDec" and not check:
+            if error == "error":
+                (error, val) = origLines.RaiseException(lineCount, numLines, val)
+            if error == "errorDec":
+                (error, val) = origLines.RaiseException(lineCount, numLines, val, True)
+
+            if not first_iteration and not global_vars.wloop:
+                print "-->", global_vars.prev_val #(?)
+                break
+
+            if global_vars.check_error or global_vars.check_expect:
                 varEnv.addBindMEME("MEME", "\"" + val + "\"")
-                val = handle_checks(error, origLines, lineCount, numLines, val)
-                print "-->", val
-                break
-
-            #print val, desired_val, val==desired_val
-            if not first_iteration and not global_vars.WLOOP:
-                if check or not global_vars.WLOOP_PRINT:
-                    val = handle_checks(error, origLines, lineCount, numLines, prev_val)
-                    print "-->", val
-                global_vars.WLOOP_PRINT = False
-                break
-
-            varEnv.addBindMEME("MEME", val)
-            if first_iteration and not global_vars.WLOOP:
-                val = handle_checks(error, origLines, lineCount, numLines, val)
-                print "-->", val
             else:
-                prev_val = val
+                varEnv.addBindMEME("MEME", val)
+            if first_iteration and not global_vars.wloop:
+                print "-->", val
+            #else:
+            #    global_vars.prev_val = val #<--- LOOK AT THIS
             first_iteration = False
         numLines = 1
-        check = False
+        global_vars.check_error = False
+        global_vars.check_expect = False
+        global_vars.prev_val = "Nothing"
+        #check = False
 
     if fullExp != "":
         val = "Error: Incorrect number of memes"
@@ -359,6 +307,68 @@ if __name__ == '__main__':
     
 
 
+
+
+
+# def parse_checks(expression, origLines, funEnv):
+#     global check, check_expect, desired_val
+#     if expression[0] == "check-error":
+#         check = True
+#         expression.pop(0)
+#         origLines.toggleErrorCheck()            
+#     elif expression[0] == "check-expect":
+#         check_expect = True
+#         expression.pop(0)
+#         try:
+#             desired_val = expression[-1]
+#             expression = expression[:-1]
+#         except:
+#             check = True
+#             return (expression, origLines)
+#         if desired_val == "check-expect" or desired_val == "check-error":
+#             return (expression, origLines)
+#         check = True
+#     return (expression, origLines)
+
+
+# def handle_checks(error, origLines, lineCount, numLines, val):
+#     global check_expect, desired_val
+
+#     if error == "error" or error == "errorDec":
+#         if error == "errorDec":
+#             origLines.RaiseException(lineCount, numLines, val, True)
+#         else:
+#             origLines.RaiseException(lineCount, numLines, val)
+#         if val == "Error: Can't check a check, ya doofus":
+#             origLines.RaiseException(lineCount, numLines, val)
+#         val = "Meme failed, as expected"
+#     if origLines.handleError():
+#         origLines.toggleErrorCheck()
+#         val = "Error: Meme didn't fail, ya ninny"
+#         origLines.RaiseException(lineCount, numLines, val)
+#     if check_expect == True:
+#         if str(val) == desired_val:
+#             val = "Meme is " + desired_val + ", as expected"
+#             desired_val = None
+#         else:
+#             val = "Check was not the meme we expected"
+#             origLines.RaiseException(lineCount, numLines, val)
+#     return val
+
+
+        # if len(expression) > 0 and expression[0] == "check-error":
+        #     global_vars.check_error = True
+
+
+        # if len(expression) != 0:
+        #     (expression, origLines) = parse_checks(expression, origLines, funEnv)
+        # if check and len(expression) == 0:
+        #     val = "Error: Incorrect number of memes"
+        #     origLines.RaiseException(lineCount, numLines, val)
+        #     # need two because if the code is (check-error) the first one
+        #     # toggles and the second one raises the error
+        #     origLines.RaiseException(lineCount, numLines, val)
+        # val = "Error: Where's the meme?"
 
 
         # if len(expression) == 1:

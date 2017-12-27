@@ -81,9 +81,13 @@ class Node:
     # wants printing and the other doesn't either both loops will print or
     # neither loop will print but I'm not sure.
     def evaluate(self, varEnv, funEnv, topDogCheck):
+        #print self.val
+        if not self.root and (self.val == "check-error" or self.val == "check-expect"):
+            return ("error", "Error: Meme has top-dog status")
         if self.root and self.val != None and self.numChildren == -1:
             return self.__stripDot(varEnv)
-        if (self.val == "if" or self.val == "while") and self.numChildren > 0:
+        top_dog_parents = ["if", "while", "check-expect", "check-error"]
+        if self.val in top_dog_parents and self.numChildren > 0:
             topDogCheck = False
         if self.numChildren != -1:
             # for readability's sake, collapse the if and elif statements below
@@ -102,10 +106,11 @@ class Node:
                     self.children[1] = ("not_error", "doesn't matter")
                     self.children[2] = ("not_error", "doesn't matter")
             elif self.val == "while":
+                global_vars.wloop = True
                 self.children[0] = (self.children[0]).evaluate(varEnv, funEnv, topDogCheck)
                 if self.children[0] == ("not_error", "spicy"):
-                    if self.children[1].val == "print":
-                        global_vars.WLOOP_PRINT = True
+                    #if self.children[1].val == "print":
+                    #    global_vars.WLOOP_PRINT = True
                     self.children[1] = (self.children[1]).evaluate(varEnv, funEnv, topDogCheck)
                 else:
                     self.children[1] = ("not_error", "doesn't matter")
@@ -119,9 +124,9 @@ class Node:
         # not sure if/why the line below is necessary
         self.children = [(a,b) for (a,b) in self.children if b != None]
 
-        top_dogs = ["print", "empty"]
+        top_dogs = ["empty"] #rethink this, now that print is not a top-dog
         if not self.root and self.val in top_dogs and topDogCheck:
-            return ("error", "Meme has top-dog status")
+            return ("error", "Error: Meme has top-dog status")
 
         for i in range(len(self.children)):
             if self.children[i][0] == "not_error":
@@ -163,7 +168,6 @@ class Node:
                         if self.children[i].numChildren != -1:
                             if all(self.children[i].children[j].val == None \
                                    for j in range(self.children[i].numChildren)):
-                                # print "HELLO?!?!?! ", self.children[i].numChildren, self.val
                                 tree.updateNoneCount(-self.children[i].numChildren)
                                 if funEnv.getArrity(self.children[i].val) != 0:
                                     self.children[i].numChildren = -1
@@ -183,14 +187,16 @@ class Node:
 
     def __findSubtree(self, varEnv, funEnv, tree):
         # don't need to check if a literal since literals can't have children
+        #lit = isIntBoolStringorList(self.val)
         var = varEnv.inEnv(self.val)
         fun = funEnv.inEnv(self.val) and (funEnv.getArrity(self.val) == 0)
 
         # variables/literals and functions of arrity zero will both always be
         # leafs and are therefore treated the same
         found = False
-        if self.numChildren > 0: 
+        if self.numChildren > 0:
             for child in reversed(self.children):
+                #print "CHILD.VAL: ", child.val
                 if child.val != None:
                     subtreeRoot = child.__findSubtree(varEnv, funEnv, tree)
                     found = True
@@ -203,6 +209,7 @@ class Node:
         if subtreeRoot[0] == "yes":
             return subtreeRoot
         if subtreeRoot[0] == "maybe":
+            #print "HERE: ", self.val
             if var or fun:
                 for i in range(self.numChildren):
                     if self.children[i] == subtreeRoot[1]:

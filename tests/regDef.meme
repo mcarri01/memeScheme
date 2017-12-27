@@ -33,6 +33,7 @@ b x meme check-error
 1 ab][cd meme check-error
 1 ab.cd meme check-error
 1 a<~bcd meme check-error
+1 a<'>bcd meme check-error
 
 
 

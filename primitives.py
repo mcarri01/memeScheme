@@ -110,14 +110,21 @@ def larger_and_smaller(args, varEnv, funEnv, op):
     return ("not_error", "spicy" if randint(0,1) == 0 else "normie")
 
 def printVar(args, varEnv, funEnv, op):
+    #if not global_vars.wloop:
+    #    val = "Error: Meme is only allowed inside body of while loop"
+    #    for _ in range(500):
+    #        val = val + " loop"
+    #    return ("error", val)
     constraints = [[global_vars.ALL_TYPES]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
 
+    # CHECK THIS LINE BELOW
     if isinstance(val_list[0], bool):
-        return ("not_error", "spicy" if val_list[0] else "normie")
-    return ("not_error", val_list[0])
+        print "-->", "spicy" if val_list[0] else "normie"
+    print "-->", val_list[0]
+    return ("not_error", "Nothing")
 
 
 def arrityZero(args, varEnv, funEnv, returnVal):
@@ -154,9 +161,7 @@ def appendAndPush(args, varEnv, funEnv, op):
 
     op(val_list[0], val_list[1])
     val_list[1] = list_to_string(val_list[1])
-    #print "A: ", varEnv.getVal(args[1], "list"), args[1], val_list[1]
     defineVar([args[1], val_list[1]], varEnv, funEnv, None)
-    #print "C: ", varEnv.getVal(args[1], "list"), args[1], val_list[1]
     while "mild" in val_list[1]:
         val_list[1] = val_list[1].replace("mild", "spicy" if randint(0,1)==0 else "normie")
     return ("not_error", val_list[1])
@@ -294,8 +299,9 @@ def defineVar(args, varEnv, funEnv, op):
         return toAppend
     val_list.append(toAppend)
 
-    reserved_terms = ["error", "MEME", "meme"]
-    reserved_symbols = ["\"", "[", "]", "<~", "."]
+    reserved_terms = ["error", "MEME", "meme", "check-expect", "check-error", \
+                      "if", "while", "empty"]
+    reserved_symbols = ["\"", "[", "]", "<~", ".", "<'>"]
 
     if isIntBoolStringorList(args[0]) or args[0] in reserved_terms:
         return ("error", "Error: Meme is reserved")
@@ -321,8 +327,33 @@ def defineVar(args, varEnv, funEnv, op):
     varEnv.addBind(args[0], val_list[0], constraints[0])
     return ("not_error", args[0]) 
 
-def check (args, varEnv, funEnv, op):
-    return ("error", "Error: Can't check a check, ya doofus")
+def check_expect (args, varEnv, funEnv, op):
+    constraints = [[global_vars.ALL_TYPES], [global_vars.ALL_TYPES]]
+    val_list = definePrimitive(args, constraints, varEnv)
+    if val_list[0] == "error":
+        return val_list
+
+    val_list = map(lambda x: x if not isinstance(x, bool) else "spicy" \
+                                                if x else "normie", val_list)
+
+    if val_list[0] == val_list[1]:
+        return ("not_error", "Check was " + str(val_list[0]) + ", as expected")
+    else:
+        return ("error", "Error: Meme was supposed to be " + \
+                    str(val_list[1]) + ", but was actually " + str(val_list[0]))
+
+def check_error (args, varEnv, funEnv, op):
+    if len(args) != 1:
+        global_vars.check_error = False
+        return ("error", "Error: Incorrect number of memes")
+    constraints = [[global_vars.ALL_TYPES]]
+    val_list = definePrimitive(args, constraints, varEnv)
+
+    global_vars.check_error = False
+    if val_list[0] == "error":
+        return ("not_error", "Meme failed, as expected")
+    else:
+        return ("error", "Error: Meme didn't fail, ya ninny")
 
 def empty(args, varEnv, funEnv, op):
     varEnv.empty()
@@ -347,13 +378,12 @@ def wloop(args, varEnv, funEnv, op):
     if isBool(args[0]):
         args = map(lambda x: x if x!="mild" else "spicy" if randint(0,1)==0 else "normie", args)
         if getBoolVal(args[0]):
-            global_vars.WLOOP = True
-            if global_vars.WLOOP_PRINT:
-                print "-->", args[1]
+            global_vars.wloop = True
+            global_vars.prev_val = args[1]
             return ("not_error", args[1])
         else:
-            global_vars.WLOOP = False
-            return ("not_error", "\"\"")
+            global_vars.wloop = False
+            return ("not_error", global_vars.prev_val)
     else:
         return ("error", "Error: Normie meme type")
 

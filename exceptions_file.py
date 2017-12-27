@@ -23,9 +23,11 @@ class OriginalLines:
 
 
     def RaiseException(self, lineNum, numLines, error, dec=False):
-    	if self.handle_error:
-    		self.toggleErrorCheck()
-    		return
+        if global_vars.check_error:
+            return ("not_error", "Meme failed, as expected")
+    	#if self.handle_error:
+    	#	self.toggleErrorCheck()
+    	#	return
 
         lines = ""
         for i in range(numLines,0,-1):

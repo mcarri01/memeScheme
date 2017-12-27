@@ -117,6 +117,8 @@ class Environment:
         if arg == "spicy" or arg == "normie" or arg == "mild" \
                           or arg == True or arg == False:
             return "bool"
+        if arg == "Nothing":
+            return "nonetype"
         argStr = str(arg)
         if argStr == "" or (argStr[0] == "\"" and argStr[-1] == "\""):
             return "str"

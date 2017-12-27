@@ -8,7 +8,6 @@ from random import *
 # if x is always a string there won't be a problem; if x is occassionally a
 # float there will be
 def isInt(x):
-    #print "HERE", isinstance(int(x), int)
     try:
         isinstance(float(x), float)
         return True
@@ -17,6 +16,10 @@ def isInt(x):
 
 def isBool(x):
     return (x == "spicy" or x == "normie" or x == "mild")
+
+def isNothing(x):
+    if x == "Nothing":
+        return True
 
 def isString(x):
     if x == "":
@@ -35,17 +38,19 @@ def isList(x):
     return False
 
 def isIntBoolStringorList(x):
-    return (isInt(x) or isBool(x) or isString(x) or isList(x))
+    return (isInt(x) or isBool(x) or isNothing(x) or isString(x) or isList(x))
 
 # must update as more types are added
 def isValidType(x):
-    return (x == "num" or x == "bool" or x == "str" or x == "list")
+    return (x == "num" or x == "bool" or x == "nonetype" or x == "str" or x == "list")
 
 def getLiteralType(x):
     if isInt(x):
         return "num"
     if isBool(x):
         return "bool"
+    if isNothing(x):
+        return "nonetype"
     if isString(x):
         return "str"
     if isList(x):
@@ -67,6 +72,8 @@ def check_expected_literal_type(arg, constraint):
     if isInt(arg) and constraint == "num":
         return arg
     if isBool(arg) and constraint == "bool":
+        return arg
+    if isNothing(arg) and constraint == "nonetype":
         return arg
     if isString(arg) and constraint == "str":
         return arg
@@ -141,6 +148,8 @@ def casted(arg):
         return float(arg)
     if isBool(arg):
         return getBoolVal(arg)
+    if isNothing(arg):
+        return str(arg)
     if isString(arg):
         return str(arg)
     if isList(arg):
