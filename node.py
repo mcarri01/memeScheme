@@ -272,15 +272,15 @@ class Node:
     def sevenCheck (self):
         if self.numChildren != -1:
             for i in range(self.numChildren):
-                if (self.children[i].sevenCheck()) == False:
-                    return False
+                if (self.children[i].sevenCheck()):
+                    return True
         else:
             try:
                 if float(self.val) == 7:
-                    return False
+                    return True
             except:
-                return True
-        return True
+                return False
+        return False
 
 
 

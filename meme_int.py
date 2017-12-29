@@ -243,7 +243,7 @@ def evaluate(lines, origLines):
         while first_iteration or global_vars.wloop:
             emptyTree = ExpressionTree(None, expression)
             expTree = makeTree(emptyTree, funEnv)
-            if expTree.sevenCheck() == False:
+            if expTree.sevenCheck():
                 (error, val) = ("error", "Error: Meme is 7")
             else:
                 expTree.epsteinCheck(varEnv, funEnv, emptyTree)
