@@ -9,6 +9,7 @@
 import global_vars
 from primitives import *
 from dot import *
+from list_string_conversion import *
 
 class Node:
     def __init__(self, val, numChildren, root):
@@ -30,20 +31,23 @@ class Node:
 
 
     def __stripDot(self, varEnv):
-        if isIntBoolStringorList(self.val):
+        if isLiteral(self.val):
             if self.val == "mild":
                 if randint(0,1) == 0:
                     self.val = "spicy"
                 else:
                     self.val = "normie"
+            if isList(self.val):
+                self.val = handle_mild(self.val)
             return ("not_error", self.val)
+
         temp_val = self.val
         arg_split = self.val.split(".")
 
         if len(arg_split) == 1:
             if varEnv.inEnv(self.val):
-                return ("not_error", \
-                         varEnv.getVal(self.val, varEnv.getOrigType(self.val)))
+                self.val = varEnv.getVal(self.val, varEnv.getOrigType(self.val))
+                return self.__stripDot(varEnv)
             else:
                 return ("error", "Error: Meme does not exist")
 
@@ -52,7 +56,7 @@ class Node:
                 temp_val = arg_split[0][2:]
                 arg_split[0] = arg_split[0][2:]
 
-        if isIntBoolStringorList(arg_split[0]):
+        if isLiteral(arg_split[0]):
             return ("error", "Error: Meme does not support dot operation")
         if arg_split[1] not in global_vars.ALL_TYPES:
             return ("error", "Error: Meme type does not exist")
@@ -96,6 +100,28 @@ class Node:
                 else:
                     self.children[1] = ("not_error", "doesn't matter")
                     self.children[2] = ("not_error", "doesn't matter")
+            elif self.val == "ifTrue":
+                self.children[0] = (self.children[0]).evaluate(varEnv, funEnv, topDogCheck)
+                if self.children[0] == ("not_error", "spicy"):
+                    self.children[1] = (self.children[1]).evaluate(varEnv, funEnv, topDogCheck)
+                elif self.children[0] == ("not_error", "normie"):
+                    if self.children[1].val == None:
+                        self.children[1] = ("not_error", None)
+                    else:
+                        self.children[1] = ("not_error", "doesn't matter")
+                else:
+                    self.children[1] = ("not_error", "doesn't matter")
+            elif self.val == "ifFalse":
+                self.children[0] = (self.children[0]).evaluate(varEnv, funEnv, topDogCheck)
+                if self.children[0] == ("not_error", "normie"):
+                    self.children[1] = (self.children[1]).evaluate(varEnv, funEnv, topDogCheck)
+                elif self.children[0] == ("not_error", "spicy"):
+                    if self.children[1].val == None:
+                        self.children[1] = ("not_error", None)
+                    else:
+                        self.children[1] = ("not_error", "doesn't matter")
+                else:
+                    self.children[1] = ("not_error", "doesn't matter")
             elif self.val == "while":
                 global_vars.wloop = True
                 self.children[0] = (self.children[0]).evaluate(varEnv, funEnv, topDogCheck)
@@ -243,6 +269,20 @@ class Node:
         return True
 
 
+    def sevenCheck (self):
+        if self.numChildren != -1:
+            for i in range(self.numChildren):
+                if (self.children[i].sevenCheck()) == False:
+                    return False
+        else:
+            try:
+                if float(self.val) == 7:
+                    return False
+            except:
+                return True
+        return True
+
+
 
     # for testing purposes only
     def printTree(self):
@@ -251,6 +291,7 @@ class Node:
         if self.numChildren != -1:
             for i in range(self.numChildren):
                 self.children[i].printTree()
+
 
 
 

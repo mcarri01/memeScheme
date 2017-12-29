@@ -33,7 +33,7 @@ j print
 [1, "didn't, hello", 2, [], " , [] ' "] x " , [] ' " append check-expect
 [1, "didn't, hello", 2, [], " , [] ' ", 123] x xyz append check-expect
 [1, "didn't, hello", 2, [], " , [] ' ", 123, normie] x normie append check-expect
-7 x length check-expect
+seven x length check-expect
 [[1, "didn't, hello", 2, [], " , [] ' ", 123, normie], 1, "didn't, hello", 2, [], " , [] ' ", 123, normie] x x push check-expect
 normie x null? check-expect
 8 x length check-expect
@@ -130,23 +130,47 @@ hitMe y meme
 (y y b insert) check-error
 
 
-!@ remove (rip) #$
+!@ remove (rippo) #$
 
-[-1, 0, 1] x (1 today -) rip check-expect
-[-1, 1] x (2 today -) rip check-expect
-[1] x today rip check-expect
-[] x today rip check-expect
+[-1, 0, 1] x (1 today -) rippo check-expect
+[-1, 1] x (2 today -) rippo check-expect
+[1] x today rippo check-expect
+[] x today rippo check-expect
 
 
-(y a.bool rip) check-error
-(y a.str rip) check-error
-(y y rip) check-error
+(y a.bool rippo) check-error
+(y a.str rippo) check-error
+(y y rippo) check-error
 
-(a.num today rip) check-error
-(a.bool today rip) check-error
-(a.str today rip) check-error
+(a.num today rippo) check-error
+(a.bool today rippo) check-error
+(a.str today rippo) check-error
 
-[["hello", spicy], "hello", spicy] (y (4 today -) rip) check-expect
+[["hello", spicy], "hello", spicy] (y (4 today -) rippo) check-expect
 y
 y (3 today -) a.num put
+
+
+!@ tests with mild #$
+[1, 2, "mild", 4] [1, 2, "mild"] 4 append check-expect
+[1, 2, mild] 4 append
+
+"mild" [1, 2, "mild"] (today 2 +) get check-expect
+[1, 2, mild] (today 2 +) get
+
+[1, 2, "mild"] [1, 2, 3] (today 2 +) "mild" put check-expect
+[1, 2, 3] (today 2 +) mild put
+
+[1, 2, "mild", 3] [1, 2, 3] (today 2 +) "mild" insert check-expect
+[1, 2, 3] (today 2 +) mild insert
+
+[1, 2, "mild", 3] [1, 2, 3] (today 2 +) "mild" insert check-expect
+[1, 2, 3] (today 2 +) mild insert
+
+[1, "mild"] [1, 2, "mild"] (today 1 +) rippo check-expect
+[1, 2, mild] (today 1 +) rippo
+
+["mild", "mild", "mild", "mild", "mild"] 5 "mild" init check-expect
+5 [mild] init
+5 mild init
 

@@ -30,7 +30,7 @@ spicy spicy check-expect
 123 ab check-expect
 
 123 //seven meme
-7 seven check-expect
+seven seven check-expect
 
 123 //+ meme
 123 + check-expect

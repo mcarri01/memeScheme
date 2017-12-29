@@ -15,3 +15,32 @@ empty
 normie if check-error
 "Meme failed, as expected" MEME check-expect
 if check-error
+
+
+!@ Test the four "normal" cases #$
+1 1 spicy ifTrue check-expect
+Nothing 1 normie ifTrue check-expect
+Nothing 1 spicy ifFalse check-expect
+1 1 normie ifFalse check-expect
+
+!@ Test various error cases#$
+(1 "hello" +) spicy ifTrue check-error
+Nothing (1 "hello" +) normie ifTrue check-expect
+spicy ifTrue check-error
+normie ifTrue check-error
+"hello" 1 ifTrue check-error
+"hello" "hello" ifTrue check-error
+"hello" [spicy] ifTrue check-error
+"hello" Nothing ifTrue check-error
+ifTrue check-error
+
+(1 "hello" +) normie ifFalse check-error
+Nothing (1 "hello" +) spicy ifFalse check-expect
+normie ifFalse check-error
+spicy ifFalse check-error
+"hello" 1 ifFalse check-error
+"hello" "hello" ifFalse check-error
+"hello" [spicy] ifFalse check-error
+"hello" Nothing ifFalse check-error
+ifFalse check-error
+

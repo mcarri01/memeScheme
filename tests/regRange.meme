@@ -1,0 +1,46 @@
+
+I like memes
+
+empty
+
+
+1 a meme
+1 a range check-error
+range check-error
+spicy range check-error
+33.num range check-error
+"hello".num range check-error
+a.it range check-error
+b.num range check-error
+a.bool range check-error
+c range check-error
+"hello" range check-error
+
+
+[0, 1, 2, 3, 4, 5] 6 range check-expect
+[] 0 range check-expect
+[] -1 range check-expect
+8.2 range check-error
+spicy range check-error
+"hello" range check-error
+[1] range check-error
+[1, spicy, "hello"] range check-error
+["hello", 2, mild, [4], -0.231] m meme
+[0, 1, 2, 3, 4] ((m length) range) check-expect
+
+
+[3, 4, 5] 6 3 rangeFrom check-expect
+[] 0 0 rangeFrom check-expect
+[] 2 3 rangeFrom check-expect
+[] -4 -3 rangeFrom check-expect
+[] -1 1 rangeFrom check-expect
+3 1.2 rangeFrom check-error
+3.2 3 rangeFrom check-error
+3.2 2.9 rangeFrom check-error
+1 spicy rangeFrom check-error
+1 "hello" rangeFrom check-error
+1 [1] rangeFrom check-error
+1 [1, spicy, "hello"] rangeFrom check-error
+["hello", 2, mild, [4], -0.231] m meme
+[2, 3, 4] ((m length) 2 rangeFrom) check-expect
+

@@ -4,7 +4,7 @@ I like memes
 
 empty
 
-7 //+ meme
+seven //+ meme
 
 !@mild 3 larger? not normie spicy or and check-expect#$
 2 1 + mild 1 meme meme check-error
@@ -32,7 +32,7 @@ y x + check-error
 3 13 4 2 ^ - 13 4 3 + 5 * % / check-expect
 spicy normie spicy and normie normie or nand normie spicy spicy and or and check-expect
 13 1 4 3 * + check-expect
-7 + check-expect
+seven + check-expect
 //- "hello" spicy 1 //- meme meme meme check-expect
 1 "hello" spicy 1 //- meme meme meme check-expect
 1 - check-expect
@@ -40,7 +40,7 @@ spicy -.bool check-expect
 "hello" -.str check-expect
 //* 1 //* meme check-expect
 * 2 * meme check-expect
-12 7 5 - meme + check-expect
+12 seven 5 - meme + check-expect
 25 4 ! 1 //! meme + check-expect
 spicy //and spicy //and meme and check-expect
 14 //+ //+ + check-expect
@@ -55,9 +55,9 @@ spicy normie normie nor 9 v/ 3 4 - 1 2 * + + //+ 10 = if check-expect
 1 2 1 ((1 2 *) 2 =) if check-expect
 2 2 1 ((1 2 *) 4 =) if check-expect
 5 "hello" //- meme check-expect 
-35 7 5 - meme * check-expect
+35 seven 5 - meme * check-expect
 2 2 //- meme check-expect
-224 7 5 - ^ * check-expect
+224 seven 5 - ^ * check-expect
 
 
 !@

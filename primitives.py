@@ -37,18 +37,22 @@ def definePrimitive(args, constraints, varEnv):
 
     return val_list
 
-def arithmetic(args, varEnv, funEnv, op):
+def numArrityTwo(args, varEnv, funEnv, op):
     constraints = [[["num"]], [["num"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
-    try: # will raise an error if op == / or op == % and val_list[1] == 0
+    try:
         result = op(val_list[0], val_list[1])
-        if int(result) == result:
-            result = int(result)
+        if not isinstance(result, list): #range returns a list
+            if int(result) == result:
+                result = int(result)
         return ("not_error", result)
     except:
-        return ("error", "Error: Memes unbounded")
+        if op == operator.div or op == operator.mod:
+            return ("error", "Error: Memes unbounded")
+        else:
+            return ("error", "Error: Meme must be an integer")
 
 def for_testing(args, varEnv, funEnv, op):
     constraints = [[["num", "str"]], [["num", "str"]]]
@@ -102,12 +106,18 @@ def equal_nequal(args, varEnv, funEnv, op):
         return val_list
     return ("not_error", "spicy" if op(val_list[0], val_list[1]) else "normie")
 
-def larger_and_smaller(args, varEnv, funEnv, op):
+def numArrityOne(args, varEnv, funEnv, op):
     constraints = [[["num"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
-    return ("not_error", "spicy" if randint(0,1) == 0 else "normie")
+
+    # range() will return an error if a non-int is passed in
+    # larger() and smaller() will never raise an error
+    try:
+        return ("not_error", op(val_list[0]))
+    except:
+        return ("error", "Error: Meme must be an integer")
 
 def printVar(args, varEnv, funEnv, op):
     constraints = [[global_vars.ALL_TYPES]]
@@ -157,8 +167,7 @@ def appendAndPush(args, varEnv, funEnv, op):
     op(val_list[0], val_list[1])
     val_list[1] = list_to_string(val_list[1])
     defineVar([args[1], val_list[1]], varEnv, funEnv, None)
-    while "mild" in val_list[1]:
-        val_list[1] = val_list[1].replace("mild", "spicy" if randint(0,1)==0 else "normie")
+    val_list[1] = handle_mild(val_list[1])
     return ("not_error", val_list[1])
 
 
@@ -175,12 +184,14 @@ def listGet(args, varEnv, funEnv, op):
 
     try:
         toReturn = str(op(val_list[0], val_list[1]))
+        if toReturn == "mild":
+            if randint(0,1) == 0:
+                toReturn = "spicy"
+            else:
+                toReturn = "normie"
     except:
         return ("error", "Error: Wow. You just seg-faulted in memeScheme. #feelsbadman")
 
-    val_list[1] = list_to_string(val_list[1])
-    while "mild" in val_list[1]:
-        toReturn = toReturn.replace("mild", "spicy" if randint(0,1)==0 else "normie")
     return ("not_error", toReturn)
 
 
@@ -205,8 +216,7 @@ def listPut(args, varEnv, funEnv, op):
 
     val_list[2] = list_to_string(val_list[2])
     defineVar([args[2], val_list[2]], varEnv, funEnv, None)
-    while "mild" in val_list[2]:
-        val_list[2] = val_list[2].replace("mild", "spicy" if randint(0,1)==0 else "normie")
+    val_list[2] = handle_mild(val_list[2])
     return ("not_error", val_list[2])
 
 
@@ -231,8 +241,7 @@ def listInsert(args, varEnv, funEnv, op):
 
     val_list[2] = list_to_string(val_list[2])
     defineVar([args[2], val_list[2]], varEnv, funEnv, None)
-    while "mild" in val_list[2]:
-        val_list[2] = val_list[2].replace("mild", "spicy" if randint(0,1)==0 else "normie")
+    val_list[2] = handle_mild(val_list[2])
     return ("not_error", val_list[2])
 
 def listRemove(args, varEnv, funEnv, op):
@@ -257,8 +266,7 @@ def listRemove(args, varEnv, funEnv, op):
 
     val_list[1] = list_to_string(val_list[1])
     defineVar([args[1], val_list[1]], varEnv, funEnv, None)
-    while "mild" in val_list[1]:
-        val_list[1] = val_list[1].replace("mild", "spicy" if randint(0,1)==0 else "normie")
+    val_list[1] = handle_mild(val_list[1])
     return ("not_error", val_list[1])
 
 
@@ -274,12 +282,13 @@ def listInit(args, varEnv, funEnv, op):
     if val_list[1] == 0:
         new_list = "[]"
     elif val_list[1] < 0:
-        return ("error", "Error: Invalid list size.")
+        return ("error", "Error: Invalid list size")
     else:
         new_list = op(val_list[0], val_list[1])
         new_list = list_to_string(new_list)
-        while "mild" in new_list:
-            new_list = new_list.replace("mild", "spicy" if randint(0,1)==0 else "normie", 1)
+        new_list = handle_mild(new_list)
+
+
     return ("not_error", new_list)
 
 
@@ -298,7 +307,7 @@ def defineVar(args, varEnv, funEnv, op):
                       "if", "while", "empty"]
     reserved_symbols = ["\"", "[", "]", "<~", ".", "<'>"]
 
-    if isIntBoolStringorList(args[0]) or args[0] in reserved_terms:
+    if isLiteral(args[0]) or args[0] in reserved_terms:
         return ("error", "Error: Meme is reserved")
     for i in reserved_symbols:
         if i in args[0]:
@@ -313,7 +322,7 @@ def defineVar(args, varEnv, funEnv, op):
         elif args[0][:2] == "//" and not funEnv.inEnv(args[0][2:]):
             return ("error", "Meme is not a function")
 
-    if isInt(val_list[0]):
+    if isNum(val_list[0]):
         if float(val_list[0]) == int(float(val_list[0])):
              val_list[0] = str(int(float(val_list[0]))) #eg. "3.0"->3.0->3->"3"
         else:
@@ -362,6 +371,15 @@ def conditional(args, varEnv, funEnv, op):
     if isBool(args[0]):
         args = map(lambda x: x if x!="mild" else "spicy" if randint(0,1)==0 else "normie", args)
         return ("not_error", args[1] if getBoolVal(args[0]) else args[2])
+    else:
+        return ("error", "Error: Normie meme type")
+
+def condArrityTwo(args, varEnv, funEnv, op):
+    if len(args) != 2:
+        return ("error", "Error: Incorrect number of memes")
+
+    if isBool(args[0]):
+        return ("not_error", op(getBoolVal(args[0]), args[1]))
     else:
         return ("error", "Error: Normie meme type")
 

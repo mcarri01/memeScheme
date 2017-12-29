@@ -1,0 +1,9 @@
+
+I like memes
+
+empty
+
+7 check-error
+seven seven check-expect 
+13 4 x meme 2 ! ^ - 13 4 3 + 5 * % / 1 13 7 2 ! ^ - 13 4 9 v/ + 5 * % / - <> check-error
+spicy 13 4 x meme 2 ! ^ - 13 4 3 + 5 * % / 1 13 seven 2 ! ^ - 13 4 9 v/ + 5 * % / - <> check-expect

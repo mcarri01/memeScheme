@@ -20,15 +20,14 @@ def addPrimitives():
 
     funEnv = Environment(dict())
     funEnv.addBind("++", (for_testing, operator.add, 2))
-    funEnv.addBind("+", (arithmetic, operator.add, 2))
-    funEnv.addBind("-", (arithmetic, operator.sub, 2))
-    funEnv.addBind("*", (arithmetic, operator.mul, 2))
-    funEnv.addBind("/", (arithmetic, operator.div, 2))
-    funEnv.addBind("%", (arithmetic, operator.mod, 2))
-    funEnv.addBind("^", (arithmetic, operator.pow, 2))
+    funEnv.addBind("+", (numArrityTwo, operator.add, 2))
+    funEnv.addBind("-", (numArrityTwo, operator.sub, 2))
+    funEnv.addBind("*", (numArrityTwo, operator.mul, 2))
+    funEnv.addBind("/", (numArrityTwo, operator.div, 2))
+    funEnv.addBind("%", (numArrityTwo, operator.mod, 2))
+    funEnv.addBind("^", (numArrityTwo, operator.pow, 2))
     funEnv.addBind("!", (more_arithmetic, math.factorial, 1))
     funEnv.addBind("v/", (more_arithmetic, math.sqrt, 1))
-    funEnv.addBind("seven", (arrityZero, 7, 0)) #FOR TESTING PURPOSES
     funEnv.addBind("and", (booleans, operator.and_, 2))
     funEnv.addBind("or", (booleans, operator.or_, 2))
     funEnv.addBind("xor", (booleans, operator.xor, 2))
@@ -41,15 +40,20 @@ def addPrimitives():
     funEnv.addBind("<=", (comparison, operator.le, 2))
     funEnv.addBind("=", (equal_nequal, operator.eq, 2))
     funEnv.addBind("<>", (equal_nequal, operator.ne, 2))
-    funEnv.addBind("larger?", (larger_and_smaller, None, 1))
-    funEnv.addBind("smaller?", (larger_and_smaller, None, 1))
+    funEnv.addBind("larger?", (numArrityOne, (lambda _: "spicy" if randint(0,1) == 0 else "normie"), 1))
+    funEnv.addBind("smaller?", (numArrityOne, (lambda _: "spicy" if randint(0,1) == 0 else "normie"), 1))
+    funEnv.addBind("range", (numArrityOne, (lambda x: range(x)), 1))
+    funEnv.addBind("rangeFrom", (numArrityTwo, (lambda x, y: range(x,y)), 2))
     funEnv.addBind("print", (printVar, None, 1))
     funEnv.addBind("meme", (defineVar, None, 2))
     funEnv.addBind("check-error", (check_error, None, 1))
     funEnv.addBind("check-expect", (check_expect, None, 2))
     funEnv.addBind("empty", (empty, None, 0))
     funEnv.addBind("if", (conditional, None, 3))
+    funEnv.addBind("ifTrue", (condArrityTwo, (lambda x, y: y if x else "Nothing"), 2))
+    funEnv.addBind("ifFalse", (condArrityTwo, (lambda x, y: y if not x else "Nothing"), 2))
     funEnv.addBind("while", (wloop, None, 2))
+    funEnv.addBind("seven", (arrityZero, 7, 0))
     funEnv.addBind("today", (arrityZero, (time.localtime().tm_yday-1), 0))
     funEnv.addBind("hitMe", (arrityZero, [], 0))
     funEnv.addBind("length", (listArrityOne, (lambda x: len(x)), 1))
@@ -63,7 +67,7 @@ def addPrimitives():
                                 else ds[:pos-today()]+[val]), 3))
     funEnv.addBind("init", (listInit, (lambda val, size: [val]*size), 2))
     funEnv.addBind("insert", (listInsert, (lambda val,pos,ds: ds.insert(pos-today(),val)), 3))
-    funEnv.addBind("rip", (listRemove,
+    funEnv.addBind("rippo", (listRemove,
         (lambda pos,ds: ds[:pos-today()]+ds[pos+1-today():] \
                                 if pos-today()+1!=0 \
                                 else ds[:pos-today()]), 2))
@@ -239,14 +243,17 @@ def evaluate(lines, origLines):
         while first_iteration or global_vars.wloop:
             emptyTree = ExpressionTree(None, expression)
             expTree = makeTree(emptyTree, funEnv)
-            expTree.epsteinCheck(varEnv, funEnv, emptyTree)
-            #expTree.printTree()
-
-            if emptyTree.get_string_length() == 0:
-                (error, val) = expTree.evaluate(varEnv, funEnv, True)
+            if expTree.sevenCheck() == False:
+                (error, val) = ("error", "Error: Meme is 7")
             else:
+                expTree.epsteinCheck(varEnv, funEnv, emptyTree)
                 #expTree.printTree()
-                (error, val) = ("error", "Error: Incorrect number of memes")
+
+                if emptyTree.get_string_length() == 0:
+                    (error, val) = expTree.evaluate(varEnv, funEnv, True)
+                else:
+                    #expTree.printTree()
+                    (error, val) = ("error", "Error: Incorrect number of memes")
 
 
             if error == "error":

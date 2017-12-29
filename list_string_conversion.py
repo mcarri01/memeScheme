@@ -36,13 +36,16 @@ def int_float_handling(arg):
 
 # I have no idea why the lstrip()s are necessary.  But sometimes a leading
 # space is thrown in and the lstrip()s take care of them.
+# string passed in should not include the opening and closing brackets (i.e.
+# the string representing the list [1, 2, 3, 4] should be passed in as
+# "1, 2, 3, 4").
 def string_to_list(string):
     new_list = []
     noQuotes = re.sub('"[^"]*"', "\"\"", string)
     expression = remove_brackets(noQuotes)
 
     if expression.find(",") == -1:
-        if isInt(string):
+        if isNum(string):
             new_list.append(int_float_handling(string))
         else:
             new_list.append(string)
@@ -52,22 +55,22 @@ def string_to_list(string):
         expression = expression.lstrip()
         if expression[0] == "\"":
             new_list.append((string[:string[1:].find("\"")+2]).lstrip())
-            expression = expression[(expression[1:].find("\""))+3:]
-            string = string[(string[1:].find("\""))+3:]
+            expression = expression[(expression[1:].find("\""))+4:]
+            string = string[(string[1:].find("\""))+4:]
         elif expression[0] == "[":
             new_list.append((string[:getMatchingBracket(string)]).lstrip())
             expression = expression[(expression[1:].find("]"))+3:]
             string = string[getMatchingBracket(string)+2:]
         else:
             if expression.find(",") != -1:
-                if isInt(expression[:expression.find(",")]):
+                if isNum(expression[:expression.find(",")]):
                     new_list.append(int_float_handling(expression[:expression.find(",")]))
                 else:
                     new_list.append((expression[:expression.find(",")]).lstrip())
                 expression = expression[(expression.find(","))+2:]
                 string = string[(string.find(","))+2:]
             else:
-                if isInt(expression):
+                if isNum(expression):
                     new_list.append(int_float_handling(expression))
                 else:
                     new_list.append(expression.lstrip())
@@ -87,4 +90,16 @@ def list_to_string(my_list):
     new_string += "]"
 
     return new_string
+
+
+def handle_mild(string):
+    my_list = string_to_list(string[1:-1])
+    helper = lambda x: handle_mild(x) if isList(x) else \
+                                x if not x=="mild" else \
+                                "spicy" if randint(0,1)==0 else "normie"
+    new_string = map(helper, my_list)
+    return list_to_string(new_string)
+
+
+
 
