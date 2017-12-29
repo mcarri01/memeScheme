@@ -20,6 +20,7 @@ def addPrimitives():
 
     funEnv = Environment(dict())
     funEnv.addBind("++", (for_testing, operator.add, 2))
+    # arithmetic
     funEnv.addBind("+", (numArrityTwo, operator.add, 2))
     funEnv.addBind("-", (numArrityTwo, operator.sub, 2))
     funEnv.addBind("*", (numArrityTwo, operator.mul, 2))
@@ -28,32 +29,27 @@ def addPrimitives():
     funEnv.addBind("^", (numArrityTwo, operator.pow, 2))
     funEnv.addBind("!", (more_arithmetic, math.factorial, 1))
     funEnv.addBind("v/", (more_arithmetic, math.sqrt, 1))
+    # booleans
     funEnv.addBind("and", (booleans, operator.and_, 2))
     funEnv.addBind("or", (booleans, operator.or_, 2))
     funEnv.addBind("xor", (booleans, operator.xor, 2))
     funEnv.addBind("nand", (booleans, (lambda x, y: not (x and y)), 2))
     funEnv.addBind("nor", (booleans, (lambda x, y: not (x or y)), 2))
     funEnv.addBind("not", (boolNot, operator.not_, 1))
+    # comparison
     funEnv.addBind(">", (comparison, operator.gt, 2))
     funEnv.addBind("<", (comparison, operator.lt, 2))
     funEnv.addBind(">=", (comparison, operator.ge, 2))
     funEnv.addBind("<=", (comparison, operator.le, 2))
     funEnv.addBind("=", (equal_nequal, operator.eq, 2))
     funEnv.addBind("<>", (equal_nequal, operator.ne, 2))
+    # larger?\smaller?
     funEnv.addBind("larger?", (numArrityOne, (lambda _: "spicy" if randint(0,1) == 0 else "normie"), 1))
     funEnv.addBind("smaller?", (numArrityOne, (lambda _: "spicy" if randint(0,1) == 0 else "normie"), 1))
+    # range
     funEnv.addBind("range", (numArrityOne, (lambda x: range(x)), 1))
     funEnv.addBind("rangeFrom", (numArrityTwo, (lambda x, y: range(x,y)), 2))
-    funEnv.addBind("print", (printVar, None, 1))
-    funEnv.addBind("meme", (defineVar, None, 2))
-    funEnv.addBind("check-error", (check_error, None, 1))
-    funEnv.addBind("check-expect", (check_expect, None, 2))
-    funEnv.addBind("empty", (empty, None, 0))
-    funEnv.addBind("if", (conditional, None, 3))
-    funEnv.addBind("ifTrue", (condArrityTwo, (lambda x, y: y if x else "Nothing"), 2))
-    funEnv.addBind("ifFalse", (condArrityTwo, (lambda x, y: y if not x else "Nothing"), 2))
-    funEnv.addBind("while", (wloop, None, 2))
-    funEnv.addBind("seven", (arrityZero, 7, 0))
+    # lists
     funEnv.addBind("today", (arrityZero, (time.localtime().tm_yday-1), 0))
     funEnv.addBind("hitMe", (arrityZero, [], 0))
     funEnv.addBind("length", (listArrityOne, (lambda x: len(x)), 1))
@@ -71,6 +67,18 @@ def addPrimitives():
         (lambda pos,ds: ds[:pos-today()]+ds[pos+1-today():] \
                                 if pos-today()+1!=0 \
                                 else ds[:pos-today()]), 2))
+    # miscellaneous
+    funEnv.addBind("seven", (arrityZero, 7, 0))
+    # basic operations
+    funEnv.addBind("print", (printVar, None, 1))
+    funEnv.addBind("meme", (defineVar, None, 2))
+    funEnv.addBind("check-error", (check_error, None, 1))
+    funEnv.addBind("check-expect", (check_expect, None, 2))
+    funEnv.addBind("empty", (empty, None, 0))
+    funEnv.addBind("if", (conditional, None, 3))
+    funEnv.addBind("ifTrue", (condArrityTwo, (lambda x, y: y if x else "Nothing"), 2))
+    funEnv.addBind("ifFalse", (condArrityTwo, (lambda x, y: y if not x else "Nothing"), 2))
+    funEnv.addBind("while", (wloop, None, 2))
 
     return (varEnv, funEnv)
 
