@@ -174,3 +174,28 @@ y (3 today -) a.num put
 5 [mild] init
 5 mild init
 
+
+!@ error checking for lists that have a bad value in them
+   (eg. variable doesn't exist, type doesn't exist, etc.) #$
+empty
+
+[x] y meme check-error
+[1, 2, x] [1, 2, x] = check-error
+[1, 2, x] length check-error
+[1, 2, x] null? check-error
+[1, 2, x] print check-error
+[1, 2, x] 4 append check-error
+[1, 2, 3] [x] append check-error
+[1, 2, x] (today 2 +) get check-error
+[1, 2, x] (today 2 +) 3 put check-error
+[1, 2, 3] (today 2 +) [x] put check-error
+[1, 2, x] (today 2 +) 3 insert check-error
+[1, 2, 3] (today 2 +) [x] insert check-error
+[1, 2, x] (today 2 +) rippo check-error
+3 [1, 2, x] init check-error
+[1, 2, 3] [1, 2, x] check-expect check-error
+[1, 2, x] [1, 2, 3] check-expect check-error
+[1, 2, x] check-error
+<~ [1, 2, x] in i for check-error
+			i print
+

@@ -79,7 +79,7 @@ def check_expected_literal_type(arg, constraint):
         return arg
     if isList(arg) and constraint == "list":
         return arg
-    return ("error", "Error: Normie meme type ")
+    return ("error", "Error: Normie meme type")
 
 
 # called if the constraint is polymorphic (eg. 'a)

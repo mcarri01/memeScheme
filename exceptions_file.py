@@ -25,9 +25,6 @@ class OriginalLines:
     def RaiseException(self, lineNum, numLines, error, dec=False):
         if global_vars.check_error:
             return ("not_error", "Meme failed, as expected")
-    	#if self.handle_error:
-    	#	self.toggleErrorCheck()
-    	#	return
 
         lines = ""
         for i in range(numLines,0,-1):
@@ -48,6 +45,5 @@ class OriginalLines:
                 print line
         else:
             print("  File {}; {}\n    {}{}".format(global_vars.filename, lineStr, lines, error))
-        #print("  File {} line {}\n    {} \n{}".format(global_vars.filename, lineNum, self.getLine(lineNum-1), error))
         exit(1)
 

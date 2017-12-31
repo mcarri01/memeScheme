@@ -59,6 +59,8 @@ Nothing "" normie while check-expect
 "Check was Nothing, as expected" MEME check-expect
 
 
+1 print mild while
+
 (1 (spicy g meme) meme)
 spicy MEME check-expect
 (1 (spicy g meme) meme)
@@ -66,4 +68,9 @@ spicy MEME check-expect
 "Check was 1, as expected" MEME check-expect
 "Check was <'>Check was 1, as expected<'>, as expected" MEME check-expect
 "Check was <'>Check was <'>Check was 1, as expected<'>, as expected<'>, as expected" MEME check-expect
+
+
+while check-error
+spicy while check-error
+1 print 1 while check-error
 

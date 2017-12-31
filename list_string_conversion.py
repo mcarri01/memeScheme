@@ -101,5 +101,14 @@ def handle_mild(string):
     return list_to_string(new_string)
 
 
+# makes sure that all elements of a list are valid (eg. variables are defined,
+# types are correct, etc.)
+def list_check(a_list, varEnv):
+    list_arg = string_to_list(a_list[1:-1])
+    for i in list_arg:
+        (error, _) = general_type(str(i), [global_vars.ALL_TYPES], varEnv)
+        if error != "" and error[0] == "error":
+            return error
+
 
 

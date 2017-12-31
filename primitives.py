@@ -1,5 +1,6 @@
 import itertools
 import global_vars
+import copy
 from env import *
 from dot import *
 from random import *
@@ -19,12 +20,16 @@ def definePrimitive(args, constraints, varEnv):
         (toAppend, constraints[i][0]) = general_type(args[i], constraints[i], varEnv)
         if toAppend != "" and toAppend[0] == "error":
             return toAppend
-        cleanArgs.append(toAppend)    
+        cleanArgs.append(toAppend)
 
     constraints[0][0] = constraintCheck(cleanArgs[0], constraints[0], varEnv)
     val_list = [] # values with correct type
     for i in range(len(cleanArgs)):
         val_list.append(getValofType(cleanArgs[i], constraints[i][0], varEnv))
+
+    for i in val_list:
+        if isList(i) and list_check(i, varEnv) != None:
+            return list_check(i, varEnv)
 
     for i in range(len(val_list)):
         try:
@@ -37,7 +42,7 @@ def definePrimitive(args, constraints, varEnv):
 
     return val_list
 
-def numArrityTwo(args, varEnv, funEnv, op):
+def numArrityTwo(args, varEnv, funEnv, op, id_num):
     constraints = [[["num"]], [["num"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
@@ -54,14 +59,14 @@ def numArrityTwo(args, varEnv, funEnv, op):
         else:
             return ("error", "Error: Meme must be an integer")
 
-def for_testing(args, varEnv, funEnv, op):
+def for_testing(args, varEnv, funEnv, op, id_num):
     constraints = [[["num", "str"]], [["num", "str"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
     return ("not_error", op(val_list[0], val_list[1]))
 
-def more_arithmetic(args, varEnv, funEnv, op):
+def more_arithmetic(args, varEnv, funEnv, op, id_num):
     constraints = [[["num"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
@@ -74,21 +79,21 @@ def more_arithmetic(args, varEnv, funEnv, op):
     except:
         return ("error", "Error: Meme is in normie domain")
 
-def booleans(args, varEnv, funEnv, op):
+def booleans(args, varEnv, funEnv, op, id_num):
     constraints = [[["bool"]], [["bool"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
     return ("not_error", "spicy" if op(val_list[0], val_list[1]) else "normie")
 
-def boolNot(args, varEnv, funEnv, op):
+def boolNot(args, varEnv, funEnv, op, id_num):
     constraints = [[["bool"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
     return ("not_error", "spicy" if op(val_list[0]) else "normie")
 
-def comparison(args, varEnv, funEnv, op):
+def comparison(args, varEnv, funEnv, op, id_num):
     constB = [["num", "str"]]
     constA = constB
     constraints = [constA, constB]
@@ -97,16 +102,18 @@ def comparison(args, varEnv, funEnv, op):
         return val_list
     return ("not_error", "spicy" if op(val_list[0], val_list[1]) else "normie")
 
-def equal_nequal(args, varEnv, funEnv, op):
+def equal_nequal(args, varEnv, funEnv, op, id_num):
     constB = [global_vars.ALL_TYPES]
     constA = constB
     constraints = [constA, constB]
+
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
+
     return ("not_error", "spicy" if op(val_list[0], val_list[1]) else "normie")
 
-def numArrityOne(args, varEnv, funEnv, op):
+def numArrityOne(args, varEnv, funEnv, op, id_num):
     constraints = [[["num"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
@@ -119,7 +126,7 @@ def numArrityOne(args, varEnv, funEnv, op):
     except:
         return ("error", "Error: Meme must be an integer")
 
-def printVar(args, varEnv, funEnv, op):
+def printVar(args, varEnv, funEnv, op, id_num):
     constraints = [[global_vars.ALL_TYPES]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
@@ -132,12 +139,12 @@ def printVar(args, varEnv, funEnv, op):
     return ("not_error", "Nothing")
 
 
-def arrityZero(args, varEnv, funEnv, returnVal):
+def arrityZero(args, varEnv, funEnv, returnVal, id_num):
     if args != []:
         return ("error", "Error: Incorrect number of memes")
     return ("not_error", returnVal)
 
-def listArrityOne(args, varEnv, funEnv, op):
+def listArrityOne(args, varEnv, funEnv, op, id_num):
     constraints = [[["list"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
@@ -150,7 +157,7 @@ def listArrityOne(args, varEnv, funEnv, op):
 
     return ("not_error", op(val_list[0]))
 
-def appendAndPush(args, varEnv, funEnv, op):
+def appendAndPush(args, varEnv, funEnv, op, id_num):
     constraints = [[global_vars.ALL_TYPES], [["list"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
@@ -171,7 +178,7 @@ def appendAndPush(args, varEnv, funEnv, op):
     return ("not_error", val_list[1])
 
 
-def listGet(args, varEnv, funEnv, op):
+def listGet(args, varEnv, funEnv, op, id_num):
     constraints = [[["num"]], [["list"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
@@ -195,7 +202,7 @@ def listGet(args, varEnv, funEnv, op):
     return ("not_error", toReturn)
 
 
-def listPut(args, varEnv, funEnv, op):
+def listPut(args, varEnv, funEnv, op, id_num):
     constraints = [[global_vars.ALL_TYPES], [["num"]], [["list"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
@@ -220,7 +227,7 @@ def listPut(args, varEnv, funEnv, op):
     return ("not_error", val_list[2])
 
 
-def listInsert(args, varEnv, funEnv, op):
+def listInsert(args, varEnv, funEnv, op, id_num):
     constraints = [[global_vars.ALL_TYPES], [["num"]], [["list"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
@@ -244,7 +251,7 @@ def listInsert(args, varEnv, funEnv, op):
     val_list[2] = handle_mild(val_list[2])
     return ("not_error", val_list[2])
 
-def listRemove(args, varEnv, funEnv, op):
+def listRemove(args, varEnv, funEnv, op, id_num):
     constraints = [[["num"]], [["list"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
@@ -252,8 +259,7 @@ def listRemove(args, varEnv, funEnv, op):
 
     if val_list[1] == "[]":
         return ("error", "Error: No meme to kill")
-    else:
-        val_list[1] = string_to_list(val_list[1][1:-1])
+    val_list[1] = string_to_list(val_list[1][1:-1])
 
     if abs(val_list[0]-time.localtime().tm_yday+1) > len(val_list[1])-1 and \
         (val_list[0]-time.localtime().tm_yday+1) * (-1) != len(val_list[1]):
@@ -270,7 +276,7 @@ def listRemove(args, varEnv, funEnv, op):
     return ("not_error", val_list[1])
 
 
-def listInit(args, varEnv, funEnv, op):
+def listInit(args, varEnv, funEnv, op, id_num):
     constraints = [[global_vars.ALL_TYPES], [["num"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
@@ -292,7 +298,7 @@ def listInit(args, varEnv, funEnv, op):
     return ("not_error", new_list)
 
 
-def defineVar(args, varEnv, funEnv, op):
+def defineVar(args, varEnv, funEnv, op, id_num=None):
     if len(args) != 2:
         return ("error", "Error: Incorrect number of memes")
     constraints = [[global_vars.ALL_TYPES]]
@@ -304,7 +310,7 @@ def defineVar(args, varEnv, funEnv, op):
     val_list.append(toAppend)
 
     reserved_terms = ["error", "MEME", "meme", "check-expect", "check-error", \
-                      "if", "while", "empty"]
+                      "if", "while", "empty", "for", "in"]
     reserved_symbols = ["\"", "[", "]", "<~", ".", "<'>"]
 
     if isLiteral(args[0]) or args[0] in reserved_terms:
@@ -328,10 +334,13 @@ def defineVar(args, varEnv, funEnv, op):
         else:
             val_list[0] = str(float(val_list[0]))
 
+    if isList(val_list[0]) and list_check(val_list[0], varEnv) != None:
+        return list_check(val_list[0], varEnv)
+
     varEnv.addBind(args[0], val_list[0], constraints[0])
     return ("not_error", args[0]) 
 
-def check_expect (args, varEnv, funEnv, op):
+def check_expect (args, varEnv, funEnv, op, id_num):
     constraints = [[global_vars.ALL_TYPES], [global_vars.ALL_TYPES]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
@@ -346,7 +355,7 @@ def check_expect (args, varEnv, funEnv, op):
         return ("error", "Error: Meme was supposed to be " + \
                     str(val_list[1]) + ", but was actually " + str(val_list[0]))
 
-def check_error (args, varEnv, funEnv, op):
+def check_error (args, varEnv, funEnv, op, id_num):
     if len(args) != 1:
         global_vars.check_error = False
         return ("error", "Error: Incorrect number of memes")
@@ -359,12 +368,12 @@ def check_error (args, varEnv, funEnv, op):
     else:
         return ("error", "Error: Meme didn't fail, ya ninny")
 
-def empty(args, varEnv, funEnv, op):
+def empty(args, varEnv, funEnv, op, id_num):
     varEnv.empty()
     return ("not_error", "Nothing")
 
 
-def conditional(args, varEnv, funEnv, op):
+def conditional(args, varEnv, funEnv, op, id_num):
     if len(args) != 3:
         return ("error", "Error: Incorrect number of memes")
 
@@ -374,7 +383,7 @@ def conditional(args, varEnv, funEnv, op):
     else:
         return ("error", "Error: Normie meme type")
 
-def condArrityTwo(args, varEnv, funEnv, op):
+def condArrityTwo(args, varEnv, funEnv, op, id_num):
     if len(args) != 2:
         return ("error", "Error: Incorrect number of memes")
 
@@ -384,24 +393,171 @@ def condArrityTwo(args, varEnv, funEnv, op):
         return ("error", "Error: Normie meme type")
 
 
-def wloop(args, varEnv, funEnv, op):
-    if len(args) != 2:
-        return ("error", "Error: Incorrect number of memes")
 
-    if isBool(args[0]):
-        args = map(lambda x: x if x!="mild" else "spicy" if randint(0,1)==0 else "normie", args)
-        if getBoolVal(args[0]):
-            global_vars.wloop = True
-            global_vars.prev_val = args[1]
-            return ("not_error", args[1])
+def wloop(args, varEnv, funEnv, op, id_num, prev_val="Nothing"):
+    tree_section = copy.deepcopy((global_vars.curr_tree).get_node(id_num))
+    if (tree_section.getChild(0)).getVal() == None or \
+       (tree_section.getChild(1)).getVal() == None:
+       return ("error", "Error: Incorrect number of memes")
+
+    conditional = (tree_section.getChild(0)).evaluate(varEnv, funEnv, False)
+    if conditional[0] == "error":
+        return conditional
+
+    if isBool(conditional[1]):
+        if getBoolVal(conditional[1]):
+            body = (tree_section.getChild(1)).evaluate(varEnv, funEnv, False)
+            if body[0] == "error":
+                return body
+            return wloop([], varEnv, funEnv, op, id_num, body[1])
         else:
-            global_vars.wloop = False
-            return ("not_error", global_vars.prev_val)
+            return ("not_error", prev_val)
     else:
         return ("error", "Error: Normie meme type")
 
 
+def floop(args, varEnv, funEnv, op, id_num, prev_val="Nothing", iteration=0):
+    tree_section = copy.deepcopy((global_vars.curr_tree).get_node(id_num))
+    for i in range(4):
+        if (tree_section.getChild(i)).getVal() == None:
+            return ("error", "Error: Incorrect number of memes")
+    if (tree_section.getChild(1)).getVal() != "in":
+        return ("error", "Error: FOMI--the Fear Of a Missing \"in\"")
 
+    constraints = [[["list"]]]
+    list_arg = (tree_section.getChild(2)).evaluate(varEnv, funEnv, False)
+    if list_arg[0] == "error":
+        return list_arg
+    list_val = definePrimitive([list_arg[1]], constraints, varEnv)
+    if list_val[0] == "error":
+        return list_val
+    if list_val[0] == "[]":
+        list_val = []
+        iterator_val = defineVar([args[0], "Nothing"], varEnv, funEnv, None)
+        if iterator_val[0] == "error":
+            return iterator_val
+    else:
+        list_val = string_to_list(list_val[0][1:-1])
+
+    if len(list_val) > iteration:
+        var_arg = (tree_section.getChild(0)).evaluate(varEnv, funEnv, False)
+        if var_arg[0] == "error":
+            return var_arg
+        arg_list = [var_arg[1], str(list_val[iteration])]
+        iterator_val = defineVar(arg_list, varEnv, funEnv, None)
+        if iterator_val[0] == "error":
+            return iterator_val
+        body = (tree_section.getChild(3)).evaluate(varEnv, funEnv, False)
+        if body[0] == "error":
+            return body
+        return floop([], varEnv, funEnv, op, id_num, body[1], iteration+1)
+    else:
+        return ("not_error", prev_val)
+
+    #return ("not_error", args[3])
+
+
+# def wloop(args, varEnv, funEnv, op, id_num):
+#     if len(args) != 2:
+#         return ("error", "Error: Incorrect number of memes")
+
+#     if isBool(args[0]):
+#         args = map(lambda x: x if x!="mild" else "spicy" if randint(0,1)==0 else "normie", args)
+#         if getBoolVal(args[0]):
+#             global_vars.wloop = True
+#             global_vars.prev_val = args[1]
+#             return ("not_error", args[1])
+#         else:
+#             global_vars.wloop = False
+#             return ("not_error", global_vars.prev_val)
+#     else:
+#         return ("error", "Error: Normie meme type")
+
+
+# def floop(args, varEnv, funEnv, op, id_num):
+
+#     if len(args) != 4:
+#         return ("error", "Error: Incorrect number of memes")
+#     if args[2] != "in":
+#         return ("error", "Error: FOMI--the Fear Of a Missing \"in\"")
+
+#     constraints = [[["list"]]]
+#     list_val = definePrimitive(args[2], constraints, varEnv)
+#     if list_val[0] == "error":
+#         return list_val
+#     if list_val[1] == "[]":
+#         list_val = []
+#         iterator_val = defineVar([args[0], "Nothing"], varEnv, funEnv, None)
+#         if iterator_val[0] == "error":
+#             return iterator_val
+#     else:
+#         list_val = string_to_list(list_val[1][1:-1])
+
+#     if len(list_val) > global_vars.floop_iteration:
+#         arg_list = [args[0], list_val[global_vars.floop_iteration]]
+#         iterator_val = defineVar(arg_list, varEnv, funEnv, None)
+#         if iterator_val[0] == "error":
+#             return iterator_val
+#         global_vars.floop = True
+#         global_vars.floop_iteration += 1
+#     else:
+#         global_vars.floop = False
+#         global_vars.floop_iteration = 0
+#         return ("not_error", global_vars.prev_val)
+
+#     return ("not_error", args[3])
+
+
+
+    #     global_vars.floop = True          
+
+    # if val_list != []:
+    #     first_arg = defineVar([args[0], val_list[1][0]], varEnv, funEnv, None)
+    # if first_arg[0] == "error":
+    #     return first_arg
+    # else:
+    #     len()
+
+
+    # else:
+    #     constraints = [[["int"]]]
+    #     first_arg_val = definePrimitive(args, constraints, varEnv)
+    #     defineVar([args[0], first_arg_val[1]], varEnv, funEnv, None)
+
+    # if 
+
+
+
+
+    # if isBool(args[0]):
+    #     args = map(lambda x: x if x!="mild" else "spicy" if randint(0,1)==0 else "normie", args)
+    #     if getBoolVal(args[0]):
+    #         global_vars.wloop = True
+    #         global_vars.prev_val = args[1]
+    #         return ("not_error", args[1])
+    #     else:
+    #         global_vars.wloop = False
+    #         return ("not_error", global_vars.prev_val)
+    # else:
+    #     return ("error", "Error: Normie meme type")
+
+
+# def numArrityTwo(args, varEnv, funEnv, op, id_num):
+#     constraints = [[["num"]], [["num"]]]
+#     val_list = definePrimitive(args, constraints, varEnv)
+#     if val_list[0] == "error":
+#         return val_list
+#     try:
+#         result = op(val_list[0], val_list[1])
+#         if not isinstance(result, list): #range returns a list
+#             if int(result) == result:
+#                 result = int(result)
+#         return ("not_error", result)
+#     except:
+#         if op == operator.div or op == operator.mod:
+#             return ("error", "Error: Memes unbounded")
+#         else:
+#             return ("error", "Error: Meme must be an integer")
 
 # def old_conditional(args, varEnv, funEnv):
 #     op = args[0]

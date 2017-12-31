@@ -13,6 +13,7 @@ class ExpressionTree:
         self.origString = string
         self.string = string
         self.noneCount = 0 # assumes the value passed to node will always be None
+        self.num_nodes = 0
 
     def update_string(self):
         try:
@@ -35,6 +36,13 @@ class ExpressionTree:
 
     def get_string_length(self):
         return len(self.string)
+
+    def update_num_nodes(self):
+        self.num_nodes += 1
+        return self.num_nodes
+
+    def get_num_nodes(self):
+        return self.num_nodes
 
 
 

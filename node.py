@@ -5,14 +5,12 @@
 ### ALGORITHM (eval_exp.py).  RIP MY TREES.
 ###
 
-
 import global_vars
-from primitives import *
 from dot import *
 from list_string_conversion import *
 
 class Node:
-    def __init__(self, val, numChildren, root):
+    def __init__(self, val, numChildren, root, id_num):
         self.val = val
         self.numChildren = numChildren
         if numChildren != -1:
@@ -21,14 +19,20 @@ class Node:
             self.children = [None]
         # root is used in determining if a function is top-level or not
         self.root = root
+        self.id_num = id_num
 
+
+    def getChild(self, i):
+        return self.children[i]
+
+    def getVal(self):
+        return self.val
 
     def getNumChildren(self):
         return self.numChildren
 
     def addChild(self, newChild, i):
         self.children[i] = newChild
-
 
     def __stripDot(self, varEnv):
         if isLiteral(self.val):
@@ -38,6 +42,8 @@ class Node:
                 else:
                     self.val = "normie"
             if isList(self.val):
+                if list_check(self.val, varEnv) != None:
+                    return list_check(self.val, varEnv)
                 self.val = handle_mild(self.val)
             return ("not_error", self.val)
 
@@ -123,12 +129,17 @@ class Node:
                 else:
                     self.children[1] = ("not_error", "doesn't matter")
             elif self.val == "while":
-                global_vars.wloop = True
-                self.children[0] = (self.children[0]).evaluate(varEnv, funEnv, topDogCheck)
-                if self.children[0] == ("not_error", "spicy"):
-                    self.children[1] = (self.children[1]).evaluate(varEnv, funEnv, topDogCheck)
-                else:
-                    self.children[1] = ("not_error", "doesn't matter")
+                self.children[0] = ("not_error", "doesn't matter")
+                self.children[1] = ("not_error", "doesn't matter")
+            elif self.val == "for":
+                for i in range(self.numChildren):
+                    self.children[i] = ("not_error", "doesn't matter")
+                #global_vars.wloop = True
+                #self.children[0] = (self.children[0]).evaluate(varEnv, funEnv, topDogCheck)
+                #if self.children[0] == ("not_error", "spicy"):
+                #    self.children[1] = (self.children[1]).evaluate(varEnv, funEnv, topDogCheck)
+                #else:
+                #    self.children[1] = ("not_error", "doesn't matter")
             else:
                 for i in range(self.numChildren):
                     self.children[i] = (self.children[i]).evaluate(varEnv, funEnv, topDogCheck)
@@ -149,7 +160,7 @@ class Node:
             else:
                 return self.children[i]
 
-        (error, val) = fun(self.children, varEnv, funEnv, op)
+        (error, val) = fun(self.children, varEnv, funEnv, op, self.id_num)
 
         # cast to string because it will record the result of an arithmetic
         # operation as an int which screws things up
@@ -230,7 +241,7 @@ class Node:
             if var or fun or left:
                 for i in range(self.numChildren):
                     if self.children[i] == subtreeRoot[1]:
-                        self.addChild(Node(None, -1, False), i)
+                        self.addChild(Node(None, -1, False, -1), i)
                         tree.updateNoneCount(1)
                 if all(self.children[i].val == None for i in range(self.numChildren)):
                     tree.updateNoneCount(-self.numChildren)
@@ -283,10 +294,18 @@ class Node:
         return False
 
 
+    def get_node(self, desired_id):
+        if self.id_num == desired_id:
+            return self
+
+        for i in range(self.numChildren):
+            if (self.children[i]).get_node(desired_id) != None:
+                return (self.children[i]).get_node(desired_id)
+
 
     # for testing purposes only
     def printTree(self):
-        print self.val, self.numChildren
+        print self.val, self.numChildren#, self.id_num
 
         if self.numChildren != -1:
             for i in range(self.numChildren):

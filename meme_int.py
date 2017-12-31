@@ -4,6 +4,7 @@ import operator
 import math
 import shlex
 import time
+import copy
 import global_vars
 from primitives import *
 from exceptions_file import *
@@ -79,6 +80,7 @@ def addPrimitives():
     funEnv.addBind("ifTrue", (condArrityTwo, (lambda x, y: y if x else "Nothing"), 2))
     funEnv.addBind("ifFalse", (condArrityTwo, (lambda x, y: y if not x else "Nothing"), 2))
     funEnv.addBind("while", (wloop, None, 2))
+    funEnv.addBind("for", (floop, None, 4)) # second argument is the "in" keyword
 
     return (varEnv, funEnv)
 
@@ -182,20 +184,20 @@ def handleQuotesAndBrackets(origExp):
     return expression
 
 
-def makeTree(tree, funEnv):
+def makeTree(tree, funEnv, id_num):
     val = tree.update_string()
     isRoot = tree.checkIfRoot()
     if funEnv.inEnv(val):
-        node = Node(val, funEnv.getArrity(val), isRoot)
+        node = Node(val, funEnv.getArrity(val), isRoot, tree.update_num_nodes())
         tree.updateNoneCount(funEnv.getArrity(val))
         for i in range(node.getNumChildren()):
             tree.updateNoneCount(-1)
-            node.addChild(makeTree(tree, funEnv), i)
+            node.addChild(makeTree(tree, funEnv, tree.get_num_nodes()), i)
         return node
     else:
         if val == None:
             tree.updateNoneCount(1)
-        return Node(val, -1, isRoot)
+        return Node(val, -1, isRoot, tree.update_num_nodes())
 
 
 
@@ -247,39 +249,32 @@ def evaluate(lines, origLines):
         expression.reverse()
 
 
-        first_iteration = True
-        while first_iteration or global_vars.wloop:
-            emptyTree = ExpressionTree(None, expression)
-            expTree = makeTree(emptyTree, funEnv)
+        emptyTree = ExpressionTree(None, expression)
+        expTree = makeTree(emptyTree, funEnv, 0)
+        expTree.epsteinCheck(varEnv, funEnv, emptyTree)
+        global_vars.curr_tree = copy.deepcopy(expTree)
+        #expTree.printTree()
+
+        if emptyTree.get_string_length() == 0:
             if expTree.sevenCheck():
                 (error, val) = ("error", "Error: Meme is 7")
             else:
-                expTree.epsteinCheck(varEnv, funEnv, emptyTree)
-                #expTree.printTree()
-
-                if emptyTree.get_string_length() == 0:
-                    (error, val) = expTree.evaluate(varEnv, funEnv, True)
-                else:
-                    #expTree.printTree()
-                    (error, val) = ("error", "Error: Incorrect number of memes")
+                (error, val) = expTree.evaluate(varEnv, funEnv, True)
+        else:
+            (error, val) = ("error", "Error: Incorrect number of memes")
 
 
-            if error == "error":
-                (error, val) = origLines.RaiseException(lineCount, numLines, val)
-            if error == "errorDec":
-                (error, val) = origLines.RaiseException(lineCount, numLines, val, True)
+        if error == "error":
+            (error, val) = origLines.RaiseException(lineCount, numLines, val)
+        if error == "errorDec":
+            (error, val) = origLines.RaiseException(lineCount, numLines, val, True)
 
-            if not first_iteration and not global_vars.wloop:
-                print "-->", global_vars.prev_val
-                break
+        print "-->", val
 
-            if global_vars.check_error or global_vars.check_expect:
-                varEnv.addBindMEME("MEME", "\"" + val + "\"")
-            else:
-                varEnv.addBindMEME("MEME", val)
-            if first_iteration and not global_vars.wloop:
-                print "-->", val
-            first_iteration = False
+        if global_vars.check_error or global_vars.check_expect:
+            varEnv.addBindMEME("MEME", "\"" + val + "\"")
+        else:
+            varEnv.addBindMEME("MEME", val)
         numLines = 1
         global_vars.reset()
 
@@ -313,6 +308,18 @@ if __name__ == '__main__':
     
 
 
+
+
+            # #expTree.printTree()
+            # (error, val) = expTree.evaluate(varEnv, funEnv, True)
+            # #print error, val, emptyTree.get_string_length()
+            # if (error == "not_error" and emptyTree.get_string_length() != 0) or \
+            #    (error == "error" and val == "Error: Meme didn't fail, ya ninny"):
+            #     if error == "error":
+            #         global_vars.check_error = True
+            #         (error, val) = ("error", "Error: Incorrect number of memes")
+            #     if error == "not_error" and val != "Meme failed, as expected":
+            #         (error, val) = ("error", "Error: Incorrect number of memes")
 
 
 

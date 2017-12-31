@@ -1,0 +1,53 @@
+
+I like memes
+
+empty
+
+
+x in i for check-error
+in i for check-error
+i for check-error
+for check-error
+<~  x ina i for check-error
+   i print 
+
+[1, 2, 3, 4] x meme
+<~  x in i for check-expect
+<~   i print
+Nothing
+4 i check-expect
+
+
+["Matthew", "Nathan", "Epstein"] y meme
+<~  y in i for check-expect
+<~   i.str print 
+Nothing
+"Epstein" i.str check-expect
+
+
+["Matthew", 123, mild, Nothing, x, spicy] z meme
+<~  ((z length) range) in j for check-expect
+<~   (z (j today +) get) print 
+Nothing
+5 j check-expect
+
+
+[spicy, 132, "hello", []] p meme
+[p, p, p, p] q meme
+<~    					((q length) range) in i for check-expect
+<~ (((q (i today +) get) length) range) in j for
+<~ ((q (i today +) get) (j today +) get) print
+										    Nothing
+
+<~ z in m for 
+	Nothing
+
+"Matthew" m check-expect
+123 m.num check-expect
+spicy m.bool check-expect
+"Matthew" m.str check-expect
+x m.list check-expect
+[1, 2, 3, 4] m.list check-expect
+Nothing m.nonetype check-expect
+
+
