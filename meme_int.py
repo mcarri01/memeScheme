@@ -273,7 +273,8 @@ def evaluate(lines, origLines):
         if error == "errorDec":
             (error, val) = origLines.RaiseException(lineCount, numLines, val, True)
 
-        print "-->", val
+        if val != "Nothing":
+            print "-->", val
 
         if global_vars.check_error or global_vars.check_expect:
             varEnv.addBindMEME("MEME", "\"" + val + "\"")
