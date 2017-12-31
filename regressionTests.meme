@@ -1,6 +1,15 @@
 
 I like memes
 
+!@ Checks that MEME is correct at the start 
+   Must be the first lines of code, hence the file name#$
+
+Nothing MEME check-expect
+
+empty
+Nothing MEME check-expect
+I like memes
+
 !@ Arithmetic #$
 
 empty
@@ -29,7 +38,7 @@ c 1 + check-error
 2 1 3 - check-expect
 6 2 3 * check-expect
 3 2 6 / check-expect
-1 3 7 % check-expect
+1 3 seven % check-expect
 8 3 2 ^ check-expect
 (720 (6 !) check-expect)
 (15 (225 v/) check-expect)
@@ -395,6 +404,35 @@ normie if check-error
 "Meme failed, as expected" MEME check-expect
 if check-error
 
+
+!@ Test the four "normal" cases #$
+1 1 spicy ifTrue check-expect
+Nothing 1 normie ifTrue check-expect
+Nothing 1 spicy ifFalse check-expect
+1 1 normie ifFalse check-expect
+
+!@ Test various error cases#$
+(1 "hello" +) spicy ifTrue check-error
+Nothing (1 "hello" +) normie ifTrue check-expect
+spicy ifTrue check-error
+normie ifTrue check-error
+"hello" 1 ifTrue check-error
+"hello" "hello" ifTrue check-error
+"hello" [spicy] ifTrue check-error
+"hello" Nothing ifTrue check-error
+ifTrue check-error
+
+(1 "hello" +) normie ifFalse check-error
+Nothing (1 "hello" +) spicy ifFalse check-expect
+normie ifFalse check-error
+spicy ifFalse check-error
+"hello" 1 ifFalse check-error
+"hello" "hello" ifFalse check-error
+"hello" [spicy] ifFalse check-error
+"hello" Nothing ifFalse check-error
+ifFalse check-error
+
+
 I like memes
 
 
@@ -705,7 +743,7 @@ I like memes
 
 empty
 
-7 //+ meme
+seven //+ meme
 
 !@mild 3 larger? not normie spicy or and check-expect#$
 2 1 + mild 1 meme meme check-error
@@ -720,7 +758,7 @@ spicy normie normie nor 9 v/ 3 4 - 1 2 * + + + 4 = if check-expect
 "3" "3" y meme check-expect
 y x + check-error
 "3" b meme 3 a meme = check-error
-!@10 3 4 - 2 1 * + + + check-expect#$
+10 3 4 - 2 1 * + + + check-expect
 9 2 + + check-expect
 14 + + + check-expect
 * check-error
@@ -733,7 +771,7 @@ y x + check-error
 3 13 4 2 ^ - 13 4 3 + 5 * % / check-expect
 spicy normie spicy and normie normie or nand normie spicy spicy and or and check-expect
 13 1 4 3 * + check-expect
-7 + check-expect
+seven + check-expect
 //- "hello" spicy 1 //- meme meme meme check-expect
 1 "hello" spicy 1 //- meme meme meme check-expect
 1 - check-expect
@@ -741,7 +779,7 @@ spicy -.bool check-expect
 "hello" -.str check-expect
 //* 1 //* meme check-expect
 * 2 * meme check-expect
-12 7 5 - meme + check-expect
+12 seven 5 - meme + check-expect
 25 4 ! 1 //! meme + check-expect
 spicy //and spicy //and meme and check-expect
 14 //+ //+ + check-expect
@@ -756,9 +794,9 @@ spicy normie normie nor 9 v/ 3 4 - 1 2 * + + //+ 10 = if check-expect
 1 2 1 ((1 2 *) 2 =) if check-expect
 2 2 1 ((1 2 *) 4 =) if check-expect
 5 "hello" //- meme check-expect 
-35 7 5 - meme * check-expect
+35 seven 5 - meme * check-expect
 2 2 //- meme check-expect
-224 7 5 - ^ * check-expect
+224 seven 5 - ^ * check-expect
 
 
 !@
@@ -812,6 +850,59 @@ d.str check-error
 
 I like memes
 
+empty
+
+
+x in i for check-error
+in i for check-error
+i for check-error
+for check-error
+<~  x ina i for check-error
+   i print 
+
+[1, 2, 3, 4] x meme
+<~  x in i for check-expect
+<~   i print
+Nothing
+4 i check-expect
+
+
+["Matthew", "Nathan", "Epstein"] y meme
+<~  y in i for check-expect
+<~   i.str print 
+Nothing
+"Epstein" i.str check-expect
+
+
+["Matthew", 123, mild, Nothing, x, spicy] z meme
+<~  ((z length) range) in j for check-expect
+<~   (z (j today +) get) print 
+Nothing
+5 j check-expect
+
+
+[spicy, 132, "hello", []] p meme
+[p, p, p, p] q meme
+<~    					((q length) range) in i for check-expect
+<~ (((q (i today +) get) length) range) in j for
+<~ ((q (i today +) get) (j today +) get) print
+										    Nothing
+
+<~ z in m for 
+	Nothing
+
+"Matthew" m check-expect
+123 m.num check-expect
+spicy m.bool check-expect
+"Matthew" m.str check-expect
+x m.list check-expect
+[1, 2, 3, 4] m.list check-expect
+Nothing m.nonetype check-expect
+
+
+
+I like memes
+
 
 !@ Larger/Smaller #$
 empty
@@ -856,6 +947,8 @@ spicy y meme
 y larger?
 y.num smaller?
 
+
+
 I like memes
 
 empty
@@ -890,7 +983,7 @@ j print
 [1, "didn't, hello", 2, [], " , [] ' "] x " , [] ' " append check-expect
 [1, "didn't, hello", 2, [], " , [] ' ", 123] x xyz append check-expect
 [1, "didn't, hello", 2, [], " , [] ' ", 123, normie] x normie append check-expect
-7 x length check-expect
+seven x length check-expect
 [[1, "didn't, hello", 2, [], " , [] ' ", 123, normie], 1, "didn't, hello", 2, [], " , [] ' ", 123, normie] x x push check-expect
 normie x null? check-expect
 8 x length check-expect
@@ -987,25 +1080,74 @@ hitMe y meme
 (y y b insert) check-error
 
 
-!@ remove (rip) #$
+!@ remove (rippo) #$
 
-[-1, 0, 1] x (1 today -) rip check-expect
-[-1, 1] x (2 today -) rip check-expect
-[1] x today rip check-expect
-[] x today rip check-expect
+[-1, 0, 1] x (1 today -) rippo check-expect
+[-1, 1] x (2 today -) rippo check-expect
+[1] x today rippo check-expect
+[] x today rippo check-expect
 
 
-(y a.bool rip) check-error
-(y a.str rip) check-error
-(y y rip) check-error
+(y a.bool rippo) check-error
+(y a.str rippo) check-error
+(y y rippo) check-error
 
-(a.num today rip) check-error
-(a.bool today rip) check-error
-(a.str today rip) check-error
+(a.num today rippo) check-error
+(a.bool today rippo) check-error
+(a.str today rippo) check-error
 
-[["hello", spicy], "hello", spicy] (y (4 today -) rip) check-expect
+[["hello", spicy], "hello", spicy] (y (4 today -) rippo) check-expect
 y
 y (3 today -) a.num put
+
+
+!@ tests with mild #$
+[1, 2, "mild", 4] [1, 2, "mild"] 4 append check-expect
+[1, 2, mild] 4 append
+
+"mild" [1, 2, "mild"] (today 2 +) get check-expect
+[1, 2, mild] (today 2 +) get
+
+[1, 2, "mild"] [1, 2, 3] (today 2 +) "mild" put check-expect
+[1, 2, 3] (today 2 +) mild put
+
+[1, 2, "mild", 3] [1, 2, 3] (today 2 +) "mild" insert check-expect
+[1, 2, 3] (today 2 +) mild insert
+
+[1, 2, "mild", 3] [1, 2, 3] (today 2 +) "mild" insert check-expect
+[1, 2, 3] (today 2 +) mild insert
+
+[1, "mild"] [1, 2, "mild"] (today 1 +) rippo check-expect
+[1, 2, mild] (today 1 +) rippo
+
+["mild", "mild", "mild", "mild", "mild"] 5 "mild" init check-expect
+5 [mild] init
+5 mild init
+
+
+!@ error checking for lists that have a bad value in them
+   (eg. variable doesn't exist, type doesn't exist, etc.) #$
+empty
+
+[x] y meme check-error
+[1, 2, x] [1, 2, x] = check-error
+[1, 2, x] length check-error
+[1, 2, x] null? check-error
+[1, 2, x] print check-error
+[1, 2, x] 4 append check-error
+[1, 2, 3] [x] append check-error
+[1, 2, x] (today 2 +) get check-error
+[1, 2, x] (today 2 +) 3 put check-error
+[1, 2, 3] (today 2 +) [x] put check-error
+[1, 2, x] (today 2 +) 3 insert check-error
+[1, 2, 3] (today 2 +) [x] insert check-error
+[1, 2, x] (today 2 +) rippo check-error
+3 [1, 2, x] init check-error
+[1, 2, 3] [1, 2, x] check-expect check-error
+[1, 2, x] [1, 2, 3] check-expect check-error
+[1, 2, x] check-error
+<~ [1, 2, x] in i for check-error
+			i print
 
 
 I like memes
@@ -1116,7 +1258,7 @@ spicy spicy check-expect
 123 ab check-expect
 
 123 //seven meme
-7 seven check-expect
+seven seven check-expect
 
 123 //+ meme
 123 + check-expect
@@ -1187,6 +1329,61 @@ normie i j = check-error
 
 I like memes
 
+empty
+
+
+1 a meme
+1 a range check-error
+range check-error
+spicy range check-error
+33.num range check-error
+"hello".num range check-error
+a.it range check-error
+b.num range check-error
+a.bool range check-error
+c range check-error
+"hello" range check-error
+
+
+[0, 1, 2, 3, 4, 5] 6 range check-expect
+[] 0 range check-expect
+[] -1 range check-expect
+8.2 range check-error
+spicy range check-error
+"hello" range check-error
+[1] range check-error
+[1, spicy, "hello"] range check-error
+["hello", 2, mild, [4], -0.231] m meme
+[0, 1, 2, 3, 4] ((m length) range) check-expect
+
+
+[3, 4, 5] 6 3 rangeFrom check-expect
+[] 0 0 rangeFrom check-expect
+[] 2 3 rangeFrom check-expect
+[] -4 -3 rangeFrom check-expect
+[] -1 1 rangeFrom check-expect
+3 1.2 rangeFrom check-error
+3.2 3 rangeFrom check-error
+3.2 2.9 rangeFrom check-error
+1 spicy rangeFrom check-error
+1 "hello" rangeFrom check-error
+1 [1] rangeFrom check-error
+1 [1, spicy, "hello"] rangeFrom check-error
+["hello", 2, mild, [4], -0.231] m meme
+[2, 3, 4] ((m length) 2 rangeFrom) check-expect
+
+
+I like memes
+
+empty
+
+7 check-error
+seven seven check-expect 
+13 4 x meme 2 ! ^ - 13 4 3 + 5 * % / 1 13 7 2 ! ^ - 13 4 9 v/ + 5 * % / - <> check-error
+spicy 13 4 x meme 2 ! ^ - 13 4 3 + 5 * % / 1 13 seven 2 ! ^ - 13 4 9 v/ + 5 * % / - <> check-expect
+
+I like memes
+
 
 empty
 
@@ -1245,6 +1442,8 @@ Nothing "" normie while check-expect
 "Check was Nothing, as expected" MEME check-expect
 
 
+1 print mild while
+
 (1 (spicy g meme) meme)
 spicy MEME check-expect
 (1 (spicy g meme) meme)
@@ -1253,4 +1452,8 @@ spicy MEME check-expect
 "Check was <'>Check was 1, as expected<'>, as expected" MEME check-expect
 "Check was <'>Check was <'>Check was 1, as expected<'>, as expected<'>, as expected" MEME check-expect
 
+
+while check-error
+spicy while check-error
+1 print 1 while check-error
 
