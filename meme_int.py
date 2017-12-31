@@ -20,7 +20,7 @@ def addPrimitives():
     varEnv.addBind("MEME", "Nothing")
 
     funEnv = Environment(dict())
-    funEnv.addBind("++", (for_testing, operator.add, 2))
+    funEnv.addBind("++", (concat, operator.add, 2))
     # arithmetic
     funEnv.addBind("+", (numArrityTwo, operator.add, 2))
     funEnv.addBind("-", (numArrityTwo, operator.sub, 2))
@@ -72,15 +72,19 @@ def addPrimitives():
     funEnv.addBind("seven", (arrityZero, 7, 0))
     # basic operations
     funEnv.addBind("print", (printVar, None, 1))
+    funEnv.addBind("putMeIn", (userInput, (lambda x: raw_input(x)), 1))
     funEnv.addBind("meme", (defineVar, None, 2))
     funEnv.addBind("check-error", (check_error, None, 1))
     funEnv.addBind("check-expect", (check_expect, None, 2))
     funEnv.addBind("empty", (empty, None, 0))
     funEnv.addBind("if", (conditional, None, 3))
-    funEnv.addBind("ifTrue", (condArrityTwo, (lambda x, y: y if x else "Nothing"), 2))
-    funEnv.addBind("ifFalse", (condArrityTwo, (lambda x, y: y if not x else "Nothing"), 2))
+    funEnv.addBind("ifTrue", (condArrityTwo, (lambda: True), 2))
+    funEnv.addBind("ifFalse", (condArrityTwo, (lambda: False), 2))
+    #funEnv.addBind("ifTrue", (condArrityTwo, (lambda x, y: y if x else "Nothing"), 2))
+    #funEnv.addBind("ifFalse", (condArrityTwo, (lambda x, y: y if not x else "Nothing"), 2))
     funEnv.addBind("while", (wloop, None, 2))
     funEnv.addBind("for", (floop, None, 4)) # second argument is the "in" keyword
+
 
     return (varEnv, funEnv)
 

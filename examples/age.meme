@@ -1,0 +1,19 @@
+
+I like memes
+
+!@
+This is a simple program that asks the user to enter their age.
+The program will then calculate how many months, days, and hours
+old the user is.  If a negative number of years is entered, the
+the program will not crash, but will produce bogus results.
+The program does not account for leap years and assumes the user's
+age is exactly the number of years entered.
+#$
+
+"Please enter your age in years: " putMeIn age meme
+
+(" months old." ((age 12 *) "You are " ++) ++)
+(" days old." ((age 365 *) "You are " ++) ++)
+(" hours old." ((age (365 24 *) *) "You are " ++) ++)
+
+

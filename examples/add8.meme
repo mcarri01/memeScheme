@@ -1,0 +1,22 @@
+
+I like memes
+
+!@
+This is a simple program that asks the user to enter eight numbers and prints
+out the sum.  If the user enters a non-number, the program will terminate.
+#$
+
+
+hitMe x meme
+<~						(8 (x length) <) while
+x ("Please enter a number: " putMeIn) append
+
+0 sum meme
+<~			((x length) range) in i for
+((x (today i +) get) sum +) sum meme
+
+sum "The sum of your numbers is " ++
+
+
+
+

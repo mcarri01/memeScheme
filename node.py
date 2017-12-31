@@ -92,46 +92,47 @@ class Node:
             topDogCheck = False
         if self.numChildren != -1:
             # for readability's sake, collapse the if and elif statements below
-            if self.val == "if":
-                self.children[0] = (self.children[0]).evaluate(varEnv, funEnv, topDogCheck)
-                if self.children[0] == ("not_error", "spicy"):
-                    self.children[1] = (self.children[1]).evaluate(varEnv, funEnv, topDogCheck)
-                    if self.children[2].val == None:
-                        self.children[2] = ("not_error", None)
-                    else:
-                        self.children[2] = ("not_error", "doesn't matter")
-                elif self.children[0] == ("not_error", "normie"):
-                    self.children[1] = ("not_error", "doesn't matter")
-                    self.children[2] = (self.children[2]).evaluate(varEnv, funEnv, topDogCheck)
-                else:
-                    self.children[1] = ("not_error", "doesn't matter")
-                    self.children[2] = ("not_error", "doesn't matter")
-            elif self.val == "ifTrue":
-                self.children[0] = (self.children[0]).evaluate(varEnv, funEnv, topDogCheck)
-                if self.children[0] == ("not_error", "spicy"):
-                    self.children[1] = (self.children[1]).evaluate(varEnv, funEnv, topDogCheck)
-                elif self.children[0] == ("not_error", "normie"):
-                    if self.children[1].val == None:
-                        self.children[1] = ("not_error", None)
-                    else:
-                        self.children[1] = ("not_error", "doesn't matter")
-                else:
-                    self.children[1] = ("not_error", "doesn't matter")
-            elif self.val == "ifFalse":
-                self.children[0] = (self.children[0]).evaluate(varEnv, funEnv, topDogCheck)
-                if self.children[0] == ("not_error", "normie"):
-                    self.children[1] = (self.children[1]).evaluate(varEnv, funEnv, topDogCheck)
-                elif self.children[0] == ("not_error", "spicy"):
-                    if self.children[1].val == None:
-                        self.children[1] = ("not_error", None)
-                    else:
-                        self.children[1] = ("not_error", "doesn't matter")
-                else:
-                    self.children[1] = ("not_error", "doesn't matter")
-            elif self.val == "while":
-                self.children[0] = ("not_error", "doesn't matter")
-                self.children[1] = ("not_error", "doesn't matter")
-            elif self.val == "for":
+            # if self.val == "if":
+            #     self.children[0] = (self.children[0]).evaluate(varEnv, funEnv, topDogCheck)
+            #     if self.children[0] == ("not_error", "spicy"):
+            #         self.children[1] = (self.children[1]).evaluate(varEnv, funEnv, topDogCheck)
+            #         if self.children[2].val == None:
+            #             self.children[2] = ("not_error", None)
+            #         else:
+            #             self.children[2] = ("not_error", "\"doesn't matter\"")
+            #     elif self.children[0] == ("not_error", "normie"):
+            #         self.children[1] = ("not_error", "\"doesn't matter\"")
+            #         self.children[2] = (self.children[2]).evaluate(varEnv, funEnv, topDogCheck)
+            #     else:
+            #         self.children[1] = ("not_error", "\"doesn't matter\"")
+            #         self.children[2] = ("not_error", "\"doesn't matter\"")
+            # elif self.val == "ifTrue":
+            #     self.children[0] = (self.children[0]).evaluate(varEnv, funEnv, topDogCheck)
+            #     if self.children[0] == ("not_error", "spicy"):
+            #         self.children[1] = (self.children[1]).evaluate(varEnv, funEnv, topDogCheck)
+            #     elif self.children[0] == ("not_error", "normie"):
+            #         if self.children[1].val == None:
+            #             self.children[1] = ("not_error", None)
+            #         else:
+            #             self.children[1] = ("not_error", "\"doesn't matter\"")
+            #     else:
+            #         self.children[1] = ("not_error", "\"doesn't matter\"")
+            # elif self.val == "ifFalse":
+            #     self.children[0] = (self.children[0]).evaluate(varEnv, funEnv, topDogCheck)
+            #     if self.children[0] == ("not_error", "normie"):
+            #         self.children[1] = (self.children[1]).evaluate(varEnv, funEnv, topDogCheck)
+            #     elif self.children[0] == ("not_error", "spicy"):
+            #         if self.children[1].val == None:
+            #             self.children[1] = ("not_error", None)
+            #         else:
+            #             self.children[1] = ("not_error", "\"doesn't matter\"")
+            #     else:
+            #         self.children[1] = ("not_error", "\"doesn't matter\"")
+            # elif self.val == "while":
+            #     self.children[0] = ("not_error", "\"doesn't matter\"")
+            #     self.children[1] = ("not_error", "\"doesn't matter\"")
+            conds_and_loops = ["if", "ifTrue", "ifFalse", "while", "for"]
+            if self.val in conds_and_loops:
                 for i in range(self.numChildren):
                     self.children[i] = ("not_error", "doesn't matter")
                 #global_vars.wloop = True
@@ -139,7 +140,7 @@ class Node:
                 #if self.children[0] == ("not_error", "spicy"):
                 #    self.children[1] = (self.children[1]).evaluate(varEnv, funEnv, topDogCheck)
                 #else:
-                #    self.children[1] = ("not_error", "doesn't matter")
+                #    self.children[1] = ("not_error", "\"doesn't matter\"")
             else:
                 for i in range(self.numChildren):
                     self.children[i] = (self.children[i]).evaluate(varEnv, funEnv, topDogCheck)

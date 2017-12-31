@@ -59,12 +59,15 @@ def numArrityTwo(args, varEnv, funEnv, op, id_num):
         else:
             return ("error", "Error: Meme must be an integer")
 
-def for_testing(args, varEnv, funEnv, op, id_num):
-    constraints = [[["num", "str"]], [["num", "str"]]]
+def concat(args, varEnv, funEnv, op, id_num):
+    constraints = [[global_vars.ALL_TYPES], [global_vars.ALL_TYPES]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
-    return ("not_error", op(val_list[0], val_list[1]))
+    for i in range(len(val_list)):
+        if not isNum(val_list[i]) and isString(val_list[i]):
+            val_list[i] = val_list[i][1:-1]
+    return ("not_error", "\""+op(str(val_list[0]), str(val_list[1]))+"\"")
 
 def more_arithmetic(args, varEnv, funEnv, op, id_num):
     constraints = [[["num"]]]
@@ -133,11 +136,35 @@ def printVar(args, varEnv, funEnv, op, id_num):
         return val_list
 
     if isinstance(val_list[0], bool):
-        print "-->", "spicy" if val_list[0] else "normie"
-    else:
-        print "-->", val_list[0]
+        if val_list[0]:
+            val_list[0] = "spicy"
+        else:
+            val_list[0] = "normie"
+        #print "-->", "spicy" if val_list[0] else "normie"
+    #else:
+        #print "-->", val_list[0]
+    if not isNum(val_list[0]) and isString(val_list[0]):
+        print val_list[0][1:-1]
     return ("not_error", "Nothing")
 
+def userInput(args, varEnv, funEnv, op, id_num):
+    constraints = [[global_vars.ALL_TYPES]]
+    val_list = definePrimitive(args, constraints, varEnv)
+    if val_list[0] == "error":
+        return val_list
+
+    if isinstance(val_list[0], bool):
+        if val_list[0]:
+            val_list[0] = "spicy"
+        else:
+            val_list[0] = "normie"
+
+    if not isNum(val_list[0]) and isString(val_list[0]):
+        val_list[0] = val_list[0][1:-1]
+    input_val = op(val_list[0])
+    if not isNum(input_val):
+        input_val = "\"" + input_val + "\""
+    return ("not_error", input_val)
 
 def arrityZero(args, varEnv, funEnv, returnVal, id_num):
     if args != []:
@@ -373,24 +400,124 @@ def empty(args, varEnv, funEnv, op, id_num):
     return ("not_error", "Nothing")
 
 
-def conditional(args, varEnv, funEnv, op, id_num):
-    if len(args) != 3:
-        return ("error", "Error: Incorrect number of memes")
 
-    if isBool(args[0]):
-        args = map(lambda x: x if x!="mild" else "spicy" if randint(0,1)==0 else "normie", args)
-        return ("not_error", args[1] if getBoolVal(args[0]) else args[2])
+# def wloop(args, varEnv, funEnv, op, id_num, prev_val="Nothing"):
+#     tree_section = copy.deepcopy((global_vars.curr_tree).get_node(id_num))
+#     if (tree_section.getChild(0)).getVal() == None or \
+#        (tree_section.getChild(1)).getVal() == None:
+#        return ("error", "Error: Incorrect number of memes")
+
+#     conditional = (tree_section.getChild(0)).evaluate(varEnv, funEnv, False)
+#     if conditional[0] == "error":
+#         return conditional
+
+#     if isBool(conditional[1]):
+#         if getBoolVal(conditional[1]):
+#             body = (tree_section.getChild(1)).evaluate(varEnv, funEnv, False)
+#             if body[0] == "error":
+#                 return body
+#             return wloop([], varEnv, funEnv, op, id_num, body[1])
+#         else:
+#             return ("not_error", prev_val)
+#     else:
+#         return ("error", "Error: Normie meme type")
+
+
+
+
+def conditional(args, varEnv, funEnv, op, id_num):
+    tree_section = copy.deepcopy((global_vars.curr_tree).get_node(id_num))
+    for i in range(3):
+        if (tree_section.getChild(i)).getVal() == None:
+            return ("error", "Error: Incorrect number of memes")
+
+    conditional = (tree_section.getChild(0)).evaluate(varEnv, funEnv, False)
+    if conditional[0] == "error":
+         return conditional
+
+    constraints = [[["bool"]]]
+    val_list = definePrimitive([conditional[1]], constraints, varEnv)
+    if val_list[0] == "error":
+        return val_list
+
+    if isinstance(val_list[0], bool):
+        if val_list[0]:
+            body = (tree_section.getChild(1)).evaluate(varEnv, funEnv, False)
+        else:
+            body = (tree_section.getChild(2)).evaluate(varEnv, funEnv, False)
+        if body[0] == "error":
+            return body
+        return ("not_error", body[1])
     else:
         return ("error", "Error: Normie meme type")
+
+
+    # constraints = [[["bool"]], [global_vars.ALL_TYPES], [global_vars.ALL_TYPES]]
+    # val_list = definePrimitive(args, constraints, varEnv)
+    # if val_list[0] == "error":
+    #     return val_list
+
+    # if isinstance(val_list[0], bool):
+    #     return ("not_error", val_list[1] if val_list[0] else val_list[2])
+    # else:
+    #     return ("error", "Error: Normie meme type")
+    #if isBool(args[0]):
+    #    args = map(lambda x: x if x!="mild" else "spicy" if randint(0,1)==0 else "normie", args)
+    #    return ("not_error", args[1] if val_list[0] else args[2])
+    #else:
+    #    return ("error", "Error: Normie meme type")
+
 
 def condArrityTwo(args, varEnv, funEnv, op, id_num):
-    if len(args) != 2:
-        return ("error", "Error: Incorrect number of memes")
+    tree_section = copy.deepcopy((global_vars.curr_tree).get_node(id_num))
+    for i in range(2):
+        if (tree_section.getChild(i)).getVal() == None:
+            return ("error", "Error: Incorrect number of memes")
 
-    if isBool(args[0]):
-        return ("not_error", op(getBoolVal(args[0]), args[1]))
+    conditional = (tree_section.getChild(0)).evaluate(varEnv, funEnv, False)
+    if conditional[0] == "error":
+         return conditional
+
+    constraints = [[["bool"]]]
+    val_list = definePrimitive([conditional[1]], constraints, varEnv)
+    if val_list[0] == "error":
+        return val_list
+
+    if isinstance(val_list[0], bool):
+        if val_list[0] == op():
+            body = (tree_section.getChild(1)).evaluate(varEnv, funEnv, False)
+            if body[0] == "error":
+                return body
+            return ("not_error", body[1])
+        else:
+            return ("not_error", "Nothing")
     else:
         return ("error", "Error: Normie meme type")
+
+
+
+
+
+    #     if getBoolVal(conditional[1]):
+    #         body = (tree_section.getChild(1)).evaluate(varEnv, funEnv, False)
+    #     else:
+    #         body = (tree_section.getChild(2)).evaluate(varEnv, funEnv, False)
+    #     if body[0] == "error":
+    #         return body
+    #     return ("not_error", body[1])
+    # else:
+    #     return ("error", "Error: Normie meme type")
+
+
+
+# def condArrityTwo(args, varEnv, funEnv, op, id_num):
+#     if len(args) != 2:
+#         return ("error", "Error: Incorrect number of memes")
+
+#     if isBool(args[0]):
+#         return ("not_error", op(getBoolVal(args[0]), args[1]))
+#     else:
+#         return ("error", "Error: Normie meme type")
 
 
 
