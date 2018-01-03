@@ -30,7 +30,7 @@ def getMatchingBracket(exp):
 
 def int_float_handling(arg):
     if float(arg) == int(float(arg)):
-         return int(arg)
+         return int(float(arg))
     else:
         return float(arg)
 
@@ -110,5 +110,16 @@ def list_check(a_list, varEnv):
         if error != "" and error[0] == "error":
             return error
 
+
+# makes sure a list that's hardcoded in is of the data-comma-space-data format
+def string_check(string):
+    noQuotes = re.sub('"[^"]*"', "\"\"", string)
+    for i in range(len(noQuotes)):
+        try:
+            if (noQuotes[i] == " " and (noQuotes[i-1] != "," or noQuotes[i+1] == "]")) or \
+               (noQuotes[i] == "," and (noQuotes[i+1] != " " or noQuotes[i-1] == "[")):
+                return ("error", "Error: Meme does not exist")
+        except:
+            return ("error", "Error: Meme does not exist")
 
 

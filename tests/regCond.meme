@@ -44,3 +44,9 @@ spicy ifFalse check-error
 "hello" Nothing ifFalse check-error
 ifFalse check-error
 
+spicy x meme
+1 2 1 x if check-expect
+1 1 x ifTrue check-expect
+1 1 (x not) ifFalse check-expect
+Nothing 1 (x not) ifTrue check-expect
+Nothing 1 x ifFalse check-expect

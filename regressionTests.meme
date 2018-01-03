@@ -42,6 +42,10 @@ c 1 + check-error
 8 3 2 ^ check-expect
 (720 (6 !) check-expect)
 (15 (225 v/) check-expect)
+1 1 int check-expect
+1 1.2 int check-expect
+-1 -1 int check-expect
+-1 -1.2 int check-expect
 
 
 
@@ -168,6 +172,157 @@ spicy x.bool y.bool xor check-expect
 
 
 
+
+I like memes
+
+empty
+
+!@ nums #$
+("testing" (Nothing (["123", [], 4] (123 (spicy x meme) meme) meme) meme) meme)
+
+3 3 num check-expect
+3 3.0 num check-expect
+3.2 3.2 num check-expect
+3 "3" num check-expect
+3 "3.0" num check-expect
+3.2 "3.2" num check-expect
+3 [3] num check-expect
+3 [3.0] num check-expect
+3.2 [3.2] num check-expect
+
+123 x num check-expect
+x.bool num check-error
+123 x.num num check-expect
+x.list num check-error
+x.nonetype num check-error
+x.str num check-error
+
+spicy num check-error
+normie num check-error
+mild num check-error
+Nothing num check-error
+"" num check-error
+"not a num" num check-error
+[] num check-error
+[1, 2] num check-error
+["3"] num check-error
+[spicy, 2] num check-error
+[[1]] num check-error
+
+
+!@ bools #$
+spicy "spicy" bool check-expect
+normie "normie" bool check-expect
+!@spicy "mild" bool check-expect
+spicy "normie" bool check-expect#$
+spicy spicy bool check-expect
+normie normie bool check-expect
+!@spicy mild bool check-expect
+normie mild bool check-expect#$
+spicy [spicy] bool check-expect
+normie [normie] bool check-expect
+!@spicy [mild] bool check-expect
+normie [mild] bool check-expect#$
+
+spicy x bool check-expect
+spicy x.bool bool check-expect
+x.num bool check-error
+x.list bool check-error
+x.nonetype bool check-error
+x.str bool check-error
+
+
+1 bool check-error
+Nothing bool check-error
+"" bool check-error
+"not a num" bool check-error
+[] bool check-error
+[spicy, normie] bool check-error
+["spicy"] bool check-error
+[2, spicy] bool check-error
+[[spicy]] bool check-error
+
+
+!@ strings #$
+"3" 3 str check-expect
+"3.0" 3.0 str check-expect
+"3.2" 3.2 str check-expect
+"spicy" spicy str check-expect
+"normie" normie str check-expect
+mild str
+"" "" str check-expect
+"hello" "hello" str check-expect
+"123" "123" str check-expect
+"spicy" "spicy" str check-expect
+"[1, spicy, Nothing]" "[1, spicy, Nothing]" str check-expect
+"Nothing" "Nothing" str check-expect
+"[3]" [3] str check-expect
+"[3.0]" [3.0] str check-expect
+"[3.2]" [3.2] str check-expect
+"[3.2, spicy, normie, []]" [3.2, spicy, normie, []] str check-expect
+"[]" [] str check-expect
+"Nothing" Nothing str check-expect
+
+[1, ] str check-error
+[1, ] x check-error
+"spicy" x str check-expect
+"spicy" x.bool str check-expect
+"123" x.num str check-expect
+"[<'>123<'>, [], 4]" x.list str check-expect
+"Nothing" x.nonetype str check-expect
+"testing" x.str str check-expect
+
+
+!@ lists #$
+[3] 3 list check-expect
+[3] 3.0 list check-expect
+[3.2] 3.2 list check-expect
+[spicy] spicy list check-expect
+[normie] normie list check-expect
+"" list
+[""] "" list check-expect
+["3"] "3" list check-expect
+["hello"] "hello" list check-expect
+[] [] list check-expect
+[1, spicy, "hello", [1, 2, 3]] [1, spicy, "hello", [1, 2, 3]] list check-expect
+["", "", "", ""] ["", "", "", ""] list check-expect
+[[[""]]] [[[""]]] list check-expect
+[Nothing] Nothing list check-expect
+
+[1, ] list check-error
+[ 1,] list check-error
+list check-error
+1 1 list check-error
+[1, 2, 3] [1, 2,  3] list check-expect
+[spicy] x list check-expect
+[spicy] x.bool list check-expect
+[123] x.num list check-expect
+["123", [], 4] x.list list check-expect
+[Nothing] x.nonetype list check-expect
+["testing"] x.str list check-expect
+
+!@ nonetype #$
+Nothing "Nothing" nonetype check-expect
+Nothing Nothing nonetype check-expect
+Nothing [Nothing] nonetype check-expect
+
+1 nonetype check-error
+spicy nonetype check-error
+normie nonetype check-error
+mild nonetype check-error
+"" nonetype check-error
+"not Nothing" nonetype check-error
+[] nonetype check-error
+[Nothing, Nothing] nonetype check-error
+["Nothing"] nonetype check-error
+[2, Nothing] nonetype check-error
+[[Nothing]] nonetype check-error
+
+
+!@ low-stress stress tests #$
+["[<'>123<'>]"] ((((((([123] num) str) num) str) list) str) list) check-expect
+["[<'>spicy<'>]"] ((((((([spicy] bool) str) bool) str) list) str) list) check-expect
+["[<'>Nothing<'>]"] ((((((([Nothing] nonetype) str) nonetype) str) list) str) list) check-expect
 
 I like memes
 
@@ -387,6 +542,30 @@ spicy q r <= check-expect
 normie r q <= check-expect
 
 
+I like memes
+
+!@ String Concatanation #$
+
+empty
+
+"ab" ++ check-error
+"ab" "ab" "ab" ++ check-error
+"ab" 2 ++ check-error
+"ab" spicy ++ check-error
+"ab" [1, 2, 3] ++ check-error
+"ab" Nothing ++ check-error
+
+"cdab" "ab" "cd" ++ check-expect
+"21" "1" "2" ++ check-expect
+"[1, 2, 3,,4 5]1" "1" "[1, 2, 3,,4 5]" ++ check-expect
+"NothingNothing" "Nothing" "Nothing" ++ check-expect
+"mildmild" "mild" "mild" ++ check-expect
+"spicynormie" "normie" "spicy" ++ check-expect
+"" "" "" ++ check-expect
+
+
+("hello" (1 x meme) meme)
+"hello" "" x ++ check-expect
 
 I like memes
 
@@ -432,6 +611,12 @@ spicy ifFalse check-error
 "hello" Nothing ifFalse check-error
 ifFalse check-error
 
+spicy x meme
+1 2 1 x if check-expect
+1 1 x ifTrue check-expect
+1 1 (x not) ifFalse check-expect
+Nothing 1 (x not) ifTrue check-expect
+Nothing 1 x ifFalse check-expect
 
 I like memes
 
@@ -758,7 +943,7 @@ spicy normie normie nor 9 v/ 3 4 - 1 2 * + + + 4 = if check-expect
 "3" "3" y meme check-expect
 y x + check-error
 "3" b meme 3 a meme = check-error
-10 3 4 - 2 1 * + + + check-expect
+!@10 3 4 - 2 1 * + + + check-expect#$
 9 2 + + check-expect
 14 + + + check-expect
 * check-error
@@ -1148,6 +1333,159 @@ empty
 [1, 2, x] check-error
 <~ [1, 2, x] in i for check-error
 			i print
+
+[1,] check-error
+[1, ] check-error
+[ 1] check-error
+[, 1] check-error
+[1,2, 3] check-error
+[1, 2, 3] [1,  2, 3] check-expect
+[1 , 2, 3] check-error
+[1 ,2, 3] check-error
+
+[1,] a meme check-error
+[1, ] a meme check-error
+[ 1] a meme check-error
+[, 1] a meme check-error
+[1,2, 3] a meme check-error
+[1, 2, 3] [1,  2, 3] a meme check-expect
+[1 , 2, 3] a meme check-error
+[1 ,2, 3] a meme check-error
+
+[1,] length check-error
+[1, ] length check-error
+[ 1] length check-error
+[, 1] length check-error
+[1,2, 3] length check-error
+3 [1,  2, 3] length check-expect
+[1 , 2, 3] length check-error
+[1 ,2, 3] length check-error
+
+[1,] null? check-error
+[1, ] null? check-error
+[ 1] null? check-error
+[, 1] null? check-error
+[1,2, 3] null? check-error
+normie [1,  2, 3] null? check-expect
+[1 , 2, 3] null? check-error
+[1 ,2, 3] null? check-error
+
+[1,] print check-error
+[1, ] print check-error
+[ 1] print check-error
+[, 1] print check-error
+[1,2, 3] print check-error
+Nothing [1,  2, 3] print check-expect
+[1 , 2, 3] print check-error
+[1 ,2, 3] print check-error
+
+[1,] 1 append check-error
+[1, ] 1 append check-error
+[ 1] 1 append check-error
+[, 1] 1 append check-error
+[1,2, 3] 1 append check-error
+[1, 2, 3, 1] [1,  2, 3] 1 append check-expect
+[1 , 2, 3] 1 append check-error
+[1 ,2, 3] 1 append check-error
+
+[] [1,] append check-error
+[] [1, ] append check-error
+[] [ 1] append check-error
+[] [, 1] append check-error
+[] [1,2, 3] append check-error
+[[1, 2, 3]] [] [1,  2, 3] append check-expect
+[] [1 , 2, 3] append check-error
+[] [1 ,2, 3] append check-error
+
+[1,] (today) get check-error
+[1, ] (today) get check-error
+[ 1] (today) get check-error
+[, 1] (today) get check-error
+[1,2, 3] (today) get check-error
+1 [1,  2, 3] (today) get check-expect
+[1 , 2, 3] (today) get check-error
+[1 ,2, 3] (today) get check-error
+
+[1,] today 1 put check-error
+[1, ] today 1 put check-error
+[ 1] today 1 put check-error
+[, 1] today 1 put check-error
+[1,2, 3] today 1 put check-error
+[2, 2, 3] [1,  2, 3] today 2 put check-expect
+[1 , 2, 3] today 1 put check-error
+[1 ,2, 3] today 1 put check-error
+
+[] today [1,] put check-error
+[] today [1, ] put check-error
+[] today [ 1] put check-error
+[] today [, 1] put check-error
+[] today [1,2, 3] put check-error
+[[1, 2, 3]] [] today [1,  2, 3] put check-expect
+[] today [1 , 2, 3] put check-error
+[] today [1 ,2, 3] put check-error
+
+[1,] today 1 insert check-error
+[1, ] today 1 insert check-error
+[ 1] today 1 insert check-error
+[, 1] today 1 insert check-error
+[1,2, 3] today 1 insert check-error
+[0, 1, 2, 3] [1,  2, 3] today 0 insert check-expect
+[1 , 2, 3] today 1 insert check-error
+[1 ,2, 3] today 1 insert check-error
+
+[] today [1,] insert check-error
+[] today [1, ] insert check-error
+[] today [ 1] insert check-error
+[] today [, 1] insert check-error
+[] today [1,2, 3] insert check-error
+[[1, 2, 3]] [] today [1,  2, 3] insert check-expect
+[] today [1 , 2, 3] insert check-error
+[] today [1 ,2, 3] insert check-error
+
+[1,] today rippo check-error
+[1, ] today rippo check-error
+[ 1] today rippo check-error
+[, 1] today rippo check-error
+[1,2, 3] today rippo check-error
+[2, 3] [1,  2, 3] today rippo check-expect
+[1 , 2, 3] today rippo check-error
+[1 ,2, 3] today rippo check-error
+
+3 [1,] init check-error
+3 [1, ] init check-error
+3 [ 1] init check-error
+3 [, 1] init check-error
+3 [1,2, 3] init check-error
+[[1, 2, 3], [1, 2, 3], [1, 2, 3]] 3 [1,  2, 3] init check-expect
+3 [1 , 2, 3] init check-error
+3 [1 ,2, 3] init check-error
+
+[1] [1,] check-expect check-error
+[1] [1, ] check-expect check-error
+[1] [ 1] check-expect check-error
+[1] [, 1] check-expect check-error
+[1, 2, 3] [1,2, 3] check-expect check-error
+[1, 2, 3] [1 , 2, 3] check-expect check-error
+[1, 2, 3] [1 ,2, 3] check-expect check-error
+
+[1,] [1] check-expect check-error
+[1, ] [1] check-expect check-error
+[ 1] [1] check-expect check-error
+[, 1] [1] check-expect check-error
+[1,2, 3] [1, 2, 3] check-expect check-error
+[1 , 2, 3] [1, 2, 3] check-expect check-error
+[1 ,2, 3] [1, 2, 3] check-expect check-error
+
+
+Nothing [1,] in i for check-error
+Nothing [1, ] in i for check-error
+Nothing [ 1] in i for check-error
+Nothing [, 1] in i for check-error
+Nothing [1,2, 3] in i for check-error
+Nothing [1 , 2, 3] in i for check-error
+Nothing [1 ,2, 3] in i for check-error
+Nothing Nothing [1, 2,  3] in i for check-expect
+
 
 
 I like memes

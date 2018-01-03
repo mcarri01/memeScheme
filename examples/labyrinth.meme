@@ -9,8 +9,8 @@ a dangerous labyrinth to save their baby brother
 (0 (normie terminated meme) meme)
 
 "What do they call you? " putMeIn name meme
-("." (name "Welcome to the labyrinth, " ++) ++)
-"Please answer questions with Y for yes and N for No."
+("." (name "Welcome to the labyrinth, " ++) ++) print
+"Please answer questions with Y for yes and N for No." print
 
 
 <~ 									 						putMeIn answer meme
@@ -24,33 +24,35 @@ a dangerous labyrinth to save their baby brother
 <~ "Okay, he did! Toby's in the labyrinth. Do you want to follow the talking worm? "
    										((1 terminated +) (spicy terminated meme) meme)
 
-<~																	terminated ifTrue
-("." (name "Labyrinth over. You earned 0 points. You're kind of a coward, " ++) ++)
+<~																			terminated ifTrue
+("." (name "Labyrinth over. You earned 0 points. You're kind of a coward, " ++) ++) print
 
 <~ (((answer "Y" <>) (answer "N" <>) and) (terminated not) and) while
 			"Please enter a valid response: " putMeIn answer meme
 
 
-<~									(("Y" answer =) (terminated not) and) if
-<~														putMeIn answer meme
+<~											(("Y" answer =) (terminated not) and) if
+<~																putMeIn answer meme
 <~ "You find Hoggle and Ludo! Do you want to face the Goblin King alone? "
    							 ((1 terminated +) (spicy terminated meme) meme)
 
-<~												((1 terminated =) terminated and) ifTrue
-("." (name "Labyrinth over. You earned 1 point. I guess you could do worse, " ++) ++)
+<~													((1 terminated =) terminated and) ifTrue
+("." (name "Labyrinth over. You earned 1 point. I guess you could do worse, " ++) ++) print
 
 <~ (((answer "Y" <>) (answer "N" <>) and) (terminated not) and) while
 			"Please enter a valid response: " putMeIn answer meme
 
 
-<~ 		(("Y" answer =) (terminated not) and) if
-<~ "Good choice!  He has no power over you!"
- ((1 terminated +) (spicy terminated meme) meme)
+<~ 			(("Y" answer =) (terminated not) and) if
+<~ "Good choice!  He has no power over you!" print
+   ((1 terminated +) (spicy terminated meme) meme)
 
-<~										((1 terminated =) terminated and) ifTrue
-("!" (name "Labyrinth over.  You earned 3 points.  You were so close, " ++) ++)
+<~												((1 terminated =) terminated and) ifTrue
+("!" (name "Labyrinth over.  You earned 3 points.  You were so close, " ++) ++) print
 
-					<~ terminated ifFalse
-"Labyrinth over.  You earned 6 points."
-										<~ terminated ifFalse
-("! You get to go home!" (name "You did perfectly, " ++) ++)
+							<~ terminated ifFalse
+"Labyrinth over.  You earned 6 points." print
+												<~ terminated ifFalse
+("! You get to go home!" (name "You did perfectly, " ++) ++) print
+
+

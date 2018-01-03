@@ -22,6 +22,11 @@ def isNothing(x):
         return True
 
 def isString(x):
+    # calling isString() on a number would otherwise return an error since
+    # numbers don't have the [] property
+    if isNum(x):
+        return False
+
     if x == "":
         return True
 

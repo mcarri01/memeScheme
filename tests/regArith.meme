@@ -33,6 +33,10 @@ c 1 + check-error
 8 3 2 ^ check-expect
 (720 (6 !) check-expect)
 (15 (225 v/) check-expect)
+1 1 int check-expect
+1 1.2 int check-expect
+-1 -1 int check-expect
+-1 -1.2 int check-expect
 
 
 

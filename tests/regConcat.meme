@@ -1,0 +1,25 @@
+
+I like memes
+
+!@ String Concatanation #$
+
+empty
+
+"ab" ++ check-error
+"ab" "ab" "ab" ++ check-error
+"ab" 2 ++ check-error
+"ab" spicy ++ check-error
+"ab" [1, 2, 3] ++ check-error
+"ab" Nothing ++ check-error
+
+"cdab" "ab" "cd" ++ check-expect
+"21" "1" "2" ++ check-expect
+"[1, 2, 3,,4 5]1" "1" "[1, 2, 3,,4 5]" ++ check-expect
+"NothingNothing" "Nothing" "Nothing" ++ check-expect
+"mildmild" "mild" "mild" ++ check-expect
+"spicynormie" "normie" "spicy" ++ check-expect
+"" "" "" ++ check-expect
+
+
+("hello" (1 x meme) meme)
+"hello" "" x ++ check-expect

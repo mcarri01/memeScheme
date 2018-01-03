@@ -1,0 +1,151 @@
+
+I like memes
+
+empty
+
+!@ nums #$
+("testing" (Nothing (["123", [], 4] (123 (spicy x meme) meme) meme) meme) meme)
+
+3 3 num check-expect
+3 3.0 num check-expect
+3.2 3.2 num check-expect
+3 "3" num check-expect
+3 "3.0" num check-expect
+3.2 "3.2" num check-expect
+3 [3] num check-expect
+3 [3.0] num check-expect
+3.2 [3.2] num check-expect
+
+123 x num check-expect
+x.bool num check-error
+123 x.num num check-expect
+x.list num check-error
+x.nonetype num check-error
+x.str num check-error
+
+spicy num check-error
+normie num check-error
+mild num check-error
+Nothing num check-error
+"" num check-error
+"not a num" num check-error
+[] num check-error
+[1, 2] num check-error
+["3"] num check-error
+[spicy, 2] num check-error
+[[1]] num check-error
+
+
+!@ bools #$
+spicy "spicy" bool check-expect
+normie "normie" bool check-expect
+!@spicy "mild" bool check-expect
+spicy "normie" bool check-expect#$
+spicy spicy bool check-expect
+normie normie bool check-expect
+!@spicy mild bool check-expect
+normie mild bool check-expect#$
+spicy [spicy] bool check-expect
+normie [normie] bool check-expect
+!@spicy [mild] bool check-expect
+normie [mild] bool check-expect#$
+
+spicy x bool check-expect
+spicy x.bool bool check-expect
+x.num bool check-error
+x.list bool check-error
+x.nonetype bool check-error
+x.str bool check-error
+
+
+1 bool check-error
+Nothing bool check-error
+"" bool check-error
+"not a num" bool check-error
+[] bool check-error
+[spicy, normie] bool check-error
+["spicy"] bool check-error
+[2, spicy] bool check-error
+[[spicy]] bool check-error
+
+
+!@ strings #$
+"3" 3 str check-expect
+"3.0" 3.0 str check-expect
+"3.2" 3.2 str check-expect
+"spicy" spicy str check-expect
+"normie" normie str check-expect
+mild str
+"" "" str check-expect
+"hello" "hello" str check-expect
+"123" "123" str check-expect
+"spicy" "spicy" str check-expect
+"[1, spicy, Nothing]" "[1, spicy, Nothing]" str check-expect
+"Nothing" "Nothing" str check-expect
+"[3]" [3] str check-expect
+"[3.0]" [3.0] str check-expect
+"[3.2]" [3.2] str check-expect
+"[3.2, spicy, normie, []]" [3.2, spicy, normie, []] str check-expect
+"[]" [] str check-expect
+"Nothing" Nothing str check-expect
+
+[1, ] str check-error
+[1, ] x check-error
+"spicy" x str check-expect
+"spicy" x.bool str check-expect
+"123" x.num str check-expect
+"[<'>123<'>, [], 4]" x.list str check-expect
+"Nothing" x.nonetype str check-expect
+"testing" x.str str check-expect
+
+
+!@ lists #$
+[3] 3 list check-expect
+[3] 3.0 list check-expect
+[3.2] 3.2 list check-expect
+[spicy] spicy list check-expect
+[normie] normie list check-expect
+"" list
+[""] "" list check-expect
+["3"] "3" list check-expect
+["hello"] "hello" list check-expect
+[] [] list check-expect
+[1, spicy, "hello", [1, 2, 3]] [1, spicy, "hello", [1, 2, 3]] list check-expect
+["", "", "", ""] ["", "", "", ""] list check-expect
+[[[""]]] [[[""]]] list check-expect
+[Nothing] Nothing list check-expect
+
+[1, ] list check-error
+[ 1,] list check-error
+list check-error
+1 1 list check-error
+[1, 2, 3] [1, 2,  3] list check-expect
+[spicy] x list check-expect
+[spicy] x.bool list check-expect
+[123] x.num list check-expect
+["123", [], 4] x.list list check-expect
+[Nothing] x.nonetype list check-expect
+["testing"] x.str list check-expect
+
+!@ nonetype #$
+Nothing "Nothing" nonetype check-expect
+Nothing Nothing nonetype check-expect
+Nothing [Nothing] nonetype check-expect
+
+1 nonetype check-error
+spicy nonetype check-error
+normie nonetype check-error
+mild nonetype check-error
+"" nonetype check-error
+"not Nothing" nonetype check-error
+[] nonetype check-error
+[Nothing, Nothing] nonetype check-error
+["Nothing"] nonetype check-error
+[2, Nothing] nonetype check-error
+[[Nothing]] nonetype check-error
+
+
+!@ low-stress stress tests #$
+["[<'>123<'>]"] ((((((([123] num) str) num) str) list) str) list) check-expect
+["[<'>spicy<'>]"] ((((((([spicy] bool) str) bool) str) list) str) list) check-expect
+["[<'>Nothing<'>]"] ((((((([Nothing] nonetype) str) nonetype) str) list) str) list) check-expect

@@ -1,3 +1,4 @@
+import os
 import sys
 import re
 import operator
@@ -20,7 +21,6 @@ def addPrimitives():
     varEnv.addBind("MEME", "Nothing")
 
     funEnv = Environment(dict())
-    funEnv.addBind("++", (concat, operator.add, 2))
     # arithmetic
     funEnv.addBind("+", (numArrityTwo, operator.add, 2))
     funEnv.addBind("-", (numArrityTwo, operator.sub, 2))
@@ -28,8 +28,9 @@ def addPrimitives():
     funEnv.addBind("/", (numArrityTwo, operator.div, 2))
     funEnv.addBind("%", (numArrityTwo, operator.mod, 2))
     funEnv.addBind("^", (numArrityTwo, operator.pow, 2))
-    funEnv.addBind("!", (more_arithmetic, math.factorial, 1))
-    funEnv.addBind("v/", (more_arithmetic, math.sqrt, 1))
+    funEnv.addBind("!", (arithArrityOne, math.factorial, 1))
+    funEnv.addBind("v/", (arithArrityOne, math.sqrt, 1))
+    funEnv.addBind("int", (arithArrityOne, (lambda x: int(x)), 1))
     # booleans
     funEnv.addBind("and", (booleans, operator.and_, 2))
     funEnv.addBind("or", (booleans, operator.or_, 2))
@@ -70,6 +71,13 @@ def addPrimitives():
                                 else ds[:pos-today()]), 2))
     # miscellaneous
     funEnv.addBind("seven", (arrityZero, 7, 0))
+    funEnv.addBind("++", (concat, operator.add, 2))
+    # casting
+    funEnv.addBind("num", (castNum, (lambda x: int(float(x)) if int(float(x))==float(x) else float(x)), 1))
+    funEnv.addBind("bool", (castBool, None, 1))
+    funEnv.addBind("str", (castStr, (lambda x: "\""+x+"\""), 1))
+    funEnv.addBind("list", (castList, (lambda x: "["+str(x)+"]"), 1))
+    funEnv.addBind("nonetype", (castNonetype, None, 1))
     # basic operations
     funEnv.addBind("print", (printVar, None, 1))
     funEnv.addBind("putMeIn", (userInput, (lambda x: raw_input(x)), 1))
@@ -84,7 +92,7 @@ def addPrimitives():
     #funEnv.addBind("ifFalse", (condArrityTwo, (lambda x, y: y if not x else "Nothing"), 2))
     funEnv.addBind("while", (wloop, None, 2))
     funEnv.addBind("for", (floop, None, 4)) # second argument is the "in" keyword
-
+    funEnv.addBind("claim", (claim, None, 1))
 
     return (varEnv, funEnv)
 
@@ -169,11 +177,10 @@ def handleQuotesAndBrackets(origExp):
     temp = origExp
     for i in range(len(expression)):
         start = 0
-        while "\"\"" in expression[i] and expression[i].find("\"", start) != -1:
+        while expression[i].find("\"", start) != -1:
             if temp.find("\"") == temp.find("\"\""):
-                expression[i] = expression[i][:expression[i].find("\"", start)] + "\"\""
                 temp = temp[(temp.find("\"\""))+2:]
-                start = expression[i].find("\"\"")+2
+                start = expression[i].find("\"\"", start)+2
                 continue
             expression[i] = expression[i][:expression[i].find("\"", start)] + \
                             temp[temp.find("\""):
@@ -272,6 +279,8 @@ def evaluate(lines, origLines):
             (error, val) = origLines.RaiseException(lineCount, numLines, val)
         if error == "errorDec":
             (error, val) = origLines.RaiseException(lineCount, numLines, val, True)
+        if error == "claim_failed":
+            (error, val) = origLines.RaiseException(lineCount, numLines, val)
 
         if val != "Nothing":
             print "-->", val
@@ -290,6 +299,9 @@ def evaluate(lines, origLines):
 
 def main():
     open(global_vars.filename, 'r')
+    if os.stat(global_vars.filename).st_size == 0: #file is empty
+        print("  File {}; {}\n    {}{}".format(global_vars.filename, "line 1", "\n", "Error: No memes"))
+        exit(1)
     lines = [line.rstrip('\n') for line in open(global_vars.filename)]
     lines = map(lambda x: ' '.join(x.split()), lines)
     # THE LINE DIRECTLY ABOVE NEEDS TO CHANGE SO THAT MULTPILE SPACES IN QUOTES

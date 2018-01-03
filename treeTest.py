@@ -129,6 +129,7 @@ def makeTree(tree, funEnv):
 
 def main():
     (varEnv, funEnv) = addPrimitives()
+
     #expString = "and or spicy normie not larger? 3" #mild
     #expString = "meme meme print 1 mild + 1 2" #top-dog
     #expString = "(print (meme (meme (meme x 1) spicy) \"hello\"))" #1
@@ -144,7 +145,7 @@ def main():
     #expString = "= (meme x 3) (meme y \"3\")" #normie meme type
     #expString = "+ + + * 1 2 - 4 3" #10
     #expString = "+ + 2" #9
-    expString = "+ + +" #14
+    #expString = "+ + +" #14
     #expString = "*" #incorrect number
     #expString = "+ * 3 \"spicy\" 5" #normie meme type
     #expString = "/ 3 0" #memes unbounded
@@ -194,7 +195,7 @@ def main():
     expTree.printTree()
     
     if emptyTree.get_string_length() == 0:
-      result = expTree.evaluate(varEnv, funEnv)
+      result = expTree.evaluate(varEnv, funEnv, False)
     else:
       result = ("error", "Error: Incorrect number of memes")
     

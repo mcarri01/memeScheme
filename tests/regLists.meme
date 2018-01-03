@@ -199,3 +199,156 @@ empty
 <~ [1, 2, x] in i for check-error
 			i print
 
+[1,] check-error
+[1, ] check-error
+[ 1] check-error
+[, 1] check-error
+[1,2, 3] check-error
+[1, 2, 3] [1,  2, 3] check-expect
+[1 , 2, 3] check-error
+[1 ,2, 3] check-error
+
+[1,] a meme check-error
+[1, ] a meme check-error
+[ 1] a meme check-error
+[, 1] a meme check-error
+[1,2, 3] a meme check-error
+[1, 2, 3] [1,  2, 3] a meme check-expect
+[1 , 2, 3] a meme check-error
+[1 ,2, 3] a meme check-error
+
+[1,] length check-error
+[1, ] length check-error
+[ 1] length check-error
+[, 1] length check-error
+[1,2, 3] length check-error
+3 [1,  2, 3] length check-expect
+[1 , 2, 3] length check-error
+[1 ,2, 3] length check-error
+
+[1,] null? check-error
+[1, ] null? check-error
+[ 1] null? check-error
+[, 1] null? check-error
+[1,2, 3] null? check-error
+normie [1,  2, 3] null? check-expect
+[1 , 2, 3] null? check-error
+[1 ,2, 3] null? check-error
+
+[1,] print check-error
+[1, ] print check-error
+[ 1] print check-error
+[, 1] print check-error
+[1,2, 3] print check-error
+Nothing [1,  2, 3] print check-expect
+[1 , 2, 3] print check-error
+[1 ,2, 3] print check-error
+
+[1,] 1 append check-error
+[1, ] 1 append check-error
+[ 1] 1 append check-error
+[, 1] 1 append check-error
+[1,2, 3] 1 append check-error
+[1, 2, 3, 1] [1,  2, 3] 1 append check-expect
+[1 , 2, 3] 1 append check-error
+[1 ,2, 3] 1 append check-error
+
+[] [1,] append check-error
+[] [1, ] append check-error
+[] [ 1] append check-error
+[] [, 1] append check-error
+[] [1,2, 3] append check-error
+[[1, 2, 3]] [] [1,  2, 3] append check-expect
+[] [1 , 2, 3] append check-error
+[] [1 ,2, 3] append check-error
+
+[1,] (today) get check-error
+[1, ] (today) get check-error
+[ 1] (today) get check-error
+[, 1] (today) get check-error
+[1,2, 3] (today) get check-error
+1 [1,  2, 3] (today) get check-expect
+[1 , 2, 3] (today) get check-error
+[1 ,2, 3] (today) get check-error
+
+[1,] today 1 put check-error
+[1, ] today 1 put check-error
+[ 1] today 1 put check-error
+[, 1] today 1 put check-error
+[1,2, 3] today 1 put check-error
+[2, 2, 3] [1,  2, 3] today 2 put check-expect
+[1 , 2, 3] today 1 put check-error
+[1 ,2, 3] today 1 put check-error
+
+[] today [1,] put check-error
+[] today [1, ] put check-error
+[] today [ 1] put check-error
+[] today [, 1] put check-error
+[] today [1,2, 3] put check-error
+[[1, 2, 3]] [] today [1,  2, 3] put check-expect
+[] today [1 , 2, 3] put check-error
+[] today [1 ,2, 3] put check-error
+
+[1,] today 1 insert check-error
+[1, ] today 1 insert check-error
+[ 1] today 1 insert check-error
+[, 1] today 1 insert check-error
+[1,2, 3] today 1 insert check-error
+[0, 1, 2, 3] [1,  2, 3] today 0 insert check-expect
+[1 , 2, 3] today 1 insert check-error
+[1 ,2, 3] today 1 insert check-error
+
+[] today [1,] insert check-error
+[] today [1, ] insert check-error
+[] today [ 1] insert check-error
+[] today [, 1] insert check-error
+[] today [1,2, 3] insert check-error
+[[1, 2, 3]] [] today [1,  2, 3] insert check-expect
+[] today [1 , 2, 3] insert check-error
+[] today [1 ,2, 3] insert check-error
+
+[1,] today rippo check-error
+[1, ] today rippo check-error
+[ 1] today rippo check-error
+[, 1] today rippo check-error
+[1,2, 3] today rippo check-error
+[2, 3] [1,  2, 3] today rippo check-expect
+[1 , 2, 3] today rippo check-error
+[1 ,2, 3] today rippo check-error
+
+3 [1,] init check-error
+3 [1, ] init check-error
+3 [ 1] init check-error
+3 [, 1] init check-error
+3 [1,2, 3] init check-error
+[[1, 2, 3], [1, 2, 3], [1, 2, 3]] 3 [1,  2, 3] init check-expect
+3 [1 , 2, 3] init check-error
+3 [1 ,2, 3] init check-error
+
+[1] [1,] check-expect check-error
+[1] [1, ] check-expect check-error
+[1] [ 1] check-expect check-error
+[1] [, 1] check-expect check-error
+[1, 2, 3] [1,2, 3] check-expect check-error
+[1, 2, 3] [1 , 2, 3] check-expect check-error
+[1, 2, 3] [1 ,2, 3] check-expect check-error
+
+[1,] [1] check-expect check-error
+[1, ] [1] check-expect check-error
+[ 1] [1] check-expect check-error
+[, 1] [1] check-expect check-error
+[1,2, 3] [1, 2, 3] check-expect check-error
+[1 , 2, 3] [1, 2, 3] check-expect check-error
+[1 ,2, 3] [1, 2, 3] check-expect check-error
+
+
+Nothing [1,] in i for check-error
+Nothing [1, ] in i for check-error
+Nothing [ 1] in i for check-error
+Nothing [, 1] in i for check-error
+Nothing [1,2, 3] in i for check-error
+Nothing [1 , 2, 3] in i for check-error
+Nothing [1 ,2, 3] in i for check-error
+Nothing Nothing [1, 2,  3] in i for check-expect
+
+

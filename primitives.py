@@ -17,6 +17,8 @@ def definePrimitive(args, constraints, varEnv):
 
     cleanArgs = [] # strips dot from argument name
     for i in range(len(args)):
+        if isList(args[i]) and string_check(args[i]) != None:
+            return string_check(args[i])
         (toAppend, constraints[i][0]) = general_type(args[i], constraints[i], varEnv)
         if toAppend != "" and toAppend[0] == "error":
             return toAppend
@@ -60,16 +62,16 @@ def numArrityTwo(args, varEnv, funEnv, op, id_num):
             return ("error", "Error: Meme must be an integer")
 
 def concat(args, varEnv, funEnv, op, id_num):
-    constraints = [[global_vars.ALL_TYPES], [global_vars.ALL_TYPES]]
+    constraints = [[["str"]], [["str"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
     for i in range(len(val_list)):
-        if not isNum(val_list[i]) and isString(val_list[i]):
+        if isString(val_list[i]):
             val_list[i] = val_list[i][1:-1]
-    return ("not_error", "\""+op(str(val_list[0]), str(val_list[1]))+"\"")
+    return ("not_error", "\""+op(val_list[0], val_list[1])+"\"")
 
-def more_arithmetic(args, varEnv, funEnv, op, id_num):
+def arithArrityOne(args, varEnv, funEnv, op, id_num):
     constraints = [[["num"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
@@ -143,7 +145,7 @@ def printVar(args, varEnv, funEnv, op, id_num):
         #print "-->", "spicy" if val_list[0] else "normie"
     #else:
         #print "-->", val_list[0]
-    if not isNum(val_list[0]) and isString(val_list[0]):
+    if isString(val_list[0]):
         print val_list[0][1:-1]
     return ("not_error", "Nothing")
 
@@ -159,7 +161,7 @@ def userInput(args, varEnv, funEnv, op, id_num):
         else:
             val_list[0] = "normie"
 
-    if not isNum(val_list[0]) and isString(val_list[0]):
+    if isString(val_list[0]):
         val_list[0] = val_list[0][1:-1]
     input_val = op(val_list[0])
     if not isNum(input_val):
@@ -320,15 +322,126 @@ def listInit(args, varEnv, funEnv, op, id_num):
         new_list = op(val_list[0], val_list[1])
         new_list = list_to_string(new_list)
         new_list = handle_mild(new_list)
-
-
     return ("not_error", new_list)
+
+
+def castNum(args, varEnv, funEnv, op, id_num):
+    constraints = [[["num", "str", "list"]]]
+    val_list = definePrimitive(args, constraints, varEnv)
+    if val_list[0] == "error":
+        return val_list
+
+    if isList(val_list[0]):
+        if len(string_to_list(val_list[0][1:-1])) == 1:
+            arg = string_to_list(val_list[0][1:-1])[0]
+            constraints = [[["num"]]]
+            val_list = definePrimitive([str(arg)], constraints, varEnv)
+            if val_list[0] == "error":
+                return ("error", "Error: Meme cannot be a num")
+        else:
+            return ("error", "Error: Meme cannot be a num")
+    if isString(val_list[0]):
+         val_list[0] = val_list[0][1:-1]
+    try:
+        return ("not_error", op(val_list[0]))
+    except:
+        return ("error", "Error: Meme cannot be a num")
+
+
+def castBool(args, varEnv, funEnv, op, id_num):
+    constraints = [[["bool", "str", "list"]]]
+    val_list = definePrimitive(args, constraints, varEnv)
+    if val_list[0] == "error":
+        return val_list
+
+    if isList(val_list[0]):
+        if len(string_to_list(val_list[0][1:-1])) == 1:
+            arg = string_to_list(val_list[0][1:-1])[0]
+            constraints = [[["bool"]]]
+            val_list = definePrimitive([str(arg)], constraints, varEnv)
+            if val_list[0] == "error":
+                return ("error", "Error: Meme cannot be a bool")
+        else:
+            return ("error", "Error: Meme cannot be a bool")
+    if isString(val_list[0]):
+        if isBool(val_list[0][1:-1]):
+            return ("not_error", val_list[0][1:-1])
+        else:
+            return ("error", "Error: Meme cannot be a bool")
+    if isinstance(val_list[0], bool):
+         return ("not_error", "spicy" if val_list[0] else "normie")
+
+
+def castStr(args, varEnv, funEnv, op, id_num):
+    constraints = [[global_vars.ALL_TYPES]]
+    val_list = definePrimitive(args, constraints, varEnv)
+    if val_list[0] == "error":
+        return val_list
+
+    if isinstance(val_list[0], bool):
+        return ("not_error", op("spicy") if val_list[0] else op("normie"))
+    if val_list[0] == "Nothing":
+        return ("not_error", op("Nothing"))
+
+    # need a try because args[0] might not be able to be cast to a float
+    try:
+        # without this statement, 3.0 would be cast to "3", for example
+        if isinstance(val_list[0], int) and float(args[0]) == val_list[0]:
+            val_list[0] = args[0]
+    except:
+        pass
+
+    if isNum(val_list[0]) or isList(val_list[0]):
+        return ("not_error", op(str(val_list[0])))
+    return ("not_error", val_list[0])
+
+
+def castList(args, varEnv, funEnv, op, id_num):
+    constraints = [[global_vars.ALL_TYPES]]
+    val_list = definePrimitive(args, constraints, varEnv)
+    if val_list[0] == "error":
+        return val_list
+
+    if isList(val_list[0]):
+        return ("not_error", val_list[0])
+    if isinstance(val_list[0], bool):
+        return ("not_error", "[spicy]" if val_list[0] else "[normie]")
+    return ("not_error", op(val_list[0]))
+
+
+def castNonetype(args, varEnv, funEnv, op, id_num):
+    constraints = [[["str", "list", "nonetype"]]]
+    val_list = definePrimitive(args, constraints, varEnv)
+    if val_list[0] == "error":
+        return val_list
+
+    if isList(val_list[0]):
+        if len(string_to_list(val_list[0][1:-1])) == 1:
+            arg = string_to_list(val_list[0][1:-1])[0]
+            constraints = [[["nonetype"]]]
+            val_list = definePrimitive([str(arg)], constraints, varEnv)
+            if val_list[0] == "error":
+                return ("error", "Error: Meme cannot be a nonetype")
+        else:
+            return ("error", "Error: Meme cannot be a nonetype")
+    if isNothing(val_list[0]):
+        return ("not_error", "Nothing")
+    if isString(val_list[0]):
+        if isNothing(val_list[0][1:-1]):
+            return ("not_error", val_list[0][1:-1])
+        else:
+            return ("error", "Error: Meme cannot be a nonetype")
 
 
 def defineVar(args, varEnv, funEnv, op, id_num=None):
     if len(args) != 2:
         return ("error", "Error: Incorrect number of memes")
     constraints = [[global_vars.ALL_TYPES]]
+
+    for arg in args:
+       if isList(arg) and string_check(arg) != None:
+           return string_check(arg)
+
 
     val_list = []
     (toAppend, constraints[0][0]) = general_type(args[1], constraints[0], varEnv)
@@ -398,31 +511,6 @@ def check_error (args, varEnv, funEnv, op, id_num):
 def empty(args, varEnv, funEnv, op, id_num):
     varEnv.empty()
     return ("not_error", "Nothing")
-
-
-
-# def wloop(args, varEnv, funEnv, op, id_num, prev_val="Nothing"):
-#     tree_section = copy.deepcopy((global_vars.curr_tree).get_node(id_num))
-#     if (tree_section.getChild(0)).getVal() == None or \
-#        (tree_section.getChild(1)).getVal() == None:
-#        return ("error", "Error: Incorrect number of memes")
-
-#     conditional = (tree_section.getChild(0)).evaluate(varEnv, funEnv, False)
-#     if conditional[0] == "error":
-#         return conditional
-
-#     if isBool(conditional[1]):
-#         if getBoolVal(conditional[1]):
-#             body = (tree_section.getChild(1)).evaluate(varEnv, funEnv, False)
-#             if body[0] == "error":
-#                 return body
-#             return wloop([], varEnv, funEnv, op, id_num, body[1])
-#         else:
-#             return ("not_error", prev_val)
-#     else:
-#         return ("error", "Error: Normie meme type")
-
-
 
 
 def conditional(args, varEnv, funEnv, op, id_num):
@@ -497,30 +585,6 @@ def condArrityTwo(args, varEnv, funEnv, op, id_num):
 
 
 
-
-    #     if getBoolVal(conditional[1]):
-    #         body = (tree_section.getChild(1)).evaluate(varEnv, funEnv, False)
-    #     else:
-    #         body = (tree_section.getChild(2)).evaluate(varEnv, funEnv, False)
-    #     if body[0] == "error":
-    #         return body
-    #     return ("not_error", body[1])
-    # else:
-    #     return ("error", "Error: Normie meme type")
-
-
-
-# def condArrityTwo(args, varEnv, funEnv, op, id_num):
-#     if len(args) != 2:
-#         return ("error", "Error: Incorrect number of memes")
-
-#     if isBool(args[0]):
-#         return ("not_error", op(getBoolVal(args[0]), args[1]))
-#     else:
-#         return ("error", "Error: Normie meme type")
-
-
-
 def wloop(args, varEnv, funEnv, op, id_num, prev_val="Nothing"):
     tree_section = copy.deepcopy((global_vars.curr_tree).get_node(id_num))
     if (tree_section.getChild(0)).getVal() == None or \
@@ -541,7 +605,6 @@ def wloop(args, varEnv, funEnv, op, id_num, prev_val="Nothing"):
             return ("not_error", prev_val)
     else:
         return ("error", "Error: Normie meme type")
-
 
 def floop(args, varEnv, funEnv, op, id_num, prev_val="Nothing", iteration=0):
     tree_section = copy.deepcopy((global_vars.curr_tree).get_node(id_num))
@@ -581,7 +644,39 @@ def floop(args, varEnv, funEnv, op, id_num, prev_val="Nothing", iteration=0):
     else:
         return ("not_error", prev_val)
 
-    #return ("not_error", args[3])
+
+def claim(args, varEnv, funEnv, op, id_num):
+    constraints = [[global_vars.ALL_TYPES]]
+    val_list = definePrimitive(args, constraints, varEnv)
+    if val_list[0] == "error":
+        return val_list
+
+    if isinstance(val_list[0], bool):
+        return (("not_error", "Nothing") if val_list[0] else ("claim_failed", "Claim failed: Fake news!"))
+    return ("error", "Error: Claim can't be verified or disproven")
+
+
+
+    #     if getBoolVal(conditional[1]):
+    #         body = (tree_section.getChild(1)).evaluate(varEnv, funEnv, False)
+    #     else:
+    #         body = (tree_section.getChild(2)).evaluate(varEnv, funEnv, False)
+    #     if body[0] == "error":
+    #         return body
+    #     return ("not_error", body[1])
+    # else:
+    #     return ("error", "Error: Normie meme type")
+
+
+
+# def condArrityTwo(args, varEnv, funEnv, op, id_num):
+#     if len(args) != 2:
+#         return ("error", "Error: Incorrect number of memes")
+
+#     if isBool(args[0]):
+#         return ("not_error", op(getBoolVal(args[0]), args[1]))
+#     else:
+#         return ("error", "Error: Normie meme type")
 
 
 # def wloop(args, varEnv, funEnv, op, id_num):
