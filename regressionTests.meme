@@ -1603,6 +1603,7 @@ I like memes
 
 empty
 
+
 !@
 line of code here
 #$ !@""#$ !@
@@ -1645,7 +1646,9 @@ seven seven check-expect
 <~  [[1, 2], 123, "didn't, hello", 2, [], normie, 123, normie],
    [[[1, 2], 123, "didn't, hello", 2, [], normie, 123, normie],
 
-
+<'>abcas<'> check-error
+<'>abc as<'> check-error
+1 abc<'>def meme check-error
 
 I like memes
 

@@ -520,7 +520,7 @@ def conditional(args, varEnv, funEnv, op, id_num):
         if (tree_section.getChild(i)).getVal() == None:
             return ("error", "Error: Incorrect number of memes")
 
-    conditional = (tree_section.getChild(0)).evaluate(varEnv, funEnv, False)
+    conditional = (tree_section.getChild(0)).evaluate(varEnv, funEnv)
     if conditional[0] == "error":
          return conditional
 
@@ -531,9 +531,9 @@ def conditional(args, varEnv, funEnv, op, id_num):
 
     if isinstance(val_list[0], bool):
         if val_list[0]:
-            body = (tree_section.getChild(1)).evaluate(varEnv, funEnv, False)
+            body = (tree_section.getChild(1)).evaluate(varEnv, funEnv)
         else:
-            body = (tree_section.getChild(2)).evaluate(varEnv, funEnv, False)
+            body = (tree_section.getChild(2)).evaluate(varEnv, funEnv)
         if body[0] == "error":
             return body
         return ("not_error", body[1])
@@ -547,7 +547,7 @@ def condArrityTwo(args, varEnv, funEnv, op, id_num):
         if (tree_section.getChild(i)).getVal() == None:
             return ("error", "Error: Incorrect number of memes")
 
-    conditional = (tree_section.getChild(0)).evaluate(varEnv, funEnv, False)
+    conditional = (tree_section.getChild(0)).evaluate(varEnv, funEnv)
     if conditional[0] == "error":
          return conditional
 
@@ -558,7 +558,7 @@ def condArrityTwo(args, varEnv, funEnv, op, id_num):
 
     if isinstance(val_list[0], bool):
         if val_list[0] == op():
-            body = (tree_section.getChild(1)).evaluate(varEnv, funEnv, False)
+            body = (tree_section.getChild(1)).evaluate(varEnv, funEnv)
             if body[0] == "error":
                 return body
             return ("not_error", body[1])
@@ -576,13 +576,13 @@ def wloop(args, varEnv, funEnv, op, id_num, prev_val="Nothing"):
        (tree_section.getChild(1)).getVal() == None:
        return ("error", "Error: Incorrect number of memes")
 
-    conditional = (tree_section.getChild(0)).evaluate(varEnv, funEnv, False)
+    conditional = (tree_section.getChild(0)).evaluate(varEnv, funEnv)
     if conditional[0] == "error":
         return conditional
 
     if isBool(conditional[1]):
         if getBoolVal(conditional[1]):
-            body = (tree_section.getChild(1)).evaluate(varEnv, funEnv, False)
+            body = (tree_section.getChild(1)).evaluate(varEnv, funEnv)
             if body[0] == "error":
                 return body
             return wloop([], varEnv, funEnv, op, id_num, body[1])
@@ -600,7 +600,7 @@ def floop(args, varEnv, funEnv, op, id_num, prev_val="Nothing", iteration=0):
         return ("error", "Error: FOMI--the Fear Of a Missing \"in\"")
 
     constraints = [[["list"]]]
-    list_arg = (tree_section.getChild(2)).evaluate(varEnv, funEnv, False)
+    list_arg = (tree_section.getChild(2)).evaluate(varEnv, funEnv)
     if list_arg[0] == "error":
         return list_arg
     list_val = definePrimitive([list_arg[1]], constraints, varEnv)
@@ -615,14 +615,14 @@ def floop(args, varEnv, funEnv, op, id_num, prev_val="Nothing", iteration=0):
         list_val = string_to_list(list_val[0][1:-1])
 
     if len(list_val) > iteration:
-        var_arg = (tree_section.getChild(0)).evaluate(varEnv, funEnv, False)
+        var_arg = (tree_section.getChild(0)).evaluate(varEnv, funEnv)
         if var_arg[0] == "error":
             return var_arg
         arg_list = [var_arg[1], str(list_val[iteration])]
         iterator_val = defineVar(arg_list, varEnv, funEnv, None)
         if iterator_val[0] == "error":
             return iterator_val
-        body = (tree_section.getChild(3)).evaluate(varEnv, funEnv, False)
+        body = (tree_section.getChild(3)).evaluate(varEnv, funEnv)
         if body[0] == "error":
             return body
         return floop([], varEnv, funEnv, op, id_num, body[1], iteration+1)

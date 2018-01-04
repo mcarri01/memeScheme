@@ -86,14 +86,11 @@ class Node:
     # without this check.  A consequence of this method is that if there is an
     # error in the garbage part of the if/while statement, the evaluator will
     # not detect it (although this is not necessarily a bad thing).
-    def evaluate(self, varEnv, funEnv, topDogCheck):
+    def evaluate(self, varEnv, funEnv):
         if not self.root and (self.val == "check-error" or self.val == "check-expect"):
             return ("error", "Error: Meme has top-dog status")
         if self.root and self.val != None and self.numChildren == -1:
             return self.__stripDot(varEnv)
-        top_dog_parents = ["if", "while", "check-expect", "check-error"]
-        if self.val in top_dog_parents and self.numChildren > 0:
-            topDogCheck = False
         if self.numChildren != -1:
             conds_and_loops = ["if", "ifTrue", "ifFalse", "while", "for"]
             if self.val in conds_and_loops:
@@ -101,17 +98,13 @@ class Node:
                     self.children[i] = ("not_error", "doesn't matter")
             else:
                 for i in range(self.numChildren):
-                    self.children[i] = (self.children[i]).evaluate(varEnv, funEnv, topDogCheck)
+                    self.children[i] = (self.children[i]).evaluate(varEnv, funEnv)
         else:
             return ("not_error", self.val)
 
         (fun, op, arrity) = funEnv.getVal(self.val, "function")
         # not sure if/why the line below is necessary
         self.children = [(a,b) for (a,b) in self.children if b != None]
-
-        top_dogs = ["empty"] #rethink this, now that print is not a top-dog
-        if not self.root and self.val in top_dogs and topDogCheck:
-            return ("error", "Error: Meme has top-dog status")
 
         for i in range(len(self.children)):
             if self.children[i][0] == "not_error":
@@ -272,6 +265,16 @@ class Node:
 
 
 
+
+
+
+        #top_dog_parents = ["if", "while", "check-expect", "check-error"]
+        #if self.val in top_dog_parents and self.numChildren > 0:
+        #    topDogCheck = False
+
+        #top_dogs = ["empty"] #rethink this, now that print is not a top-dog
+        #if not self.root and self.val in top_dogs and topDogCheck:
+        #    return ("error", "Error: Meme has top-dog status")
 
             # for readability's sake, collapse the if and elif statements below
             # if self.val == "if":

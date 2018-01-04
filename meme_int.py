@@ -122,18 +122,21 @@ def getMatchingBracket(noQuotes):
 # list of n elements into n different parts, instead of interpreting it as
 # a single entity.
 def handleQuotesAndBrackets(origExp):
+    toReturn = 0
+
     noQuotes = re.sub('"[^"]*"', "\"\"", origExp) #remove quotes
-    noQuotes = ' '.join(noQuotes.split())
+    regex = re.compile('[()]')
+    noQuotes = regex.sub(" ", noQuotes)
+    noQuotes = ' '.join(noQuotes.split()) #combine whitespace
+
+    if "<'>" in noQuotes:
+        toReturn = 3
     expression = ""
 
-    #multiline statements sometimes get an extra space added to them
-    noQuotes = ' '.join(noQuotes.split())
-    # gets rid of parentheses
-    regex = re.compile('[()]')
-    noQuotes = regex.sub("", noQuotes)
+    # regex = re.compile('[()]')
+    # noQuotes = regex.sub("", noQuotes)
 
     nestedCount = 0
-    toReturn = 0
     for i in range(len(noQuotes)):
         if nestedCount == 0:
             expression = expression + noQuotes[i]
@@ -256,9 +259,7 @@ def evaluate(lines, origLines):
         if lines[line] == "I like memes":
             continue
 
-        #print lines[line]
         expression = handleQuotesAndBrackets(lines[line])
-        #print expression
 
         if isinstance(expression, int):
             if global_vars.check_error:
@@ -272,6 +273,8 @@ def evaluate(lines, origLines):
                     val = "Error: SIKE! That's the wrong bracket!"
                 if expression == 2:
                     val = "Error: Endless memer"
+                if expression == 3:
+                    val = "Error: Why you so drama? Use normal quotes!"
                 origLines.RaiseException(lineCount, numLines, val)
         expression.reverse()
 
@@ -286,7 +289,7 @@ def evaluate(lines, origLines):
             if expTree.sevenCheck():
                 (error, val) = ("error", "Error: Meme is 7")
             else:
-                (error, val) = expTree.evaluate(varEnv, funEnv, True)
+                (error, val) = expTree.evaluate(varEnv, funEnv)
                 val = val.replace("<'>", "\"")
         else:
             (error, val) = ("error", "Error: Incorrect number of memes")
