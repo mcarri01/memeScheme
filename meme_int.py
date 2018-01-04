@@ -28,9 +28,9 @@ def addPrimitives():
     funEnv.addBind("/", (numArrityTwo, operator.div, 2))
     funEnv.addBind("%", (numArrityTwo, operator.mod, 2))
     funEnv.addBind("^", (numArrityTwo, operator.pow, 2))
-    funEnv.addBind("!", (arithArrityOne, math.factorial, 1))
-    funEnv.addBind("v/", (arithArrityOne, math.sqrt, 1))
-    funEnv.addBind("int", (arithArrityOne, (lambda x: int(x)), 1))
+    funEnv.addBind("!", (numArrityOne, math.factorial, 1))
+    funEnv.addBind("v/", (numArrityOne, math.sqrt, 1))
+    funEnv.addBind("int", (numArrityOne, (lambda x: int(x)), 1))
     # booleans
     funEnv.addBind("and", (booleans, operator.and_, 2))
     funEnv.addBind("or", (booleans, operator.or_, 2))
@@ -123,6 +123,7 @@ def getMatchingBracket(noQuotes):
 # a single entity.
 def handleQuotesAndBrackets(origExp):
     noQuotes = re.sub('"[^"]*"', "\"\"", origExp) #remove quotes
+    noQuotes = ' '.join(noQuotes.split())
     expression = ""
 
     #multiline statements sometimes get an extra space added to them
@@ -191,7 +192,7 @@ def handleQuotesAndBrackets(origExp):
             temp = temp[(temp.find("\""))+1:]
             start = expression[i].find("\"", start)+1
 
-    expression = map(lambda x: x.replace("<'>", "\""), expression)
+    #expression = map(lambda x: x.replace("<'>", "\""), expression)
     return expression
 
 
@@ -213,6 +214,7 @@ def makeTree(tree, funEnv, id_num):
 
 
 def evaluate(lines, origLines):
+    userMemerCheck = False
     fullExp = ""
     numLines = 1 #number of lines a multiline expression is
     (varEnv, funEnv) = addPrimitives()
@@ -222,15 +224,20 @@ def evaluate(lines, origLines):
         lineCount += 1
 
         lines[line] = handle_comments(line, lines, lineCount, origLines)
-        if lines[line] == "" and numLines == 1:
+        #condensed = ' '.join(lines[line].split())
+
+        #if (lines[line].lstrip == "" or condensed == "") and numLines == 1:
+        if (lines[line]).lstrip() == "" and numLines == 1:
             continue
-        if lines[line] == "" and numLines != 1:
+        #if (lines[line] == "" or condensed == "") and numLines != 1:
+        if (lines[line]).lstrip() == "" and numLines != 1:
             numLines += 1
             continue
-        if lines[line] == len(lines[line]) * " ":
-            continue
-        if lines[line][:2] == "<~":
-            fullExp = lines[line][2:] + ' ' + fullExp
+        #if lines[line] == len(lines[line]) * " ":
+        #    continue
+        #print lines[line].lstrip()[:2]
+        if ((lines[line]).lstrip())[:2] == "<~":
+            fullExp = ((lines[line]).lstrip())[2:] + ' ' + fullExp
             numLines += 1
             continue
         elif fullExp != "":
@@ -239,10 +246,19 @@ def evaluate(lines, origLines):
             expLength = numLines
         handle_strings(lines[line], lineCount, numLines, origLines)
 
+        if not userMemerCheck:
+            if lines[line] != "I like memes":
+                val = "Error: User does not like memes"
+                origLines.RaiseException(lineCount, numLines, val)
+            else:
+                userMemerCheck = True
+
         if lines[line] == "I like memes":
             continue
 
+        #print lines[line]
         expression = handleQuotesAndBrackets(lines[line])
+        #print expression
 
         if isinstance(expression, int):
             if global_vars.check_error:
@@ -271,6 +287,7 @@ def evaluate(lines, origLines):
                 (error, val) = ("error", "Error: Meme is 7")
             else:
                 (error, val) = expTree.evaluate(varEnv, funEnv, True)
+                val = val.replace("<'>", "\"")
         else:
             (error, val) = ("error", "Error: Incorrect number of memes")
 
@@ -278,9 +295,9 @@ def evaluate(lines, origLines):
         if error == "error":
             (error, val) = origLines.RaiseException(lineCount, numLines, val)
         if error == "errorDec":
-            (error, val) = origLines.RaiseException(lineCount, numLines, val, True)
+            (error, val) = origLines.RaiseException(lineCount, numLines, val, 1)
         if error == "claim_failed":
-            (error, val) = origLines.RaiseException(lineCount, numLines, val)
+            (error, val) = origLines.RaiseException(lineCount, numLines, val, 2)
 
         if val != "Nothing":
             print "-->", val
@@ -297,13 +314,14 @@ def evaluate(lines, origLines):
         origLines.RaiseException(lineCount, numLines, val)
 
 
+
 def main():
     open(global_vars.filename, 'r')
     if os.stat(global_vars.filename).st_size == 0: #file is empty
         print("  File {}; {}\n    {}{}".format(global_vars.filename, "line 1", "\n", "Error: No memes"))
         exit(1)
     lines = [line.rstrip('\n') for line in open(global_vars.filename)]
-    lines = map(lambda x: ' '.join(x.split()), lines)
+    #lines = map(lambda x: ' '.join(x.split()), lines)
     # THE LINE DIRECTLY ABOVE NEEDS TO CHANGE SO THAT MULTPILE SPACES IN QUOTES
     # WILL NOT BE CONDENSED
 
@@ -314,7 +332,7 @@ def main():
     ### THIS HAS BEEN FIXED
     #### SO WHY DON'T YOU DELETE THESE COMMENTS?!?!?
     ##### THAT IS A GOOD QUESTION
-    userMemerCheck(lines, origLines)
+    #userMemerCheck(lines, origLines)
     evaluate(lines, origLines)
     
 

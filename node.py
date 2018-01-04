@@ -42,11 +42,11 @@ class Node:
                 else:
                     self.val = "normie"
             if isList(self.val):
+                # both functions below return error if there's an error or None
+                # if there's not
                 if string_check(self.val) != None:
-                    print "string"
                     return string_check(self.val)
                 if list_check(self.val, varEnv) != None:
-                    print "list"
                     return list_check(self.val, varEnv)
                 self.val = handle_mild(self.val)
             return ("not_error", self.val)

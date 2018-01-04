@@ -107,39 +107,44 @@ def handle_comments(line, lines, lineCount, origLines):
     return currLine.replace(markerA, "!@").replace(markerB, "#$")
 
 
+
+
+# THE FUNCTION BELOW IS NO LONGER NECESSARY
+
 # determines whether or not the first line of code is "I like memes"
 # necessary because we want to allow the use to put comments before "I like
 # memes"
-def userMemerCheck(lines, origLines):
-    global C_START, C_END
-    comment = False
-    s = "I like memes"
-    k = 0
-    message = "Error: User does not like memes"
 
-    for i in range(len(lines)):
-        if len(lines[i]) == 0:
-                continue
-        if not comment and len(lines[i]) == 1:
-            origLines.RaiseException(i+1, 1, message)
-        for j in range(len(lines[i])):
-            if j != len(lines[i])-1 and lines[i][j]+lines[i][j+1] == C_START and not comment:
-                comment = True
-            if not comment:
-                if lines[i][j] == "$" and lines[i][j] != 0 and lines[i][j-1] == "#":
-                    continue
-                if lines[i][j] == s[k]:
-                    if s[k] == "s": #last char in "I like memes"
-                        return
-                    else:
-                        k += 1
-                elif lines[i][j] == " ":
-                    continue
-                else:
-                    origLines.RaiseException(i+1, 1, message)
-            if j != len(lines[i])-1 and lines[i][j]+lines[i][j+1] == C_END and comment:
-                comment = False
-    origLines.RaiseException(i+1, 1, message)
+# def userMemerCheck(lines, origLines):
+#     global C_START, C_END
+#     comment = False
+#     s = "I like memes"
+#     k = 0
+#     message = "Error: User does not like memes"
+
+#     for i in range(len(lines)):
+#         if len(lines[i]) == 0:
+#                 continue
+#         if not comment and len(lines[i]) == 1:
+#             origLines.RaiseException(i+1, 1, message)
+#         for j in range(len(lines[i])):
+#             if j != len(lines[i])-1 and lines[i][j]+lines[i][j+1] == C_START and not comment:
+#                 comment = True
+#             if not comment:
+#                 if lines[i][j] == "$" and lines[i][j] != 0 and lines[i][j-1] == "#":
+#                     continue
+#                 if lines[i][j] == s[k]:
+#                     if s[k] == "s": #last char in "I like memes"
+#                         return
+#                     else:
+#                         k += 1
+#                 elif lines[i][j] == " ":
+#                     continue
+#                 else:
+#                     origLines.RaiseException(i+1, 1, message)
+#             if j != len(lines[i])-1 and lines[i][j]+lines[i][j+1] == C_END and comment:
+#                 comment = False
+#     origLines.RaiseException(i+1, 1, message)
 
 
 

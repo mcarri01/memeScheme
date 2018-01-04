@@ -245,7 +245,7 @@ Nothing bool check-error
 
 !@ strings #$
 "3" 3 str check-expect
-"3.0" 3.0 str check-expect
+"3" 3.0 str check-expect
 "3.2" 3.2 str check-expect
 "spicy" spicy str check-expect
 "normie" normie str check-expect
@@ -257,7 +257,7 @@ mild str
 "[1, spicy, Nothing]" "[1, spicy, Nothing]" str check-expect
 "Nothing" "Nothing" str check-expect
 "[3]" [3] str check-expect
-"[3.0]" [3.0] str check-expect
+"[3]" [3.0] str check-expect
 "[3.2]" [3.2] str check-expect
 "[3.2, spicy, normie, []]" [3.2, spicy, normie, []] str check-expect
 "[]" [] str check-expect
@@ -319,10 +319,34 @@ mild nonetype check-error
 [[Nothing]] nonetype check-error
 
 
-!@ low-stress stress tests #$
+!@ stress tests #$
 ["[<'>123<'>]"] ((((((([123] num) str) num) str) list) str) list) check-expect
 ["[<'>spicy<'>]"] ((((((([spicy] bool) str) bool) str) list) str) list) check-expect
 ["[<'>Nothing<'>]"] ((((((([Nothing] nonetype) str) nonetype) str) list) str) list) check-expect
+"[<'>[<'>[<'>    <'>]<'>]<'>]" "    " str list str list str list str check-expect
+"a<'>b<'>c[<'>[<'>[<'>    <'>]<'>]<'>]" "    " str list str list str list str "a<'>b<'>c" ++ check-expect
+["[<'>1   2   3<'>]"]
+"1   2   3" list str list "1   2   3" list str list check-expect
+["[<'>1   2   3<'>]"] "1   2   3" list str list check-expect
+["[<'>   1   2   3   <'>]"] "   1   2   3   " list str list check-expect
+
+
+4 16 v/ check-expect
+16.0 v/
+0.5 16.2 ^ 16.2 v/ check-expect
+-16 v/ check-error
+24 4 ! check-expect
+4.0 !
+24.0 4.0 ! check-expect
+-4 ! check-error
+10.2 ! check-error
+
+
+
+
+
+
+
 
 I like memes
 
@@ -346,6 +370,19 @@ I like memes
 
 
 
+I like memes
+
+empty
+
+Nothing 1 1 = claim check-expect
+Nothing 1 spicy ((3 x meme) (1.2 1.8 +) =) if claim check-expect
+1 claim check-error
+Nothing spicy claim check-expect
+spicy (Nothing (spicy claim) =) check-expect
+!@1 2 = claim check-error#$
+!@spicy (Nothing (normie claim) =) check-expect#$
+!@normie claim check-error#$
+!@normie claim#$
 
 !@ Comments #$
 
@@ -1156,9 +1193,6 @@ spicy x null? check-expect
 normie x null? check-expect
 
 
-"      a" j meme
-j print
-
 
 !@ appending #$
 
@@ -1199,8 +1233,8 @@ j today get check-error
 [1] b check-expect
 
 [[1, 2], 1, "didn't, hello", 2, [], " , [] ' ", 123, normie] (x today [1, 2] put) check-expect
-					<~ (x (today 5 +) "DAVID STERN IS REALLY COOL" put) check-expect
-[[1, 2], 1, "didn't, hello", 2, [], "DAVID STERN IS REALLY COOL", 123, normie]
+					<~ (x (today 5 +) "DAVID STERN  IS   REALLY    COOL" put) check-expect
+[[1, 2], 1, "didn't, hello", 2, [], "DAVID STERN  IS   REALLY    COOL", 123, normie]
 [[1, 2], 1, "didn't, hello", 2, [], normie, 123, normie] (x (3 today -) normie put) check-expect
 [[1, 2], 123, "didn't, hello", 2, [], normie, 123, normie] (x (today (b length) +) xyz put) check-expect
 [0, 123, "didn't, hello", 2, [], normie, 123, normie] (x ((x length) today -) 0 put) check-expect
@@ -1252,9 +1286,9 @@ x (today 4 +) 2 insert check-error
 ("hello" (3 (normie a meme) meme) meme)
 hitMe y meme
 [spicy] y today spicy insert check-expect
-["hello", spicy] y today "hello" insert check-expect
-[["hello", spicy], "hello", spicy] y today y insert check-expect
-[3, ["hello", spicy], "hello", spicy] y today a.num insert check-expect
+["      ", spicy] y today "      " insert check-expect
+[["      ", spicy], "      ", spicy] y today y insert check-expect
+[3, ["      ", spicy], "      ", spicy] y today a.num insert check-expect
 
 (a.num today 1 insert) check-error
 (a.bool today 1 insert) check-error
@@ -1281,7 +1315,7 @@ hitMe y meme
 (a.bool today rippo) check-error
 (a.str today rippo) check-error
 
-[["hello", spicy], "hello", spicy] (y (4 today -) rippo) check-expect
+[["      ", spicy], "      ", spicy] (y (4 today -) rippo) check-expect
 y
 y (3 today -) a.num put
 

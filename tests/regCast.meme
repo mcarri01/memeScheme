@@ -71,7 +71,7 @@ Nothing bool check-error
 
 !@ strings #$
 "3" 3 str check-expect
-"3.0" 3.0 str check-expect
+"3" 3.0 str check-expect
 "3.2" 3.2 str check-expect
 "spicy" spicy str check-expect
 "normie" normie str check-expect
@@ -83,7 +83,7 @@ mild str
 "[1, spicy, Nothing]" "[1, spicy, Nothing]" str check-expect
 "Nothing" "Nothing" str check-expect
 "[3]" [3] str check-expect
-"[3.0]" [3.0] str check-expect
+"[3]" [3.0] str check-expect
 "[3.2]" [3.2] str check-expect
 "[3.2, spicy, normie, []]" [3.2, spicy, normie, []] str check-expect
 "[]" [] str check-expect
@@ -145,7 +145,31 @@ mild nonetype check-error
 [[Nothing]] nonetype check-error
 
 
-!@ low-stress stress tests #$
+!@ stress tests #$
 ["[<'>123<'>]"] ((((((([123] num) str) num) str) list) str) list) check-expect
 ["[<'>spicy<'>]"] ((((((([spicy] bool) str) bool) str) list) str) list) check-expect
 ["[<'>Nothing<'>]"] ((((((([Nothing] nonetype) str) nonetype) str) list) str) list) check-expect
+"[<'>[<'>[<'>    <'>]<'>]<'>]" "    " str list str list str list str check-expect
+"a<'>b<'>c[<'>[<'>[<'>    <'>]<'>]<'>]" "    " str list str list str list str "a<'>b<'>c" ++ check-expect
+["[<'>1   2   3<'>]"]
+"1   2   3" list str list "1   2   3" list str list check-expect
+["[<'>1   2   3<'>]"] "1   2   3" list str list check-expect
+["[<'>   1   2   3   <'>]"] "   1   2   3   " list str list check-expect
+
+
+4 16 v/ check-expect
+16.0 v/
+0.5 16.2 ^ 16.2 v/ check-expect
+-16 v/ check-error
+24 4 ! check-expect
+4.0 !
+24.0 4.0 ! check-expect
+-4 ! check-error
+10.2 ! check-error
+
+
+
+
+
+
+

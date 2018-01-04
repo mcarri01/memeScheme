@@ -22,8 +22,10 @@ class OriginalLines:
             return self.lines[lineNum-1]
 
 
-    def RaiseException(self, lineNum, numLines, error, dec=False):
-        if global_vars.check_error:
+    # special defaults to 0; is 1 when the Declaration of Independence should
+    # be printed; and is 2 when a claim fails
+    def RaiseException(self, lineNum, numLines, error, special=0):
+        if global_vars.check_error and special != 2:
             return ("not_error", "Meme failed, as expected")
 
         lines = ""
@@ -37,7 +39,7 @@ class OriginalLines:
         else:
             lineStr = "line " + str(lineNum)
 
-        if dec:
+        if special == 1:
             open("dec.txt", 'r')
             decOfInd = [line.rstrip('\n') for line in open("dec.txt")]
             sys.stdout.write("  File {}; {}\n    {}".format(global_vars.filename, lineStr, lines))

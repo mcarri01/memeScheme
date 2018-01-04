@@ -1,6 +1,7 @@
 import itertools
-import global_vars
 import copy
+import math
+import global_vars
 from env import *
 from dot import *
 from random import *
@@ -71,18 +72,27 @@ def concat(args, varEnv, funEnv, op, id_num):
             val_list[i] = val_list[i][1:-1]
     return ("not_error", "\""+op(val_list[0], val_list[1])+"\"")
 
-def arithArrityOne(args, varEnv, funEnv, op, id_num):
+
+def numArrityOne(args, varEnv, funEnv, op, id_num):
     constraints = [[["num"]]]
     val_list = definePrimitive(args, constraints, varEnv)
     if val_list[0] == "error":
         return val_list
-    try: # will raise an error if op == ! or op == v/ and val_list[0] < 0
-        result = op(val_list[0])
-        if int(result) == result:
-            result = int(result)
-        return ("not_error", result)
+
+    # ! will raise an error if arg is non-integral or negative
+    # v/ will raise an error if arg is negative
+    # range will return an error if a non-int is passed in
+    # int, larger?, and smaller? will never raise an error
+    try:
+        if op == math.sqrt:
+            result = op(val_list[0])
+            if int(result) == result:
+                result = int(result)
+            return ("not_error", result)
+        return ("not_error", op(val_list[0]))
     except:
         return ("error", "Error: Meme is in normie domain")
+
 
 def booleans(args, varEnv, funEnv, op, id_num):
     constraints = [[["bool"]], [["bool"]]]
@@ -118,18 +128,6 @@ def equal_nequal(args, varEnv, funEnv, op, id_num):
 
     return ("not_error", "spicy" if op(val_list[0], val_list[1]) else "normie")
 
-def numArrityOne(args, varEnv, funEnv, op, id_num):
-    constraints = [[["num"]]]
-    val_list = definePrimitive(args, constraints, varEnv)
-    if val_list[0] == "error":
-        return val_list
-
-    # range() will return an error if a non-int is passed in
-    # larger() and smaller() will never raise an error
-    try:
-        return ("not_error", op(val_list[0]))
-    except:
-        return ("error", "Error: Meme must be an integer")
 
 def printVar(args, varEnv, funEnv, op, id_num):
     constraints = [[global_vars.ALL_TYPES]]
@@ -272,7 +270,7 @@ def listInsert(args, varEnv, funEnv, op, id_num):
 
     if abs(val_list[1]-time.localtime().tm_yday+1) > len(val_list[2]):
         val_list[1]-time.localtime().tm_yday+1
-        return ("errorDec", "____")
+        return ("errorDec", "Error: No meme there")
     op(val_list[0], val_list[1], val_list[2])
 
     val_list[2] = list_to_string(val_list[2])
@@ -287,7 +285,7 @@ def listRemove(args, varEnv, funEnv, op, id_num):
         return val_list
 
     if val_list[1] == "[]":
-        return ("error", "Error: No meme to kill")
+        return ("errorDec", "____")
     val_list[1] = string_to_list(val_list[1][1:-1])
 
     if abs(val_list[0]-time.localtime().tm_yday+1) > len(val_list[1])-1 and \
@@ -383,16 +381,13 @@ def castStr(args, varEnv, funEnv, op, id_num):
     if val_list[0] == "Nothing":
         return ("not_error", op("Nothing"))
 
-    # need a try because args[0] might not be able to be cast to a float
-    try:
-        # without this statement, 3.0 would be cast to "3", for example
-        if isinstance(val_list[0], int) and float(args[0]) == val_list[0]:
-            val_list[0] = args[0]
-    except:
-        pass
-
-    if isNum(val_list[0]) or isList(val_list[0]):
+    if isNum(val_list[0]):
         return ("not_error", op(str(val_list[0])))
+    if isList(val_list[0]):
+        temp = handle_mild(val_list[0])
+        temp = str(temp)
+        temp = temp.replace("\"", "<'>")
+        return ("not_error", op(temp))
     return ("not_error", val_list[0])
 
 
@@ -489,6 +484,12 @@ def check_expect (args, varEnv, funEnv, op, id_num):
     val_list = map(lambda x: x if not isinstance(x, bool) else "spicy" \
                                                 if x else "normie", val_list)
 
+    for i in range(len(val_list)):
+        try:
+            val_list[i] = val_list[i].replace("<'>", "\"")
+        except:
+            pass
+
     if val_list[0] == val_list[1]:
         return ("not_error", "Check was " + str(val_list[0]) + ", as expected")
     else:
@@ -538,22 +539,6 @@ def conditional(args, varEnv, funEnv, op, id_num):
         return ("not_error", body[1])
     else:
         return ("error", "Error: Normie meme type")
-
-
-    # constraints = [[["bool"]], [global_vars.ALL_TYPES], [global_vars.ALL_TYPES]]
-    # val_list = definePrimitive(args, constraints, varEnv)
-    # if val_list[0] == "error":
-    #     return val_list
-
-    # if isinstance(val_list[0], bool):
-    #     return ("not_error", val_list[1] if val_list[0] else val_list[2])
-    # else:
-    #     return ("error", "Error: Normie meme type")
-    #if isBool(args[0]):
-    #    args = map(lambda x: x if x!="mild" else "spicy" if randint(0,1)==0 else "normie", args)
-    #    return ("not_error", args[1] if val_list[0] else args[2])
-    #else:
-    #    return ("error", "Error: Normie meme type")
 
 
 def condArrityTwo(args, varEnv, funEnv, op, id_num):
@@ -655,6 +640,66 @@ def claim(args, varEnv, funEnv, op, id_num):
         return (("not_error", "Nothing") if val_list[0] else ("claim_failed", "Claim failed: Fake news!"))
     return ("error", "Error: Claim can't be verified or disproven")
 
+
+
+
+
+
+
+#from castStr:
+    # need a try because args[0] might not be able to be cast to a float
+    # try:
+    #     # without this statement, 3.0 would be cast to "3", for example
+    #     if isinstance(val_list[0], int) and float(args[0]) == val_list[0]:
+    #         val_list[0] = args[0]
+    # except:
+    #     pass
+
+
+# def arithArrityOne(args, varEnv, funEnv, op, id_num):
+#     constraints = [[["num"]]]
+#     val_list = definePrimitive(args, constraints, varEnv)
+#     if val_list[0] == "error":
+#         return val_list
+#     try: # will raise an error if op == ! or op == v/ and val_list[0] < 0
+#          # or if op == ! and val_list[0] is not an integer
+#         result = op(val_list[0]) #necessary because sqrt always returns a float
+#         if int(result) == result:
+#            result = int(result)
+#         return ("not_error", result)
+#     except:
+#         return ("error", "Error: Meme is in normie domain")
+
+
+
+# def arithArrityOne(args, varEnv, funEnv, op, id_num):
+#     constraints = [[["num"]]]
+#     val_list = definePrimitive(args, constraints, varEnv)
+#     if val_list[0] == "error":
+#         return val_list
+#     try: # will raise an error if op == ! or op == v/ and val_list[0] < 0
+#         result = op(val_list[0])
+#         if int(result) == result:
+#             result = int(result)
+#         return ("not_error", result)
+#     except:
+#         return ("error", "Error: Meme is in normie domain")
+
+
+    # constraints = [[["bool"]], [global_vars.ALL_TYPES], [global_vars.ALL_TYPES]]
+    # val_list = definePrimitive(args, constraints, varEnv)
+    # if val_list[0] == "error":
+    #     return val_list
+
+    # if isinstance(val_list[0], bool):
+    #     return ("not_error", val_list[1] if val_list[0] else val_list[2])
+    # else:
+    #     return ("error", "Error: Normie meme type")
+    #if isBool(args[0]):
+    #    args = map(lambda x: x if x!="mild" else "spicy" if randint(0,1)==0 else "normie", args)
+    #    return ("not_error", args[1] if val_list[0] else args[2])
+    #else:
+    #    return ("error", "Error: Normie meme type")
 
 
     #     if getBoolVal(conditional[1]):

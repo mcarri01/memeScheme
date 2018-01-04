@@ -21,9 +21,6 @@ spicy x null? check-expect
 normie x null? check-expect
 
 
-"      a" j meme
-j print
-
 
 !@ appending #$
 
@@ -64,8 +61,8 @@ j today get check-error
 [1] b check-expect
 
 [[1, 2], 1, "didn't, hello", 2, [], " , [] ' ", 123, normie] (x today [1, 2] put) check-expect
-					<~ (x (today 5 +) "DAVID STERN IS REALLY COOL" put) check-expect
-[[1, 2], 1, "didn't, hello", 2, [], "DAVID STERN IS REALLY COOL", 123, normie]
+					<~ (x (today 5 +) "DAVID STERN  IS   REALLY    COOL" put) check-expect
+[[1, 2], 1, "didn't, hello", 2, [], "DAVID STERN  IS   REALLY    COOL", 123, normie]
 [[1, 2], 1, "didn't, hello", 2, [], normie, 123, normie] (x (3 today -) normie put) check-expect
 [[1, 2], 123, "didn't, hello", 2, [], normie, 123, normie] (x (today (b length) +) xyz put) check-expect
 [0, 123, "didn't, hello", 2, [], normie, 123, normie] (x ((x length) today -) 0 put) check-expect
@@ -117,9 +114,9 @@ x (today 4 +) 2 insert check-error
 ("hello" (3 (normie a meme) meme) meme)
 hitMe y meme
 [spicy] y today spicy insert check-expect
-["hello", spicy] y today "hello" insert check-expect
-[["hello", spicy], "hello", spicy] y today y insert check-expect
-[3, ["hello", spicy], "hello", spicy] y today a.num insert check-expect
+["      ", spicy] y today "      " insert check-expect
+[["      ", spicy], "      ", spicy] y today y insert check-expect
+[3, ["      ", spicy], "      ", spicy] y today a.num insert check-expect
 
 (a.num today 1 insert) check-error
 (a.bool today 1 insert) check-error
@@ -146,7 +143,7 @@ hitMe y meme
 (a.bool today rippo) check-error
 (a.str today rippo) check-error
 
-[["hello", spicy], "hello", spicy] (y (4 today -) rippo) check-expect
+[["      ", spicy], "      ", spicy] (y (4 today -) rippo) check-expect
 y
 y (3 today -) a.num put
 

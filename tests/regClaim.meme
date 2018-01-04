@@ -6,7 +6,9 @@ empty
 Nothing 1 1 = claim check-expect
 Nothing 1 spicy ((3 x meme) (1.2 1.8 +) =) if claim check-expect
 1 claim check-error
-!@1 2 = claim#$
 Nothing spicy claim check-expect
+spicy (Nothing (spicy claim) =) check-expect
+!@1 2 = claim check-error#$
+!@spicy (Nothing (normie claim) =) check-expect#$
 !@normie claim check-error#$
 !@normie claim#$

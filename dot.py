@@ -27,6 +27,8 @@ def isString(x):
     if isNum(x):
         return False
 
+    x = x.replace("<'>", "\"")
+
     if x == "":
         return True
 
@@ -67,7 +69,6 @@ def getLiteralType(x):
 # desired_type is a list of types that would be valid
 # used to raise type errors in general_type
 def isUndesirableType(x, desired_types):
-    #types = ["bool", "num", "string", "list"]
     f = lambda y: False if (x!=y or y in desired_types) else True
     return reduce((lambda acc, a: operator.or_ (acc, f(a))), global_vars.ALL_TYPES, False)
 
