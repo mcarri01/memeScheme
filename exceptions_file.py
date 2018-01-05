@@ -23,8 +23,11 @@ class OriginalLines:
 
 
     # special defaults to 0; is 1 when the Declaration of Independence should
-    # be printed; and is 2 when a claim fails
+    # be printed; and is 2 when a claim fails; 3 is if the error occurred
+    # within a function definition
     def RaiseException(self, lineNum, numLines, error, special=0):
+        if global_vars.function_check and special != 3:
+            return "error"
         if global_vars.check_error and special != 2:
             return ("not_error", "Meme failed, as expected")
 

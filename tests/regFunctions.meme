@@ -1,0 +1,76 @@
+
+I like memes
+
+empty
+
+
+!@Should return a Meme does not exist error because x is not defined within the function's scope#$ 
+!@
+1 2 +
+[1, 2, 3] x meme
+x func_name define
+	3 x meme
+	4 y meme
+	x y +
+donezo
+#$
+
+!@ Meme is reserved error #$
+!@
+[1] func_name define
+	3 x meme
+	4 y meme
+	x y +
+donezo
+#$
+
+
+1 2 3 func_name
+
+[arg1, arg2, arg3] func_name define
+	3 x meme
+	4 y meme
+	x y +
+	!@[arg1, arg2, arg3] other_name define#$ !@ Can't define a function within a function error#$
+donezo
+
+
+!@ Normie meme type error #$
+!@
+123 func_name define
+	3 x meme
+	4 y meme
+	x y +
+donezo
+!@
+
+!@ Meme is reserved error #$
+!@
+[arg1, arg2, arg3] + define
+	3 x meme
+	4 y meme
+	x y +
+donezo
+#$
+
+!@ Meme contains a reserved symbol error #$
+!@
+[arg1, arg2, arg3] ab<~ad define
+	3 x meme
+	4 y meme
+	x y +
+donezo
+#$
+
+!@ No function definition in progress error #$
+!@
+donezo
+#$
+
+!@ Endless memeer error #$
+!@
+[arg1, arg2, arg3] a_name define
+	3 x meme
+	4 y meme
+	x y +
+#$

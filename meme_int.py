@@ -88,11 +88,11 @@ def addPrimitives():
     funEnv.addBind("if", (conditional, None, 3))
     funEnv.addBind("ifTrue", (condArrityTwo, (lambda: True), 2))
     funEnv.addBind("ifFalse", (condArrityTwo, (lambda: False), 2))
-    #funEnv.addBind("ifTrue", (condArrityTwo, (lambda x, y: y if x else "Nothing"), 2))
-    #funEnv.addBind("ifFalse", (condArrityTwo, (lambda x, y: y if not x else "Nothing"), 2))
     funEnv.addBind("while", (wloop, None, 2))
     funEnv.addBind("for", (floop, None, 4)) # second argument is the "in" keyword
     funEnv.addBind("claim", (claim, None, 1))
+    #funEnv.addBind("kappa", (defineFunction, None, 1))
+    #funEnv.addBind("donezo", (define, (lambda: global_vars.function = False), 0))
 
     return (varEnv, funEnv)
 
@@ -101,6 +101,128 @@ def addPrimitives():
 # non-leap year is 364.
 def today():
     return (time.localtime().tm_yday-1)
+
+
+
+def function_check(lines_to_evaluate, origLines, funEnv):
+    global_vars.function_check = True
+    lineCount = 0
+    fullExp = ""
+    numLines = 1
+    function_definition = False
+
+    # need to make a copy otherwise it will modify the lines array that will be
+    # passed to evaluate() 
+    lines = []
+    for line in lines_to_evaluate:
+        lines.append(line)
+
+    for line in range(len(lines)):
+        lineCount += 1
+
+        lines[line] = handle_comments(line, lines, lineCount, origLines)
+        if lines[line] == "error":
+            global_vars.function_check = False
+            return
+        if (lines[line]).lstrip() == "" and numLines == 1:
+            continue
+        if (lines[line]).lstrip() == "" and numLines != 1:
+            numLines += 1
+            continue
+        if ((lines[line]).lstrip())[:2] == "<~":
+            fullExp = ((lines[line]).lstrip())[2:] + ' ' + fullExp
+            numLines += 1
+            continue
+        elif fullExp != "":
+            lines[line] = lines[line] + ' ' + fullExp
+            fullExp = ""
+            expLength = numLines
+
+        if handle_strings(lines[line], lineCount, numLines, origLines) == "error":
+            global_vars.function_check = False
+            return
+
+        expression = handleQuotesAndBrackets(lines[line])
+        if isinstance(expression, int):
+            global_vars.function_check = False
+            return
+        expression.reverse()
+        # try:
+        #     print expression, expression[2]
+        # except:
+        #     pass
+
+        if expression[0] == "define":
+            if function_definition:
+                val = "Error: Can't define a function within a function"
+                origLines.RaiseException(lineCount, numLines, val, 3)
+            else:
+                if len(expression) != 3:
+                    val = "Error: Incorrect number of memes"
+                    origLines.RaiseException(lineCount, numLines, val, 3)
+                constraints = [[["list"]]]
+
+                if isList(expression[2]) and string_check(expression[2]) != None:
+                    (error, val) = string_check(expression[2])
+                    origLines.RaiseException(lineCount, numLines, val, 3)
+
+                (toAppend, constraints[0][0]) = general_type(expression[2], constraints[0], Environment(dict()))
+                if toAppend[0] == "error":
+                    origLines.RaiseException(lineCount, numLines, toAppend[1], 3)
+                val_list = [toAppend]
+
+                reserved_terms = global_vars.PRIMITIVES + ["MEME", "in", "donezo"]
+                reserved_symbols = ["\"", "[", "]", "<~", ".", "<'>", "//"]
+
+                if isLiteral(expression[1]) or expression[1] in reserved_terms:
+                    val = "Error: Meme is reserved"
+                    origLines.RaiseException(lineCount, numLines, val, 3)
+                for i in reserved_symbols:
+                    if i in expression[1]:
+                        val = "Error: Meme contains reserved symbol"
+                        origLines.RaiseException(lineCount, numLines, val, 3)
+
+                testArgsEnv = Environment(dict())
+                if val_list[0] == "[]":
+                    val_list[0] = []
+                else:
+                    val_list[0] = string_to_list(val_list[0][1:-1])
+
+                for param in val_list[0]:
+                    (error, val) = defineVar([param, "1"], testArgsEnv, funEnv, None)
+                    if error == "error":
+                        origLines.RaiseException(lineCount, numLines, val, 3)
+                function_definition = True
+                function_lineCount = lineCount
+                function_numLines = numLines
+                name = expression[1]
+                arrity = len(val_list[0]) 
+                function_body = [expression]
+                lines_to_evaluate[line] = ""
+                continue
+        elif function_definition:
+            if expression == ["donezo"]:
+                function_definition = False
+                funEnv.addBind(name, (userFun, function_body, arrity))
+                lines_to_evaluate[line] = ""
+            else:
+                function_body.append(expression)
+                lines_to_evaluate[line] = ""
+        else:
+            if expression == ["donezo"]:
+                val = "Error: No function definition in progress"
+                origLines.RaiseException(lineCount, numLines, val, 3)
+
+        numLines = 1
+
+    if function_definition:
+        val = "Error: Endless memer"
+        origLines.RaiseException(function_lineCount, function_numLines, val, 3)
+    global_vars.function_check = False
+    #print lines_to_evaluate
+
+
+
 
 
 # returns the location of the closing bracket that corresponds to the first
@@ -125,16 +247,16 @@ def handleQuotesAndBrackets(origExp):
     toReturn = 0
 
     noQuotes = re.sub('"[^"]*"', "\"\"", origExp) #remove quotes
-    regex = re.compile('[()]')
-    noQuotes = regex.sub(" ", noQuotes)
+    # regex = re.compile('[()]')
+    # noQuotes = regex.sub(" ", noQuotes)
     noQuotes = ' '.join(noQuotes.split()) #combine whitespace
 
     if "<'>" in noQuotes:
         toReturn = 3
     expression = ""
 
-    # regex = re.compile('[()]')
-    # noQuotes = regex.sub("", noQuotes)
+    regex = re.compile('[()]')
+    noQuotes = regex.sub("", noQuotes)
 
     nestedCount = 0
     for i in range(len(noQuotes)):
@@ -216,29 +338,23 @@ def makeTree(tree, funEnv, id_num):
 
 
 
-def evaluate(lines, origLines):
+def evaluate(lines, origLines, varEnv, funEnv):
+    print funEnv.getVal("func_name", "function")
     userMemerCheck = False
     fullExp = ""
     numLines = 1 #number of lines a multiline expression is
-    (varEnv, funEnv) = addPrimitives()
+    #(varEnv, funEnv) = addPrimitives()
 
     lineCount = 0
     for line in range(len(lines)):
         lineCount += 1
-
         lines[line] = handle_comments(line, lines, lineCount, origLines)
-        #condensed = ' '.join(lines[line].split())
 
-        #if (lines[line].lstrip == "" or condensed == "") and numLines == 1:
         if (lines[line]).lstrip() == "" and numLines == 1:
             continue
-        #if (lines[line] == "" or condensed == "") and numLines != 1:
         if (lines[line]).lstrip() == "" and numLines != 1:
             numLines += 1
             continue
-        #if lines[line] == len(lines[line]) * " ":
-        #    continue
-        #print lines[line].lstrip()[:2]
         if ((lines[line]).lstrip())[:2] == "<~":
             fullExp = ((lines[line]).lstrip())[2:] + ' ' + fullExp
             numLines += 1
@@ -260,6 +376,10 @@ def evaluate(lines, origLines):
             continue
 
         expression = handleQuotesAndBrackets(lines[line])
+        # try:
+        #     print expression, expression[2]
+        # except:
+        #     pass
 
         if isinstance(expression, int):
             if global_vars.check_error:
@@ -278,7 +398,6 @@ def evaluate(lines, origLines):
                 origLines.RaiseException(lineCount, numLines, val)
         expression.reverse()
 
-
         emptyTree = ExpressionTree(None, expression)
         expTree = makeTree(emptyTree, funEnv, 0)
         expTree.epsteinCheck(varEnv, funEnv, emptyTree)
@@ -292,6 +411,7 @@ def evaluate(lines, origLines):
                 (error, val) = expTree.evaluate(varEnv, funEnv)
                 val = val.replace("<'>", "\"")
         else:
+            print funEnv.getVal("func_name", "function")
             (error, val) = ("error", "Error: Incorrect number of memes")
 
 
@@ -336,7 +456,10 @@ def main():
     #### SO WHY DON'T YOU DELETE THESE COMMENTS?!?!?
     ##### THAT IS A GOOD QUESTION
     #userMemerCheck(lines, origLines)
-    evaluate(lines, origLines)
+
+    (varEnv, funEnv) = addPrimitives()
+    function_check(lines, origLines, funEnv)
+    evaluate(lines, origLines, varEnv, funEnv)
     
 
 if __name__ == '__main__':

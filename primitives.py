@@ -437,7 +437,6 @@ def defineVar(args, varEnv, funEnv, op, id_num=None):
        if isList(arg) and string_check(arg) != None:
            return string_check(arg)
 
-
     val_list = []
     (toAppend, constraints[0][0]) = general_type(args[1], constraints[0], varEnv)
     if toAppend[0] == "error":
@@ -445,7 +444,8 @@ def defineVar(args, varEnv, funEnv, op, id_num=None):
     val_list.append(toAppend)
 
     reserved_terms = ["error", "MEME", "meme", "check-expect", "check-error", \
-                      "if", "while", "empty", "for", "in"]
+                      "if", "ifTrue", "ifFalse", "while", "empty", "for", "in", \
+                      "donezo"]
     reserved_symbols = ["\"", "[", "]", "<~", ".", "<'>"]
 
     if isLiteral(args[0]) or args[0] in reserved_terms:
@@ -453,6 +453,8 @@ def defineVar(args, varEnv, funEnv, op, id_num=None):
     for i in reserved_symbols:
         if i in args[0]:
             return ("error", "Error: Meme contains reserved symbol")
+    if (len(args[0]) > 2) and ("//" in args[0][2:]):
+        return ("error", "Error: Meme contains reserved symbol")
     # if "<~" in args[0][:2] == "<~":
     #     return ("error", "Error: Meme begins with reserved symbol")
     # if "." in args[0]:
@@ -639,6 +641,80 @@ def claim(args, varEnv, funEnv, op, id_num):
     if isinstance(val_list[0], bool):
         return (("not_error", "Nothing") if val_list[0] else ("claim_failed", "Claim failed: Fake news!"))
     return ("error", "Error: Claim can't be verified or disproven")
+
+
+def userFun(args, varEnv, funEnv, op, id_num):
+    return ("not_error", "1")
+
+# def defineFunction(args, varEnv, funEnv, op, id_num):
+#     if len(args) != 1:
+#         return ("error", "Error: Incorrect number of memes")
+#     constraints = [[["list"]]]
+
+#    if isList(arg) and string_check(arg) != None:
+#        return string_check(arg)
+
+#     (val, constraints[0][0]) = general_type(args[1], constraints[0], varEnv)
+#     if val[0] == "error":
+#         return val
+#     val_list = [val]
+
+#     if val_list[0] == "[]":
+#         val_list[0] = []
+#     else:
+#         val_list[0] = string_to_list(val_list[0][1:-1])
+
+
+
+#     return ("not_error", op(val_list[0]))
+
+
+# def defineVar(args, varEnv, funEnv, op, id_num=None):
+#     if len(args) != 2:
+#         return ("error", "Error: Incorrect number of memes")
+#     constraints = [[global_vars.ALL_TYPES]]
+
+#     for arg in args:
+#        if isList(arg) and string_check(arg) != None:
+#            return string_check(arg)
+
+#     val_list = []
+#     (toAppend, constraints[0][0]) = general_type(args[1], constraints[0], varEnv)
+#     if toAppend[0] == "error":
+#         return toAppend
+#     val_list.append(toAppend)
+
+#     reserved_terms = ["error", "MEME", "meme", "check-expect", "check-error", \
+#                       "if", "while", "empty", "for", "in"]
+#     reserved_symbols = ["\"", "[", "]", "<~", ".", "<'>"]
+
+#     if isLiteral(args[0]) or args[0] in reserved_terms:
+#         return ("error", "Error: Meme is reserved")
+#     for i in reserved_symbols:
+#         if i in args[0]:
+#             return ("error", "Error: Meme contains reserved symbol")
+#     # if "<~" in args[0][:2] == "<~":
+#     #     return ("error", "Error: Meme begins with reserved symbol")
+#     # if "." in args[0]:
+#     #     return ("error", "Error: Dot cannot appear in meme name")
+#     if len(args[0]) > 2: #avoids the necessity of a try-except
+#         if args[0][:2] == "//" and funEnv.inEnv(args[0][2:]):
+#             args[0] = args[0][2:]
+#         elif args[0][:2] == "//" and not funEnv.inEnv(args[0][2:]):
+#             return ("error", "Meme is not a function")
+
+#     if isNum(val_list[0]):
+#         if float(val_list[0]) == int(float(val_list[0])):
+#              val_list[0] = str(int(float(val_list[0]))) #eg. "3.0"->3.0->3->"3"
+#         else:
+#             val_list[0] = str(float(val_list[0]))
+
+#     if isList(val_list[0]) and list_check(val_list[0], varEnv) != None:
+#         return list_check(val_list[0], varEnv)
+
+#     varEnv.addBind(args[0], val_list[0], constraints[0])
+#     return ("not_error", args[0]) 
+
 
 
 

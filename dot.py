@@ -26,7 +26,7 @@ def isString(x):
     # numbers don't have the [] property
     if isNum(x):
         return False
-
+    
     x = x.replace("<'>", "\"")
 
     if x == "":

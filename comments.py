@@ -13,7 +13,7 @@ def handle_strings(expression, lineCount, numLines, origLines):
     if expression.count("\"") % 2 == 0:
         return
     val = "Error: Endless memer"
-    origLines.RaiseException(lineCount, numLines, val)
+    return origLines.RaiseException(lineCount, numLines, val)
 
 
 
@@ -37,7 +37,6 @@ def handle_comments(line, lines, lineCount, origLines):
 
     global comment, comment_start_line, C_START, C_END, QUOTE
     while loop:
-        #print currLine
         loop = False
         # deals with the end of block comments and the case of !@\n"#$"
         if C_END in currLine and comment:
@@ -73,7 +72,8 @@ def handle_comments(line, lines, lineCount, origLines):
                     loop = True
                 elif not comment:
                     val = "Error: Lil ending memer doesn't have a partner"
-                    origLines.RaiseException(lineCount, 1, val)
+                    comment = False
+                    return origLines.RaiseException(lineCount, 1, val)
                 else:
                     loop = True
             else:
@@ -99,10 +99,12 @@ def handle_comments(line, lines, lineCount, origLines):
                 loop = True
             else:
                 val = "Error: Lil ending memer doesn't have a partner"
-                origLines.RaiseException(lineCount, 1, val)
+                comment = False
+                return origLines.RaiseException(lineCount, 1, val)
     if lineCount == len(lines) and comment:
         val = "Error: Endless memer"
-        origLines.RaiseException(comment_start_line, 1, val)
+        comment = False
+        return origLines.RaiseException(comment_start_line, 1, val)
 
     return currLine.replace(markerA, "!@").replace(markerB, "#$")
 
