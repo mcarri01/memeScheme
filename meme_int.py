@@ -13,6 +13,7 @@ from env import *
 from comments import *
 from node import *
 from expTree import *
+from makeTree import *
 
 
 
@@ -91,8 +92,6 @@ def addPrimitives():
     funEnv.addBind("while", (wloop, None, 2))
     funEnv.addBind("for", (floop, None, 4)) # second argument is the "in" keyword
     funEnv.addBind("claim", (claim, None, 1))
-    #funEnv.addBind("kappa", (defineFunction, None, 1))
-    #funEnv.addBind("donezo", (define, (lambda: global_vars.function = False), 0))
 
     return (varEnv, funEnv)
 
@@ -101,6 +100,31 @@ def addPrimitives():
 # non-leap year is 364.
 def today():
     return (time.localtime().tm_yday-1)
+
+
+def condense_lines(line, lines, lineCount, origLines, numLines, fullExp):
+    lines[line] = handle_comments(line, lines, lineCount, origLines)
+    if lines[line] == "error":
+        global_vars.function_check = False
+        return ("error", "", 0)
+    if (lines[line]).lstrip() == "" and numLines == 1:
+        return ("continue", "", 1)
+    if (lines[line]).lstrip() == "" and numLines != 1:
+        return ("continue", fullExp, numLines+1)
+    if ((lines[line]).lstrip())[:2] == "<~":
+        fullExp = ((lines[line]).lstrip())[2:] + ' ' + fullExp
+        return ("continue", fullExp, numLines+1)
+    elif fullExp != "":
+        fullExp = lines[line] + ' ' + fullExp
+    else:
+        fullExp = lines[line]
+
+    if handle_strings(fullExp, lineCount, numLines, origLines) == "error":
+        print fullExp
+        global_vars.function_check = False
+        return ("error", "", 0)
+
+    return ("finished", fullExp, numLines)
 
 
 
@@ -120,39 +144,50 @@ def function_check(lines_to_evaluate, origLines, funEnv):
     for line in range(len(lines)):
         lineCount += 1
 
-        lines[line] = handle_comments(line, lines, lineCount, origLines)
-        if lines[line] == "error":
-            global_vars.function_check = False
+        (status, fullExp, numLines) = condense_lines(line, lines, lineCount, origLines, numLines, fullExp)
+        if status == "error":
             return
-        if (lines[line]).lstrip() == "" and numLines == 1:
+        if status == "continue":
+            lines[line] = ""
             continue
-        if (lines[line]).lstrip() == "" and numLines != 1:
-            numLines += 1
-            continue
-        if ((lines[line]).lstrip())[:2] == "<~":
-            fullExp = ((lines[line]).lstrip())[2:] + ' ' + fullExp
-            numLines += 1
-            continue
-        elif fullExp != "":
-            lines[line] = lines[line] + ' ' + fullExp
+        if status == "finished":
+            lines[line] = fullExp
             fullExp = ""
             expLength = numLines
 
-        if handle_strings(lines[line], lineCount, numLines, origLines) == "error":
-            global_vars.function_check = False
-            return
+        # lines[line] = handle_comments(line, lines, lineCount, origLines)
+        # if lines[line] == "error":
+        #     global_vars.function_check = False
+        #     return
+        # if (lines[line]).lstrip() == "" and numLines == 1:
+        #     continue
+        # if (lines[line]).lstrip() == "" and numLines != 1:
+        #     numLines += 1
+        #     continue
+        # if ((lines[line]).lstrip())[:2] == "<~":
+        #     fullExp = ((lines[line]).lstrip())[2:] + ' ' + fullExp
+        #     numLines += 1
+        #     continue
+        # elif fullExp != "":
+        #     lines[line] = lines[line] + ' ' + fullExp
+        #     fullExp = ""
+        #     expLength = numLines
+
+        # if handle_strings(lines[line], lineCount, numLines, origLines) == "error":
+        #     global_vars.function_check = False
+        #     return
 
         expression = handleQuotesAndBrackets(lines[line])
         if isinstance(expression, int):
             global_vars.function_check = False
-            return
+            if lines[line][-11:] == "check-error":
+                continue
+            else:
+                return
         expression.reverse()
-        # try:
-        #     print expression, expression[2]
-        # except:
-        #     pass
 
         if expression[0] == "define":
+            #print lines[line], function_definition
             if function_definition:
                 val = "Error: Can't define a function within a function"
                 origLines.RaiseException(lineCount, numLines, val, 3)
@@ -166,7 +201,8 @@ def function_check(lines_to_evaluate, origLines, funEnv):
                     (error, val) = string_check(expression[2])
                     origLines.RaiseException(lineCount, numLines, val, 3)
 
-                (toAppend, constraints[0][0]) = general_type(expression[2], constraints[0], Environment(dict()))
+                emptyEnv = Environment(dict())
+                (toAppend, constraints[0][0]) = general_type(expression[2], constraints[0], emptyEnv, emptyEnv)
                 if toAppend[0] == "error":
                     origLines.RaiseException(lineCount, numLines, toAppend[1], 3)
                 val_list = [toAppend]
@@ -182,44 +218,43 @@ def function_check(lines_to_evaluate, origLines, funEnv):
                         val = "Error: Meme contains reserved symbol"
                         origLines.RaiseException(lineCount, numLines, val, 3)
 
-                testArgsEnv = Environment(dict())
-                if val_list[0] == "[]":
-                    val_list[0] = []
-                else:
-                    val_list[0] = string_to_list(val_list[0][1:-1])
+                # if val_list[0] == "[]":
+                #     val_list[0] = []
+                # else:
+                #     val_list[0] = string_to_list(val_list[0][1:-1])
 
-                for param in val_list[0]:
-                    (error, val) = defineVar([param, "1"], testArgsEnv, funEnv, None)
-                    if error == "error":
-                        origLines.RaiseException(lineCount, numLines, val, 3)
+                val_list[0] = string_to_list(val_list[0])
+
                 function_definition = True
                 function_lineCount = lineCount
                 function_numLines = numLines
                 name = expression[1]
                 arrity = len(val_list[0]) 
                 function_body = [expression]
-                lines_to_evaluate[line] = ""
+                for i in range(line-numLines, line+1):
+                    lines_to_evaluate[i] = ""
                 continue
         elif function_definition:
             if expression == ["donezo"]:
                 function_definition = False
-                funEnv.addBind(name, (userFun, function_body, arrity))
-                lines_to_evaluate[line] = ""
+                funEnv.addBind(name, (userFun, function_body, arrity, [function_lineCount, line]))
+                for i in range(line-numLines, line+1):
+                    lines_to_evaluate[i] = ""
             else:
                 function_body.append(expression)
-                lines_to_evaluate[line] = ""
+                for i in range(line-numLines, line+1):
+                    lines_to_evaluate[i] = ""
         else:
             if expression == ["donezo"]:
                 val = "Error: No function definition in progress"
                 origLines.RaiseException(lineCount, numLines, val, 3)
-
         numLines = 1
+
 
     if function_definition:
         val = "Error: Endless memer"
         origLines.RaiseException(function_lineCount, function_numLines, val, 3)
     global_vars.function_check = False
-    #print lines_to_evaluate
 
 
 
@@ -281,9 +316,9 @@ def handleQuotesAndBrackets(origExp):
 
     expression = re.findall(r'(?:[^\s,"]|"(?:\\.|[^"])*")+', expression) #literally no idea
 
-    if expression[-1] == "check-error":
+    if expression[-1] == "check-error" and not global_vars.function_check:
         global_vars.check_error = True
-    if expression[-1] == "check-expect":
+    if expression[-1] == "check-expect" and not global_vars.function_check:
         global_vars.check_expect = True
     if toReturn != 0:
         return toReturn
@@ -321,25 +356,64 @@ def handleQuotesAndBrackets(origExp):
     return expression
 
 
-def makeTree(tree, funEnv, id_num):
-    val = tree.update_string()
-    isRoot = tree.checkIfRoot()
-    if funEnv.inEnv(val):
-        node = Node(val, funEnv.getArrity(val), isRoot, tree.update_num_nodes())
-        tree.updateNoneCount(funEnv.getArrity(val))
-        for i in range(node.getNumChildren()):
-            tree.updateNoneCount(-1)
-            node.addChild(makeTree(tree, funEnv, tree.get_num_nodes()), i)
-        return node
-    else:
-        if val == None:
-            tree.updateNoneCount(1)
-        return Node(val, -1, isRoot, tree.update_num_nodes())
+# def makeTree(tree, funEnv, id_num):
+#     val = tree.update_string()
+#     isRoot = tree.checkIfRoot()
+#     if funEnv.inEnv(val):
+#         node = Node(val, funEnv.getArrity(val), isRoot, tree.update_num_nodes())
+#         tree.updateNoneCount(funEnv.getArrity(val))
+#         for i in range(node.getNumChildren()):
+#             tree.updateNoneCount(-1)
+#             node.addChild(makeTree(tree, funEnv, tree.get_num_nodes()), i)
+#         return node
+#     else:
+#         if val == None:
+#             tree.updateNoneCount(1)
+#         return Node(val, -1, isRoot, tree.update_num_nodes())
+
+# If an error is raised within a function, the error message should point to
+# the line within the function where the error occurs.  This function ensures
+# that that happens.
+def getErrorLine(funEnv, origLines, error):
+    fun_start = funEnv.getVal(global_vars.curr_function[-1], "function")[3][0]
+    fun_stop = funEnv.getVal(global_vars.curr_function[-1], "function")[3][1]
+    error_num = int(error.split("@")[1])+1
+
+    lines=[]
+    for i in range(fun_start+1, fun_stop+1):
+        lines.append(origLines.getLine(i-1))
+
+    lineCount = fun_start - 1
+    fullExp = ""
+    numLines = 1
+    trueLineCount = 0
+
+    for line in range(len(lines)):
+        lineCount += 1
+        (status, fullExp, numLines) = condense_lines(line, lines, lineCount, origLines, numLines, fullExp)
+        if status == "error":
+            return (lineCount, numLines)
+        if status == "continue":
+            continue
+        if status == "finished":
+            trueLineCount += 1
+            if trueLineCount == error_num:
+                return (lineCount+1, numLines)
+            lines[line] = fullExp
+            fullExp = ""
+            expLength = numLines
+
 
 
 
 def evaluate(lines, origLines, varEnv, funEnv):
-    print funEnv.getVal("func_name", "function")
+    #print funEnv.getEnv()
+    # print funEnv.getVal("factorial", "function")
+    # print funEnv.getVal("add_nums", "function")
+    # print funEnv.getVal("test_check_expect", "function")
+    # print funEnv.getVal("test_check_error", "function")
+
+
     userMemerCheck = False
     fullExp = ""
     numLines = 1 #number of lines a multiline expression is
@@ -348,22 +422,31 @@ def evaluate(lines, origLines, varEnv, funEnv):
     lineCount = 0
     for line in range(len(lines)):
         lineCount += 1
-        lines[line] = handle_comments(line, lines, lineCount, origLines)
 
-        if (lines[line]).lstrip() == "" and numLines == 1:
+        (status, fullExp, numLines) = condense_lines(line, lines, lineCount, origLines, numLines, fullExp)
+        if status == "continue":
+            lines[line] = ""
             continue
-        if (lines[line]).lstrip() == "" and numLines != 1:
-            numLines += 1
-            continue
-        if ((lines[line]).lstrip())[:2] == "<~":
-            fullExp = ((lines[line]).lstrip())[2:] + ' ' + fullExp
-            numLines += 1
-            continue
-        elif fullExp != "":
-            lines[line] = lines[line] + ' ' + fullExp
+        if status == "finished":
+            lines[line] = fullExp
             fullExp = ""
             expLength = numLines
-        handle_strings(lines[line], lineCount, numLines, origLines)
+        # lines[line] = handle_comments(line, lines, lineCount, origLines)
+
+        # if (lines[line]).lstrip() == "" and numLines == 1:
+        #     continue
+        # if (lines[line]).lstrip() == "" and numLines != 1:
+        #     numLines += 1
+        #     continue
+        # if ((lines[line]).lstrip())[:2] == "<~":
+        #     fullExp = ((lines[line]).lstrip())[2:] + ' ' + fullExp
+        #     numLines += 1
+        #     continue
+        # elif fullExp != "":
+        #     lines[line] = lines[line] + ' ' + fullExp
+        #     fullExp = ""
+        #     expLength = numLines
+        # handle_strings(lines[line], lineCount, numLines, origLines)
 
         if not userMemerCheck:
             if lines[line] != "I like memes":
@@ -376,10 +459,6 @@ def evaluate(lines, origLines, varEnv, funEnv):
             continue
 
         expression = handleQuotesAndBrackets(lines[line])
-        # try:
-        #     print expression, expression[2]
-        # except:
-        #     pass
 
         if isinstance(expression, int):
             if global_vars.check_error:
@@ -398,24 +477,28 @@ def evaluate(lines, origLines, varEnv, funEnv):
                 origLines.RaiseException(lineCount, numLines, val)
         expression.reverse()
 
+        locEnv = Environment(dict())
         emptyTree = ExpressionTree(None, expression)
         expTree = makeTree(emptyTree, funEnv, 0)
-        expTree.epsteinCheck(varEnv, funEnv, emptyTree)
-        global_vars.curr_tree = copy.deepcopy(expTree)
+        expTree.epsteinCheck(varEnv, funEnv, emptyTree, [locEnv])
+        global_vars.curr_tree.append(copy.deepcopy(expTree))
         #expTree.printTree()
 
         if emptyTree.get_string_length() == 0:
             if expTree.sevenCheck():
                 (error, val) = ("error", "Error: Meme is 7")
             else:
-                (error, val) = expTree.evaluate(varEnv, funEnv)
+                (error, val) = expTree.evaluate(varEnv, funEnv, [locEnv])
                 val = val.replace("<'>", "\"")
         else:
-            print funEnv.getVal("func_name", "function")
             (error, val) = ("error", "Error: Incorrect number of memes")
 
+        if not global_vars.check_error and len(global_vars.curr_function) != 0 \
+           and global_vars.curr_function[-1] not in global_vars.PRIMITIVES:
+           (lineCount, numLines) = getErrorLine(funEnv, origLines, error)
+           origLines.RaiseException(lineCount, numLines, val)
 
-        if error == "error":
+        if error == "error" or "@" in error:
             (error, val) = origLines.RaiseException(lineCount, numLines, val)
         if error == "errorDec":
             (error, val) = origLines.RaiseException(lineCount, numLines, val, 1)
@@ -443,20 +526,9 @@ def main():
     if os.stat(global_vars.filename).st_size == 0: #file is empty
         print("  File {}; {}\n    {}{}".format(global_vars.filename, "line 1", "\n", "Error: No memes"))
         exit(1)
+
     lines = [line.rstrip('\n') for line in open(global_vars.filename)]
-    #lines = map(lambda x: ' '.join(x.split()), lines)
-    # THE LINE DIRECTLY ABOVE NEEDS TO CHANGE SO THAT MULTPILE SPACES IN QUOTES
-    # WILL NOT BE CONDENSED
-
     origLines = OriginalLines(lines)
-    #regex = re.compile('[()]') # remove parentheses
-    #lines = [regex.sub("", line) for line in liness
-    ## FIX THE ABOVE LINES SO THAT YOU CAN HAVE PARENTHESES IN QUOTES
-    ### THIS HAS BEEN FIXED
-    #### SO WHY DON'T YOU DELETE THESE COMMENTS?!?!?
-    ##### THAT IS A GOOD QUESTION
-    #userMemerCheck(lines, origLines)
-
     (varEnv, funEnv) = addPrimitives()
     function_check(lines, origLines, funEnv)
     evaluate(lines, origLines, varEnv, funEnv)

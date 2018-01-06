@@ -3,6 +3,62 @@ I like memes
 
 empty
 
+[n] factorial define
+<~ 					(n 1 =) if
+<~						   n
+	 ((1 n -) factorial) n *
+donezo
+
+[a, b, c] add_nums define
+	4 x meme
+	x print
+	a b c x + + +
+donezo
+
+[] test_check_expect define
+	3 1 2 + check-expect
+	0
+donezo
+
+[] test_check_error define
+	1 spicy + check-error
+	0
+donezo
+
+[] test_seven define
+	7
+donezo
+
+[] test_correct_seven define
+	seven
+donezo
+
+[] test_incorrect_number define
+	7 test_incorrect_number
+donezo
+
+
+[] test_MEME define
+	1 2 +
+	3
+donezo
+
+[] test_claim define
+	1 2 = claim
+donezo
+
+
+
+!@
+[] error_test define
+	call 1 +
+donezo
+
+[] call define
+	1 2 3 +
+donezo
+#$
+
 
 !@Should return a Meme does not exist error because x is not defined within the function's scope#$ 
 !@
@@ -24,16 +80,12 @@ donezo
 donezo
 #$
 
-
-1 2 3 func_name
-
-[arg1, arg2, arg3] func_name define
-	3 x meme
-	4 y meme
-	x y +
-	!@[arg1, arg2, arg3] other_name define#$ !@ Can't define a function within a function error#$
+!@ Can't define a function within a funciton error #$
+!@
+[1] func_name define
+	[1, 2] func_name2 define
 donezo
-
+#$
 
 !@ Normie meme type error #$
 !@
@@ -74,3 +126,29 @@ donezo
 	4 y meme
 	x y +
 #$
+
+720 6 factorial check-expect
+spicy factorial check-error
+spicy x meme
+spicy x meme
+x print !@ should print spicy #$
+10 (3 2 1 add_nums) check-expect !@ function should print 4 #$
+x print !@ should print spicy #$
+test_check_expect check-error
+test_check_error check-error
+test_seven check-error
+test_seven check-error
+seven test_correct_seven check-expect
+test_incorrect_number check-error
+3 test_MEME check-expect
+test_MEME
+3 MEME check-expect
+!@test_claim claim should fail#$
+
+!@error_test should result in an incorrect number of memes error--not a normie meme type one #$
+
+
+
+
+
+

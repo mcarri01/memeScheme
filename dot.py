@@ -89,14 +89,15 @@ def check_expected_literal_type(arg, constraint):
 
 
 # called if the constraint is polymorphic (eg. 'a)
-def general_type(arg, constraints, varEnv):
+def general_type(arg, constraints, varEnv, locEnv):
     if not isLiteral(arg):
         arg_split = arg.split(".")
     else:
         arg_split = [arg]
 
     if len(arg_split[0]) > 2:
-        if arg_split[0][:2] == "//" and varEnv.inEnv(arg_split[0][2:]):
+        if arg_split[0][:2] == "//" and \
+           (locEnv.inEnv(arg_split[0][2:]) or varEnv.inEnv(arg_split[0][2:])):
             arg = arg_split[0][2:]
             arg_split[0] = arg_split[0][2:]
 
@@ -107,9 +108,10 @@ def general_type(arg, constraints, varEnv):
             return (("error", "Error: Meme type does not exist"), constraints)
         if arg_split[1] not in constraints[0]:
             return (("error", "Error: Normie meme type"), constraints)
-        if not varEnv.inEnv(arg_split[0]):
+        if not varEnv.inEnv(arg_split[0]) and not varEnv.inEnv(arg_split[0]):
             return (("error", "Error: Meme does not exist"), constraints)
-        if isUndesirableType(arg_split[1], varEnv.getVarTypes(arg_split[0])):
+        if isUndesirableType(arg_split[1], locEnv.getVarTypes(arg_split[0])) and \
+           isUndesirableType(arg_split[1], varEnv.getVarTypes(arg_split[0])):
             return (("error", "Error: Normie meme type"), constraints)
         arg = arg_split[0]
         constraints = [arg_split[1]]
@@ -123,27 +125,36 @@ def general_type(arg, constraints, varEnv):
                     break
                 elif i == len(constraints[0])-1:
                     return (errorTest, constraints)
-        elif not varEnv.inEnv(arg):
+        elif not locEnv.inEnv(arg) and not varEnv.inEnv(arg):
             return (("error", "Error: Meme does not exist"), constraints)
         else: #if var is a variable with no dot
-            typesOfArg = varEnv.getVarTypes(arg)
-            intersection = [x for x in typesOfArg if x in constraints[0]]
-            if intersection == []:
-                return (("error", "Error: Normie meme type"), constraints)
-            else:
-                constraints = intersection
+            for env in [locEnv, varEnv]:
+                typesOfArg = env.getVarTypes(arg)
+                intersection = [x for x in typesOfArg if x in constraints[0]]
+                if intersection == []:
+                    if env == varEnv:
+                        return (("error", "Error: Normie meme type"), constraints)
+                else:
+                    constraints = intersection
+                    break
     return (arg, constraints)
 
 
 # if input is two variables with identical and multiple types, constraints will
 # not be a singleton list so we need to find the constraint we want
-def constraintCheck(arg, constraints, varEnv):
+# by the time this function is called, we should know that the intersection
+# between the argument's types and the constraints is not empty
+def constraintCheck(arg, constraints, varEnv, locEnv):
     if len(constraints[0]) == 1:
         return constraints[0]
 
-    typesOfArg = varEnv.getVarTypes(arg)
-    intersection = [x for x in typesOfArg if x in constraints[0]]
-    constraints = [intersection[0]]
+    for env in [locEnv, varEnv]:
+        typesOfArg = env.getVarTypes(arg)
+        intersection = [x for x in typesOfArg if x in constraints[0]]
+        if intersection == []:
+            continue
+        constraints = [intersection[0]]
+        break
     return constraints
 
 # must update as more types are added
@@ -175,13 +186,24 @@ def getBoolVal(arg):
 
 # by the time this function is called, all potential errors should have been
 # handled so arg will either be a literal or variable of type constraint
-def getValofType(arg, constraint, varEnv):
+def getValofType(arg, constraint, varEnv, locEnv):
     if isLiteral(arg):
         return casted(arg)
 
-    if isinstance(constraint, list):
-        return casted(varEnv.getVal(arg, constraint[0]))
-    return casted(varEnv.getVal(arg, constraint))
+    for env in [locEnv, varEnv]:
+        #if isinstance(constraint, list):
+        if env.inEnvandType(arg, constraint[0]):
+            return casted(env.getVal(arg, constraint[0]))
+        else:
+            continue
+        # elif env.inEnvandType(arg, constraint):
+        #     return casted(env.getVal(arg, constraint))
+        # else:
+        #     continue
+
+    # if isinstance(constraint, list):
+    #     return casted(varEnv.getVal(arg, constraint[0]))
+    # return casted(varEnv.getVal(arg, constraint))
 
 
 

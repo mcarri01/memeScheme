@@ -99,6 +99,7 @@ class Environment:
             for i in range(len(self.env[var])):
                 typeList.append(self.env[var][i][1])
             return typeList
+        return []
 
     def empty(self):
         self.env = dict()
@@ -127,6 +128,9 @@ class Environment:
                 return "variable"
             else:
                 return "function"
+
+    def getEnv(self):
+        return self.env
 
 
 

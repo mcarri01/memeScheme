@@ -50,4 +50,7 @@ x m.list check-expect
 [1, 2, 3, 4] m.list check-expect
 Nothing m.nonetype check-expect
 
+"hello" k ["hello", 1, normie] in k for check-expect
+
+
 

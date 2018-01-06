@@ -36,10 +36,12 @@ def int_float_handling(arg):
 
 # I have no idea why the lstrip()s are necessary.  But sometimes a leading
 # space is thrown in and the lstrip()s take care of them.
-# string passed in should not include the opening and closing brackets (i.e.
-# the string representing the list [1, 2, 3, 4] should be passed in as
-# "1, 2, 3, 4").
 def string_to_list(string):
+    if string == "[]":
+        return []
+    else:
+        string = string[1:-1]
+
     new_list = []
     noQuotes = re.sub('"[^"]*"', "\"\"", string)
     expression = remove_brackets(noQuotes)
@@ -93,7 +95,7 @@ def list_to_string(my_list):
 
 
 def handle_mild(string):
-    my_list = string_to_list(string[1:-1])
+    my_list = string_to_list(string)
     helper = lambda x: handle_mild(x) if isList(x) else \
                                 x if not x=="mild" else \
                                 "spicy" if randint(0,1)==0 else "normie"
@@ -103,10 +105,10 @@ def handle_mild(string):
 
 # makes sure that all elements of a list are valid (eg. variables are defined,
 # types are correct, etc.)
-def list_check(a_list, varEnv):
-    list_arg = string_to_list(a_list[1:-1])
+def list_check(a_list, varEnv, locEnv):
+    list_arg = string_to_list(a_list)
     for i in list_arg:
-        (error, _) = general_type(str(i), [global_vars.ALL_TYPES], varEnv)
+        (error, _) = general_type(str(i), [global_vars.ALL_TYPES], varEnv, locEnv)
         if error != "" and error[0] == "error":
             return error
 

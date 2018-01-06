@@ -23,8 +23,11 @@ class OriginalLines:
 
 
     # special defaults to 0; is 1 when the Declaration of Independence should
-    # be printed; and is 2 when a claim fails; 3 is if the error occurred
-    # within a function definition
+    # be printed; is 2 when a claim fails; and is 3 if the error occurred
+    # within a function definition.
+    # During the initial check of the file, errors will be raised if a function
+    # is in a wrong format but a comment or string error won't be raised until
+    # the program's execution.
     def RaiseException(self, lineNum, numLines, error, special=0):
         if global_vars.function_check and special != 3:
             return "error"

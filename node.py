@@ -34,7 +34,7 @@ class Node:
     def addChild(self, newChild, i):
         self.children[i] = newChild
 
-    def __stripDot(self, varEnv):
+    def __stripDot(self, varEnv, locEnv):
         if isLiteral(self.val):
             if self.val == "mild":
                 if randint(0,1) == 0:
@@ -46,8 +46,8 @@ class Node:
                 # if there's not
                 if string_check(self.val) != None:
                     return string_check(self.val)
-                if list_check(self.val, varEnv) != None:
-                    return list_check(self.val, varEnv)
+                if list_check(self.val, varEnv, locEnv) != None:
+                    return list_check(self.val, varEnv, locEnv)
                 self.val = handle_mild(self.val)
             return ("not_error", self.val)
 
@@ -55,14 +55,15 @@ class Node:
         arg_split = self.val.split(".")
 
         if len(arg_split) == 1:
-            if varEnv.inEnv(self.val):
-                self.val = varEnv.getVal(self.val, varEnv.getOrigType(self.val))
-                return self.__stripDot(varEnv)
-            else:
-                return ("error", "Error: Meme does not exist")
+            for env in [locEnv, varEnv]:
+                if env.inEnv(self.val):
+                    self.val = env.getVal(self.val, env.getOrigType(self.val))
+                    return self.__stripDot(varEnv, locEnv)
+            return ("error", "Error: Meme does not exist")
 
         if len(arg_split[0]) > 2:
-            if arg_split[0][:2] == "//" and varEnv.inEnv(arg_split[0][2:]):
+            if arg_split[0][:2] == "//" and \
+               (locEnv.inEnv(arg_split[0][2:]) or varEnv.inEnv(arg_split[0][2:])):
                 temp_val = arg_split[0][2:]
                 arg_split[0] = arg_split[0][2:]
 
@@ -70,9 +71,10 @@ class Node:
             return ("error", "Error: Meme does not support dot operation")
         if arg_split[1] not in global_vars.ALL_TYPES:
             return ("error", "Error: Meme type does not exist")
-        if not varEnv.inEnv(arg_split[0]):
+        if not locEnv.inEnv(arg_split[0]) and not varEnv.inEnv(arg_split[0]):
             return ("error", "Error: Meme does not exist")
-        if isUndesirableType(arg_split[1], varEnv.getVarTypes(arg_split[0])):
+        if isUndesirableType(arg_split[1], locEnv.getVarTypes(arg_split[0])) and \
+           isUndesirableType(arg_split[1], varEnv.getVarTypes(arg_split[0])):
             return ("error", "Error: Normie meme type")
         return ("not_error", varEnv.getVal(arg_split[0], arg_split[1]))
 
@@ -86,11 +88,13 @@ class Node:
     # without this check.  A consequence of this method is that if there is an
     # error in the garbage part of the if/while statement, the evaluator will
     # not detect it (although this is not necessarily a bad thing).
-    def evaluate(self, varEnv, funEnv):
-        if not self.root and (self.val == "check-error" or self.val == "check-expect"):
+    def evaluate(self, varEnv, funEnv, locEnv):
+        if not self.root and (self.val == "check-error" or self.val == "check-expect" or self.val == "define"):
             return ("error", "Error: Meme has top-dog status")
+        if (self.val == "check-expect" or self.val == "check-error") and global_vars.user_function > 0:
+        	return ("error", "Error: Can't check within a function")
         if self.root and self.val != None and self.numChildren == -1:
-            return self.__stripDot(varEnv)
+            return self.__stripDot(varEnv, locEnv[-1])
         if self.numChildren != -1:
             conds_and_loops = ["if", "ifTrue", "ifFalse", "while", "for"]
             if self.val in conds_and_loops:
@@ -98,11 +102,11 @@ class Node:
                     self.children[i] = ("not_error", "doesn't matter")
             else:
                 for i in range(self.numChildren):
-                    self.children[i] = (self.children[i]).evaluate(varEnv, funEnv)
+                    self.children[i] = (self.children[i]).evaluate(varEnv, funEnv, locEnv)
         else:
             return ("not_error", self.val)
 
-        (fun, op, arrity) = funEnv.getVal(self.val, "function")
+        (fun, op, arrity) = funEnv.getVal(self.val, "function")[:3] #user-defined functions have line numbers
         # not sure if/why the line below is necessary
         self.children = [(a,b) for (a,b) in self.children if b != None]
 
@@ -112,21 +116,24 @@ class Node:
             else:
                 return self.children[i]
 
-        (error, val) = fun(self.children, varEnv, funEnv, op, self.id_num)
+        if self.val not in global_vars.PRIMITIVES:
+        	global_vars.curr_function.append(self.val)
+        (error, val) = fun(self.children, varEnv, locEnv, funEnv, op, self.id_num)
 
         # cast to string because it will record the result of an arithmetic
         # operation as an int which screws things up
+
         return (error, str(val))
 
 
-    def epsteinCheck(self, varEnv, funEnv, tree):
+    def epsteinCheck(self, varEnv, funEnv, tree, locEnv):
         if tree.getNoneCount() == 0:
             return
         none_check = lambda x: x.val==None
         # if statement below handles cases like (+ print), (spicy (1 \\- meme) meme)
         if self.numChildren != -1 and \
            all(self.children[i].val == None for i in range(self.numChildren)):
-            if varEnv.inEnv(self.val):
+            if locEnv[-1].inEnv(self.val) or varEnv.inEnv(self.val):
                 tree.updateNoneCount(-self.numChildren)
                 if funEnv.getArrity(self.val) != 0:
                     self.numChildren = -1
@@ -135,7 +142,7 @@ class Node:
         if self.numChildren != -1 and filter(none_check, self.children) != []:
             if self.children[0].val == None:
                 return
-            (status, node) = (self.children[0]).__findSubtree(varEnv, funEnv, tree)
+            (status, node) = (self.children[0]).__findSubtree(varEnv, funEnv, tree, locEnv[-1])
             if status == "yes":
                 for i in range((len(self.children)-1), -1, -1):
                     if self.children[i].val == None:
@@ -154,18 +161,18 @@ class Node:
                 return
         elif self.numChildren != -1:
             for i in range(self.numChildren):
-                self.children[i].epsteinCheck(varEnv, funEnv, tree)
+                self.children[i].epsteinCheck(varEnv, funEnv, tree, locEnv)
             return
             if self.root:
                 return
         else: # node value is a variable/literal
             return
-        return self.epsteinCheck(varEnv, funEnv, tree)
+        return self.epsteinCheck(varEnv, funEnv, tree, locEnv)
 
 
-    def __findSubtree(self, varEnv, funEnv, tree):
+    def __findSubtree(self, varEnv, funEnv, tree, locEnv):
         # don't need to check if a literal since literals can't have children
-        var = varEnv.inEnv(self.val)
+        var = locEnv.inEnv(self.val) or varEnv.inEnv(self.val)
         fun = funEnv.inEnv(self.val) and (funEnv.getArrity(self.val) == 0)
         left = False
 
@@ -176,10 +183,10 @@ class Node:
             for i in range((len(self.children)-1), -1, -1):
                 if self.children[i].val != None:
                     for j in range(i-1, -1, -1):
-                        left = self.children[j].__backInTime(varEnv, funEnv)
+                        left = self.children[j].__backInTime(varEnv, funEnv, locEnv)
                         if left:
                             break
-                    subtreeRoot = self.children[i].__findSubtree(varEnv, funEnv, tree)
+                    subtreeRoot = self.children[i].__findSubtree(varEnv, funEnv, tree, locEnv)
                     found = True
                     break
             if not found:
@@ -209,14 +216,14 @@ class Node:
     # since the 3 will be on the middle branch of the if.  Without this
     # function an error would be returned since 3's parent is not a variable
     # or a function with arrity zero.
-    def __backInTime(self, varEnv, funEnv):
-        var = varEnv.inEnv(self.val)
+    def __backInTime(self, varEnv, funEnv, locEnv):
+        var = locEnv.inEnv(self.val) or varEnv.inEnv(self.val)
         fun = funEnv.inEnv(self.val) and (funEnv.getArrity(self.val) == 0)
         if self.numChildren > 0 and (var or fun):
             return True
 
         for i in range(self.numChildren):
-            if (self.children[i].__backInTime(varEnv, funEnv)):
+            if (self.children[i].__backInTime(varEnv, funEnv, locEnv)):
                 return True
         return False
 

@@ -49,4 +49,12 @@ j.str check-error
 normie i j = check-error
 
 
+1 print
+spicy print
+"hello" print
+[1, 2, 3] print
+Nothing print
+
+
+
 

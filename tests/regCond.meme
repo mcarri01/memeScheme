@@ -50,3 +50,19 @@ spicy x meme
 1 1 (x not) ifFalse check-expect
 Nothing 1 (x not) ifTrue check-expect
 Nothing 1 x ifFalse check-expect
+
+
+
+0 q spicy if check-error
+5 q meme
+5 (0 q spicy if) check-expect
+
+j spicy ifTrue check-error
+5 j meme
+5 (j spicy ifTrue) check-expect
+
+v normie ifFalse check-error
+5 v meme
+5 (v normie ifFalse) check-expect
+
+

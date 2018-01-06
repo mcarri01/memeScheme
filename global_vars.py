@@ -10,15 +10,19 @@ PRIMITIVES = ["MEME", "+", "-", "*", "/", "%", "^", "!", "v/", "int", "and", \
 			  "check-expect", "empty", "if", "ifTrue", "ifFalse", "while", \
 			  "for", "claim", "define"]
 function_check = False
+user_function = 0
+curr_function = []
 check_error = False
 check_expect = False
-curr_tree = None
+curr_tree = []
 
 def reset():
-    global check_error, check_expect, prev_val
+    global user_function, curr_function, check_error, check_expect, curr_tree
+    user_function = 0
+    curr_function = []
     check_error = False
     check_expect = False
-    curr_tree = None
+    curr_tree = []
 
 
 

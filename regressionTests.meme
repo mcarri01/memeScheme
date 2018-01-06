@@ -655,6 +655,22 @@ spicy x meme
 Nothing 1 (x not) ifTrue check-expect
 Nothing 1 x ifFalse check-expect
 
+
+
+0 q spicy if check-error
+5 q meme
+5 (0 q spicy if) check-expect
+
+j spicy ifTrue check-error
+5 j meme
+5 (j spicy ifTrue) check-expect
+
+v normie ifFalse check-error
+5 v meme
+5 (v normie ifFalse) check-expect
+
+
+
 I like memes
 
 
@@ -1120,6 +1136,163 @@ spicy m.bool check-expect
 x m.list check-expect
 [1, 2, 3, 4] m.list check-expect
 Nothing m.nonetype check-expect
+
+"hello" k ["hello", 1, normie] in k for check-expect
+
+
+
+
+I like memes
+
+empty
+
+[n] factorial define
+<~ 					(n 1 =) if
+<~						   n
+	 ((1 n -) factorial) n *
+donezo
+
+[a, b, c] add_nums define
+	4 x meme
+	x print
+	a b c x + + +
+donezo
+
+[] test_check_expect define
+	3 1 2 + check-expect
+	0
+donezo
+
+[] test_check_error define
+	1 spicy + check-error
+	0
+donezo
+
+[] test_seven define
+	7
+donezo
+
+[] test_correct_seven define
+	seven
+donezo
+
+[] test_incorrect_number define
+	7 test_incorrect_number
+donezo
+
+
+[] test_MEME define
+	1 2 +
+	3
+donezo
+
+[] test_claim define
+	1 2 = claim
+donezo
+
+
+
+!@
+[] error_test define
+	call 1 +
+donezo
+
+[] call define
+	1 2 3 +
+donezo
+#$
+
+
+!@Should return a Meme does not exist error because x is not defined within the function's scope#$ 
+!@
+1 2 +
+[1, 2, 3] x meme
+x func_name define
+	3 x meme
+	4 y meme
+	x y +
+donezo
+#$
+
+!@ Meme is reserved error #$
+!@
+[1] func_name define
+	3 x meme
+	4 y meme
+	x y +
+donezo
+#$
+
+!@ Can't define a function within a funciton error #$
+!@
+[1] func_name define
+	[1, 2] func_name2 define
+donezo
+#$
+
+!@ Normie meme type error #$
+!@
+123 func_name define
+	3 x meme
+	4 y meme
+	x y +
+donezo
+!@
+
+!@ Meme is reserved error #$
+!@
+[arg1, arg2, arg3] + define
+	3 x meme
+	4 y meme
+	x y +
+donezo
+#$
+
+!@ Meme contains a reserved symbol error #$
+!@
+[arg1, arg2, arg3] ab<~ad define
+	3 x meme
+	4 y meme
+	x y +
+donezo
+#$
+
+!@ No function definition in progress error #$
+!@
+donezo
+#$
+
+!@ Endless memeer error #$
+!@
+[arg1, arg2, arg3] a_name define
+	3 x meme
+	4 y meme
+	x y +
+#$
+
+720 6 factorial check-expect
+spicy factorial check-error
+spicy x meme
+spicy x meme
+x print !@ should print spicy #$
+10 (3 2 1 add_nums) check-expect !@ function should print 4 #$
+x print !@ should print spicy #$
+test_check_expect check-error
+test_check_error check-error
+test_seven check-error
+test_seven check-error
+seven test_correct_seven check-expect
+test_incorrect_number check-error
+3 test_MEME check-expect
+test_MEME
+3 MEME check-expect
+!@test_claim claim should fail#$
+
+!@error_test should result in an incorrect number of memes error--not a normie meme type one #$
+
+
+
+
 
 
 
@@ -1700,6 +1873,14 @@ j.str check-error
 normie i j = check-error
 
 
+1 print
+spicy print
+"hello" print
+[1, 2, 3] print
+Nothing print
+
+
+
 
 
 I like memes
@@ -1831,4 +2012,7 @@ spicy MEME check-expect
 while check-error
 spicy while check-error
 1 print 1 while check-error
+
+0 k meme
+5 ((k 1 +) k meme) (5 k <) while check-expect
 
