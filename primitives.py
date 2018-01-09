@@ -51,8 +51,10 @@ def definePrimitive(args, constraints, varEnv, locEnv):
 # Checks to make sure the result of a conditional or a loop (both of which 
 # evaluate subtrees) can be translated into a value.
 def verifyResult(val, varEnv, locEnv):
+    if val[0] != "not_error":
+        return val
     constraints = [[global_vars.ALL_TYPES]]
-    val_list = definePrimitive([val], constraints, varEnv, locEnv[-1])
+    val_list = definePrimitive([val[1]], constraints, varEnv, locEnv[-1])
     if val_list[0] == "error":
         return val_list
     val_list = map(lambda x: x if not isinstance(x, bool) else "spicy" \
@@ -71,7 +73,12 @@ def numArrityTwo(args, varEnv, locEnv, funEnv, op, id_num):
                 result = int(result)
         return ("not_error", result)
     except:
-        if op == operator.div or op == operator.mod:
+        if op == randint:
+            if val_list[0] > val_list[1]:
+                return ("error", "Error: Meme too big; meme too small")
+            else:
+                return ("error", "Error: Memes must be integers")    
+        elif op == operator.div or op == operator.mod:
             return ("error", "Error: Memes unbounded")
         else:
             return ("error", "Error: Meme must be an integer")
@@ -158,9 +165,9 @@ def printVar(args, varEnv, locEnv, funEnv, op, id_num):
     #else:
         #print "-->", val_list[0]
     if isString(val_list[0]):
-        print val_list[0][1:-1]
+        op(val_list[0][1:-1])
     else:
-        print val_list[0]
+        op(val_list[0])
     return ("not_error", "Nothing")
 
 def userInput(args, varEnv, locEnv, funEnv, op, id_num):
@@ -182,10 +189,75 @@ def userInput(args, varEnv, locEnv, funEnv, op, id_num):
         input_val = "\"" + input_val + "\""
     return ("not_error", input_val)
 
-def arrityZero(args, varEnv, locEnv, funEnv, returnVal, id_num):
+# def getChar(args, varEnv, locEnv, funEnv, op, id_num):
+#     constraints = [[global_vars.ALL_TYPES]]
+#     val_list = definePrimitive(args, constraints, varEnv, locEnv[-1])
+#     if val_list[0] == "error":
+#         return val_list
+
+#     if isinstance(val_list[0], bool):
+#         if val_list[0]:
+#             val_list[0] = "spicy"
+#         else:
+#             val_list[0] = "normie"
+
+#     if isString(val_list[0]):
+#         val_list[0] = val_list[0][1:-1]
+#     input_val = op(val_list[0])
+#     if not isNum(input_val):
+#         input_val = "\"" + input_val + "\""
+#     return ("not_error", input_val)
+
+def arrityZero(args, varEnv, locEnv, funEnv, op, id_num):
     if args != []:
         return ("error", "Error: Incorrect number of memes")
-    return ("not_error", returnVal)
+    return ("not_error", op())
+
+def getChar(args, varEnv, locEnv, funEnv, op, id_num):
+    if args != []:
+        return ("error", "Error: Incorrect number of memes")
+    val = op()
+    if isNum(val):
+        return ("not_error", int(val))
+    else:
+        return ("not_error", "\""+val+"\"")
+    # if isString(val_list[0]):
+    #     val_list[0] = val_list[0][1:-1]
+    # input_val = op(val_list[0])
+    # if not isNum(input_val):
+    #     input_val = "\"" + input_val + "\""
+    #return ("not_error", val)
+
+
+def BARD(args, varEnv, locEnv, funEnv, op, id_num):
+    if args != []:
+        return ("error", "Error: Incorrect number of memes")
+    compliments = ["You're doing great!", "You can do it!", "Don't stop now!", \
+                   "This is really great code!", "You're a smart cookie!", \
+                   "I LIKE MEMES.  I LIKE 'EM ALOT", "You're perfect!", \
+                   "On a scale of 1 to 10, you're an 11.", \
+                   "Your hair looks stunning today!", "You're inspiring!", \
+                   "You would surve a zombie apocalypse.", \
+                   "There's ordinary, and then there's you.", \
+                   "You're really something special!", \
+                   "You're a gift to those around you.", \
+                   "You're someone's reason to smile :)", \
+                   "Is that your picture next to \"charming\" in the dictionary?", \
+                   "Your inside is even more beautiful than your outside.", \
+                   "Being around you makes everything better!", \
+                   "Jokes are funnier when you tell them!", \
+                   "Our community is better because you're in it!",
+                   "I bet you do crossword puzzles in ink.", \
+                   "You're a winner winner chicken dinner!",
+                   "You just light up the room!", "You have the best laugh!", \
+                   "You bring out the best in people!", \
+                   "We are all better people for having known you.",
+                   "The world needs more people like you in it!", \
+                   "You deserve love and happiness.", "You have the best ideas!", \
+                   "You have a gift for making people comfortable."]
+    print compliments[randint(0,29)]
+    return ("not_error", "Nothing")
+
 
 def listArrityOne(args, varEnv, locEnv, funEnv, op, id_num):
     constraints = [[["list"]]]
@@ -218,7 +290,7 @@ def appendAndPush(args, varEnv, locEnv, funEnv, op, id_num):
 
     op(val_list[0], val_list[1])
     val_list[1] = list_to_string(val_list[1])
-    defineVar([args[1], val_list[1]], varEnv, locEnv, funEnv, None)
+    #defineVar([args[1], val_list[1]], varEnv, locEnv, funEnv, None)
     val_list[1] = handle_mild(val_list[1])
     return ("not_error", val_list[1])
 
@@ -269,7 +341,7 @@ def listPut(args, varEnv, locEnv, funEnv, op, id_num):
     val_list[2] = op(val_list[0], val_list[1], val_list[2])
 
     val_list[2] = list_to_string(val_list[2])
-    defineVar([args[2], val_list[2]], varEnv, locEnv, funEnv, None)
+    #defineVar([args[2], val_list[2]], varEnv, locEnv, funEnv, None)
     val_list[2] = handle_mild(val_list[2])
     return ("not_error", val_list[2])
 
@@ -464,6 +536,7 @@ def defineVar(args, varEnv, locEnv, funEnv, op, id_num=None):
         return toAppend
     val_list.append(toAppend)
 
+
     reserved_terms = ["error", "MEME", "meme", "check-expect", "check-error", \
                       "if", "ifTrue", "ifFalse", "while", "empty", "for", "in", \
                       "donezo"]
@@ -495,9 +568,11 @@ def defineVar(args, varEnv, locEnv, funEnv, op, id_num=None):
     if isList(val_list[0]) and list_check(val_list[0], varEnv, locEnv[-1]) != None:
         return list_check(val_list[0], varEnv, locEnv[-1])
 
-    if global_vars.user_function > 0:
+    if global_vars.user_function > 0 and args[0][-2:] != "_g":
         locEnv[-1].addBind(args[0], val_list[0], constraints[0])
     else:
+        if args[0][-2:] == "_g":
+            args[0] = args[0][:-2]
         varEnv.addBind(args[0], val_list[0], constraints[0])
     return ("not_error", args[0]) 
 
@@ -565,7 +640,7 @@ def conditional(args, varEnv, locEnv, funEnv, op, id_num):
             body = (tree_section.getChild(2)).evaluate(varEnv, funEnv, locEnv)
         if body[0] == "error":
             return body
-        return verifyResult(body[1], varEnv, locEnv)
+        return verifyResult(body, varEnv, locEnv)
     else:
         return ("error", "Error: Normie meme type")
 
@@ -590,7 +665,7 @@ def condArrityTwo(args, varEnv, locEnv, funEnv, op, id_num):
             body = (tree_section.getChild(1)).evaluate(varEnv, funEnv, locEnv)
             if body[0] == "error":
                 return body
-            return verifyResult(body[1], varEnv, locEnv)
+            return verifyResult(body, varEnv, locEnv)
         else:
             return ("not_error", "Nothing")
     else:
@@ -616,6 +691,7 @@ def wloop(args, varEnv, locEnv, funEnv, op, id_num, prev_val="Nothing"):
                 return body
             return wloop([], varEnv, locEnv, funEnv, op, id_num, body[1])
         else:
+            prev_val = ("not_error", prev_val)
             return verifyResult(prev_val, varEnv, locEnv)
     else:
         return ("error", "Error: Normie meme type")
@@ -637,7 +713,7 @@ def floop(args, varEnv, locEnv, funEnv, op, id_num, prev_val="Nothing", iteratio
         return list_val
     if list_val[0] == "[]":
         list_val = []
-        iterator_val = defineVar([args[0], "Nothing"], varEnv, funEnv, None)
+        iterator_val = defineVar([args[0], "Nothing"], varEnv, locEnv, funEnv, None)
         if iterator_val[0] == "error":
             return iterator_val
     else:
@@ -656,6 +732,7 @@ def floop(args, varEnv, locEnv, funEnv, op, id_num, prev_val="Nothing", iteratio
             return body
         return floop([], varEnv, locEnv, funEnv, op, id_num, body[1], iteration+1)
     else:
+        prev_val = ("not_error", prev_val)
         return verifyResult(prev_val, varEnv, locEnv)
 
 
@@ -673,19 +750,18 @@ def claim(args, varEnv, locEnv, funEnv, op, id_num):
 
 def userFun(args, varEnv, locEnv, funEnv, op, id_num):
     params = string_to_list(funEnv.getVal(global_vars.curr_function[-1], "function")[1][0][2])
-    # if params == "[]":
-    #     params = []
-    # else:
-    #     params = string_to_list(params[1:-1])
 
     if len(params) != len(args):
-        #print params, args, funEnv.getVal(global_vars.curr_function[-1], "function")
         return ("error", "Error: Incorrect number of memes")
 
     global_vars.user_function += 1
     locEnv.append(Environment(dict()))
     for i in range(len(args)):
-        result = defineVar([params[i], args[i]], varEnv, locEnv, funEnv, None)
+        # line below is necessary because an argument could exist only in the
+        # local environment of the previous function called
+        args[i] = ("not_error", args[i])
+        arg = str(verifyResult(args[i], varEnv, locEnv[:-1])[1])
+        result = defineVar([params[i], arg], varEnv, locEnv, funEnv, None)
         if result[0] == "error":
             return result
 
@@ -695,6 +771,7 @@ def userFun(args, varEnv, locEnv, funEnv, op, id_num):
         expTree = makeTree(emptyTree, funEnv, 0)
         expTree.epsteinCheck(varEnv, funEnv, emptyTree, locEnv)
         global_vars.curr_tree.append(copy.deepcopy(expTree))
+        #expTree.printTree()
 
         if emptyTree.get_string_length() == 0:
             if expTree.sevenCheck():

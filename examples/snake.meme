@@ -1,0 +1,123 @@
+
+I like memes
+
+41 WIDTH meme
+11 HEIGHT meme
+(2 (1 WIDTH -) /) y meme
+(2 (1 HEIGHT -) /) x meme
+0 score meme
+
+[] main define
+	hitMe board meme
+
+	<~ (HEIGHT range) in i for
+		board hitMe append board meme
+
+	<~														(HEIGHT range) in i for
+	<~														(WIDTH range) in j for
+	<~											(0 i =) ((1 HEIGHT -) i =) or if
+	<~    board (today i +) ((board (i today +) get) "+" append) put board meme
+	<~											(0 j =) ((1 WIDTH -) j =) or if
+	<~ board (today i +) ((board (i today +) get) "|" append) put board meme
+	   board (today i +) ((board (i today +) get) " " append) put board meme
+
+
+	((board (today x +) get) (today y +) "s" put) row meme
+	hitMe new_board meme
+
+	<~										(HEIGHT range) in i for
+	<~ 													i x <> if
+	<~ (new_board (board (today i +) get) append) new_board meme
+						   (new_board row append) new_board meme
+
+    (new_board get_new_snack) board meme
+    board play_game
+
+donezo
+
+
+[board] get_new_snack define
+	((2 HEIGHT -) 1 rando) snack_x meme
+	((2 WIDTH  -) 1 rando) snack_y meme
+
+	((board (today snack_x +) get) (today snack_y +) "x" put) row meme
+
+	hitMe new_board meme
+	<~							((board snack_x get) snack_y get) " " <> if
+	<~ 												board get_new_snack
+	<~											(HEIGHT range) in i for
+	<~ 												i snack_x <> if
+	<~ (new_board (board (today i +) get) append) new_board meme
+						   (new_board row append) new_board meme
+donezo
+
+
+[board] play_game define
+	board print_board
+	normie new_snack meme
+	uno move meme
+	["a", "s", "d", "w"] valid_moves meme
+
+	((board (today x +) get) (today y +) "#" put) row meme
+	hitMe new_board meme
+	<~												valid_moves in i for
+	<~													move i = ifTrue
+	<~										(HEIGHT range) in i for
+	<~													i x <> if
+	<~ (new_board (board (today i +) get) append) new_board meme
+						   (new_board row append) new_board meme
+
+    <~						"a" move = if
+    <~			       (1 y -) y_g meme
+    <~					"s" move = if
+    <~		   	   (1 x +) x_g meme
+    <~				"d" move = if
+    <~	   	   (1 y +) y_g meme
+    <~			"w" move = if
+    <~  	(1 x -) x_g meme
+       board play_game
+
+    <~ (new_board (today x +) get) (today y +) get "x" = ifTrue
+      				spicy new_snack meme
+	<~			new_snack ifTrue
+		(score 10 +) score_g meme
+
+	((new_board (today x +) get) (today y +) "s" put) row meme
+	hitMe board meme
+
+	<~ (((new_board (today x +) get) (today y +) get) " " <>) (((new_board (today x +) get) (today y +) get) "x" <>) and if
+	<~																										losing_message
+	<~																							   (HEIGHT range) in i for
+	<~																											i x <> if
+	<~															(board (new_board (today i +) get) append) board meme
+																						(board row append) board meme
+
+					<~ new_snack ifTrue
+	board get_new_snack board meme
+	board play_game
+donezo
+
+[board] print_board define
+	clear_screen
+
+	<~ 					board in row for
+	<~ ((row length) range) in char for
+	<~ 			(1 WIDTH -) char <> if
+	<~ row (today char +) get write
+	   row (today char +) get print
+
+   ((score str) "Score: " ++) score_message meme
+   score_message print
+donezo
+
+
+[] losing_message define
+	clear_screen
+	("." ((score str) "You lost! Your final score was " ++) ++) print
+	DavidStern
+donezo
+
+
+main
+
+

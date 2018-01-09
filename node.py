@@ -122,7 +122,6 @@ class Node:
 
         # cast to string because it will record the result of an arithmetic
         # operation as an int which screws things up
-
         return (error, str(val))
 
 

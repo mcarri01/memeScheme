@@ -8,7 +8,8 @@ PRIMITIVES = ["MEME", "+", "-", "*", "/", "%", "^", "!", "v/", "int", "and", \
 			  "init", "insert", "rippo", "seven", "++", "num", "bool", "str", \
 			  "list", "nonetype", "print", "putMeIn", "meme", "check-error", \
 			  "check-expect", "empty", "if", "ifTrue", "ifFalse", "while", \
-			  "for", "claim", "define"]
+			  "for", "claim", "define", "MatthewCarrington-Fair", \
+			  "DavidStern", "BenFrancis", "rando", "write", "uno", "clear_screen"]
 function_check = False
 user_function = 0
 curr_function = []

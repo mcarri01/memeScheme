@@ -1,0 +1,71 @@
+
+I like memes
+
+!@
+prime?
+This function takes in a single parameter, n and returns spicy if n is prime
+and normie if it is not.
+The function fails a claim if the input is invalid (i.e. n<0 or n is a
+non-integer)
+#$
+
+[n] prime? define
+	((0 n >) ((n int) n =) and) claim
+	<~ (2 n prime?Help) 1 = if
+	<~					spicy
+					   normie
+donezo
+
+[n, factor] prime?Help define
+	<~ 							1 n = if
+	<~ 								0
+	<~			(2 (factor * n) <) if
+	<~ 				   			1
+	<~ 		(0 (factor n %) =) if
+	<~ 				        0
+	(1 factor +) n prime?Help 
+donezo
+
+normie 1 prime? check-expect
+spicy 2 prime? check-expect
+spicy seven prime? check-expect
+spicy 83 prime? check-expect
+normie 91 prime? check-expect
+!@
+0 prime?
+4.5 prime?
+#$
+
+!@
+
+[n] prime? define
+	0 n > claim
+	n2 prime?Help print
+
+	<~ (n 2 prime?Help) 1 = if
+	<~					spicy
+					   normie
+donezo
+
+[n, factor] prime?Help define
+	<~ 							1 n = if
+	<~ 								0
+	<~			(2 (factor * n) <) if
+	<~ 				   			1
+	<~ 		(0 (factor n %) =) if
+	<~ 				        0
+	(1 factor +) n prime?Help 
+donezo
+
+normie 1 prime? check-expect
+spicy 2 prime? check-expect
+spicy seven prime? check-expect
+spicy 83 prime? check-expect
+normie 91 prime? check-expect
+
+
+#$
+!@
+0 prime?
+4.5 prime?
+#$

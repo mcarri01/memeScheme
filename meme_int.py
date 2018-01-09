@@ -1,19 +1,20 @@
-import os
-import sys
+from __future__ import print_function #otherwise print cannot be in a lambda
+import copy
+import math
 import re
 import operator
-import math
-import shlex
+import os
+import sys
 import time
-import copy
 import global_vars
-from primitives import *
-from exceptions_file import *
-from env import *
 from comments import *
-from node import *
+from env import *
+from exceptions_file import *
 from expTree import *
+from getch import *
 from makeTree import *
+from node import *
+from primitives import *
 
 
 
@@ -29,9 +30,9 @@ def addPrimitives():
     funEnv.addBind("/", (numArrityTwo, operator.div, 2))
     funEnv.addBind("%", (numArrityTwo, operator.mod, 2))
     funEnv.addBind("^", (numArrityTwo, operator.pow, 2))
+    funEnv.addBind("rando", (numArrityTwo, randint, 2))
     funEnv.addBind("!", (numArrityOne, math.factorial, 1))
     funEnv.addBind("v/", (numArrityOne, math.sqrt, 1))
-    funEnv.addBind("int", (numArrityOne, (lambda x: int(x)), 1))
     # booleans
     funEnv.addBind("and", (booleans, operator.and_, 2))
     funEnv.addBind("or", (booleans, operator.or_, 2))
@@ -53,8 +54,8 @@ def addPrimitives():
     funEnv.addBind("range", (numArrityOne, (lambda x: range(x)), 1))
     funEnv.addBind("rangeFrom", (numArrityTwo, (lambda x, y: range(x,y)), 2))
     # lists
-    funEnv.addBind("today", (arrityZero, (time.localtime().tm_yday-1), 0))
-    funEnv.addBind("hitMe", (arrityZero, [], 0))
+    funEnv.addBind("today", (arrityZero, (lambda: (time.localtime().tm_yday-1)), 0))
+    funEnv.addBind("hitMe", (arrityZero, (lambda: []), 0))
     funEnv.addBind("length", (listArrityOne, (lambda x: len(x)), 1))
     funEnv.addBind("null?", (listArrityOne, (lambda x: "spicy" if len(x)==0 else "normie"), 1))
     funEnv.addBind("append", (appendAndPush, (lambda val, ds: ds.append(val)), 2))
@@ -71,17 +72,25 @@ def addPrimitives():
                                 if pos-today()+1!=0 \
                                 else ds[:pos-today()]), 2))
     # miscellaneous
-    funEnv.addBind("seven", (arrityZero, 7, 0))
+    funEnv.addBind("seven", (arrityZero, (lambda: 7), 0))
+    funEnv.addBind("clear_screen", (arrityZero, (lambda: print("\033[H\033[J")), 0))
+    funEnv.addBind("BenFrancis", (arrityZero, (lambda: "Nothing"), 0))
+    funEnv.addBind("DavidStern", (arrityZero, (lambda: exit(0)), 0))
+    funEnv.addBind("MatthewCarrington-Fair", (BARD, None, 0))
     funEnv.addBind("++", (concat, operator.add, 2))
+
     # casting
+    funEnv.addBind("int", (numArrityOne, (lambda x: int(x)), 1))
     funEnv.addBind("num", (castNum, (lambda x: int(float(x)) if int(float(x))==float(x) else float(x)), 1))
     funEnv.addBind("bool", (castBool, None, 1))
     funEnv.addBind("str", (castStr, (lambda x: "\""+x+"\""), 1))
     funEnv.addBind("list", (castList, (lambda x: "["+str(x)+"]"), 1))
     funEnv.addBind("nonetype", (castNonetype, None, 1))
     # basic operations
-    funEnv.addBind("print", (printVar, None, 1))
+    funEnv.addBind("print", (printVar, (lambda x: print(x)), 1))
+    funEnv.addBind("write", (printVar, (lambda x: sys.stdout.write(str(x))), 1))
     funEnv.addBind("putMeIn", (userInput, (lambda x: raw_input(x)), 1))
+    funEnv.addBind("uno", (getChar, (lambda: getch()), 0))
     funEnv.addBind("meme", (defineVar, None, 2))
     funEnv.addBind("check-error", (check_error, None, 1))
     funEnv.addBind("check-expect", (check_expect, None, 2))
@@ -120,7 +129,7 @@ def condense_lines(line, lines, lineCount, origLines, numLines, fullExp):
         fullExp = lines[line]
 
     if handle_strings(fullExp, lineCount, numLines, origLines) == "error":
-        print fullExp
+        print(fullExp)
         global_vars.function_check = False
         return ("error", "", 0)
 
@@ -155,28 +164,6 @@ def function_check(lines_to_evaluate, origLines, funEnv):
             fullExp = ""
             expLength = numLines
 
-        # lines[line] = handle_comments(line, lines, lineCount, origLines)
-        # if lines[line] == "error":
-        #     global_vars.function_check = False
-        #     return
-        # if (lines[line]).lstrip() == "" and numLines == 1:
-        #     continue
-        # if (lines[line]).lstrip() == "" and numLines != 1:
-        #     numLines += 1
-        #     continue
-        # if ((lines[line]).lstrip())[:2] == "<~":
-        #     fullExp = ((lines[line]).lstrip())[2:] + ' ' + fullExp
-        #     numLines += 1
-        #     continue
-        # elif fullExp != "":
-        #     lines[line] = lines[line] + ' ' + fullExp
-        #     fullExp = ""
-        #     expLength = numLines
-
-        # if handle_strings(lines[line], lineCount, numLines, origLines) == "error":
-        #     global_vars.function_check = False
-        #     return
-
         expression = handleQuotesAndBrackets(lines[line])
         if isinstance(expression, int):
             global_vars.function_check = False
@@ -187,7 +174,6 @@ def function_check(lines_to_evaluate, origLines, funEnv):
         expression.reverse()
 
         if expression[0] == "define":
-            #print lines[line], function_definition
             if function_definition:
                 val = "Error: Can't define a function within a function"
                 origLines.RaiseException(lineCount, numLines, val, 3)
@@ -217,11 +203,6 @@ def function_check(lines_to_evaluate, origLines, funEnv):
                     if i in expression[1]:
                         val = "Error: Meme contains reserved symbol"
                         origLines.RaiseException(lineCount, numLines, val, 3)
-
-                # if val_list[0] == "[]":
-                #     val_list[0] = []
-                # else:
-                #     val_list[0] = string_to_list(val_list[0][1:-1])
 
                 val_list[0] = string_to_list(val_list[0])
 
@@ -282,8 +263,6 @@ def handleQuotesAndBrackets(origExp):
     toReturn = 0
 
     noQuotes = re.sub('"[^"]*"', "\"\"", origExp) #remove quotes
-    # regex = re.compile('[()]')
-    # noQuotes = regex.sub(" ", noQuotes)
     noQuotes = ' '.join(noQuotes.split()) #combine whitespace
 
     if "<'>" in noQuotes:
@@ -352,24 +331,8 @@ def handleQuotesAndBrackets(origExp):
             temp = temp[(temp.find("\""))+1:]
             start = expression[i].find("\"", start)+1
 
-    #expression = map(lambda x: x.replace("<'>", "\""), expression)
     return expression
 
-
-# def makeTree(tree, funEnv, id_num):
-#     val = tree.update_string()
-#     isRoot = tree.checkIfRoot()
-#     if funEnv.inEnv(val):
-#         node = Node(val, funEnv.getArrity(val), isRoot, tree.update_num_nodes())
-#         tree.updateNoneCount(funEnv.getArrity(val))
-#         for i in range(node.getNumChildren()):
-#             tree.updateNoneCount(-1)
-#             node.addChild(makeTree(tree, funEnv, tree.get_num_nodes()), i)
-#         return node
-#     else:
-#         if val == None:
-#             tree.updateNoneCount(1)
-#         return Node(val, -1, isRoot, tree.update_num_nodes())
 
 # If an error is raised within a function, the error message should point to
 # the line within the function where the error occurs.  This function ensures
@@ -407,17 +370,9 @@ def getErrorLine(funEnv, origLines, error):
 
 
 def evaluate(lines, origLines, varEnv, funEnv):
-    #print funEnv.getEnv()
-    # print funEnv.getVal("factorial", "function")
-    # print funEnv.getVal("add_nums", "function")
-    # print funEnv.getVal("test_check_expect", "function")
-    # print funEnv.getVal("test_check_error", "function")
-
-
     userMemerCheck = False
     fullExp = ""
     numLines = 1 #number of lines a multiline expression is
-    #(varEnv, funEnv) = addPrimitives()
 
     lineCount = 0
     for line in range(len(lines)):
@@ -431,22 +386,6 @@ def evaluate(lines, origLines, varEnv, funEnv):
             lines[line] = fullExp
             fullExp = ""
             expLength = numLines
-        # lines[line] = handle_comments(line, lines, lineCount, origLines)
-
-        # if (lines[line]).lstrip() == "" and numLines == 1:
-        #     continue
-        # if (lines[line]).lstrip() == "" and numLines != 1:
-        #     numLines += 1
-        #     continue
-        # if ((lines[line]).lstrip())[:2] == "<~":
-        #     fullExp = ((lines[line]).lstrip())[2:] + ' ' + fullExp
-        #     numLines += 1
-        #     continue
-        # elif fullExp != "":
-        #     lines[line] = lines[line] + ' ' + fullExp
-        #     fullExp = ""
-        #     expLength = numLines
-        # handle_strings(lines[line], lineCount, numLines, origLines)
 
         if not userMemerCheck:
             if lines[line] != "I like memes":
@@ -464,7 +403,7 @@ def evaluate(lines, origLines, varEnv, funEnv):
             if global_vars.check_error:
                 global_vars.check_error = False
                 val = "Meme failed, as expected"
-                print "-->", val
+                print("-->", val)
                 numLines = 1
                 continue
             else:
@@ -498,15 +437,15 @@ def evaluate(lines, origLines, varEnv, funEnv):
            (lineCount, numLines) = getErrorLine(funEnv, origLines, error)
            origLines.RaiseException(lineCount, numLines, val)
 
-        if error == "error" or "@" in error:
-            (error, val) = origLines.RaiseException(lineCount, numLines, val)
-        if error == "errorDec":
+        if "errorDec" in error: #could be errorDec or errorDec@_
             (error, val) = origLines.RaiseException(lineCount, numLines, val, 1)
-        if error == "claim_failed":
+        if "claim_failed" in error:
             (error, val) = origLines.RaiseException(lineCount, numLines, val, 2)
+        if error != "not_error" and "error" in error:
+            (error, val) = origLines.RaiseException(lineCount, numLines, val)
 
         if val != "Nothing":
-            print "-->", val
+            print("-->", val)
 
         if global_vars.check_error or global_vars.check_expect:
             varEnv.addBindMEME("MEME", "\"" + val + "\"")
@@ -540,6 +479,67 @@ if __name__ == '__main__':
     main()
     
 
+
+
+
+
+
+# def makeTree(tree, funEnv, id_num):
+#     val = tree.update_string()
+#     isRoot = tree.checkIfRoot()
+#     if funEnv.inEnv(val):
+#         node = Node(val, funEnv.getArrity(val), isRoot, tree.update_num_nodes())
+#         tree.updateNoneCount(funEnv.getArrity(val))
+#         for i in range(node.getNumChildren()):
+#             tree.updateNoneCount(-1)
+#             node.addChild(makeTree(tree, funEnv, tree.get_num_nodes()), i)
+#         return node
+#     else:
+#         if val == None:
+#             tree.updateNoneCount(1)
+#         return Node(val, -1, isRoot, tree.update_num_nodes())
+
+
+        # lines[line] = handle_comments(line, lines, lineCount, origLines)
+        # if (lines[line]).lstrip() == "" and numLines == 1:
+        #     continue
+        # if (lines[line]).lstrip() == "" and numLines != 1:
+        #     numLines += 1
+        #     continue
+        # if ((lines[line]).lstrip())[:2] == "<~":
+        #     fullExp = ((lines[line]).lstrip())[2:] + ' ' + fullExp
+        #     numLines += 1
+        #     continue
+        # elif fullExp != "":
+        #     lines[line] = lines[line] + ' ' + fullExp
+        #     fullExp = ""
+        #     expLength = numLines
+        # handle_strings(lines[line], lineCount, numLines, origLines)
+
+
+
+
+        # lines[line] = handle_comments(line, lines, lineCount, origLines)
+        # if lines[line] == "error":
+        #     global_vars.function_check = False
+        #     return
+        # if (lines[line]).lstrip() == "" and numLines == 1:
+        #     continue
+        # if (lines[line]).lstrip() == "" and numLines != 1:
+        #     numLines += 1
+        #     continue
+        # if ((lines[line]).lstrip())[:2] == "<~":
+        #     fullExp = ((lines[line]).lstrip())[2:] + ' ' + fullExp
+        #     numLines += 1
+        #     continue
+        # elif fullExp != "":
+        #     lines[line] = lines[line] + ' ' + fullExp
+        #     fullExp = ""
+        #     expLength = numLines
+
+        # if handle_strings(lines[line], lineCount, numLines, origLines) == "error":
+        #     global_vars.function_check = False
+        #     return
 
 
 

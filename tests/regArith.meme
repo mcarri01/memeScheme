@@ -81,6 +81,13 @@ spicy y meme
 2 y x.num + check-expect 
 2 x.num y.num + check-expect
 
+!@ Tests random, as best as we can #$
+1 2 rando check-error
+2.1 1 rando check-error
+2 1.2 rando check-error
+2.1 1.2 rando check-error
 
-
+-6 a meme
+				<~ 5 a < while
+5 ((a 1 +) a meme) rando print
 
