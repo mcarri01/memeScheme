@@ -165,7 +165,8 @@ def printVar(args, varEnv, locEnv, funEnv, op, id_num):
     #else:
         #print "-->", val_list[0]
     if isString(val_list[0]):
-        op(val_list[0][1:-1])
+        val_list[0] = val_list[0][1:-1].replace("<'>", "\"")
+        op(val_list[0])
     else:
         op(val_list[0])
     return ("not_error", "Nothing")

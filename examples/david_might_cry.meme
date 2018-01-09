@@ -30,7 +30,9 @@ I like memes
 	<~ (new_board (board (today i +) get) append) new_board meme
 						   (new_board row append) new_board meme
 
+
     (new_board get_new_snack) board meme
+    opening_message
     board play_game
 
 donezo
@@ -117,6 +119,17 @@ donezo
 	DavidStern
 donezo
 
+[] opening_message define
+	clear_screen
+	"Welcome to a game of snake!" print
+	"Use the <'>a<'>, <'>d<'>, <'>w<'>, and <'>s<'> keys to move left, right, up, and down, respectively." print
+	"Don't run into your own tail or go off the board.  Each <'>x<'> is worth 10 points." print
+	"Good luck!" print
+	"(Enter the letter <'>y<'> to begin.)" print
+	uno start meme
+	<~ ("y" start <>) while
+		uno start meme
+donezo
 
 main
 
